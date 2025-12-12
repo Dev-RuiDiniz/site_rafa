@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { FaInstagram, FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { HiOutlineMail, HiOutlinePhone, HiOutlineLocationMarker } from "react-icons/hi";
@@ -49,8 +50,14 @@ export function Footer() {
               transition={{ duration: 0.5 }}
             >
               <Link href="/" className="inline-block mb-6">
-                <span className="text-3xl font-serif font-semibold tracking-tight">SHR</span>
-                <span className="block text-xs tracking-[0.2em] text-gray-400 uppercase mt-1">
+                <Image
+                  src="/logoshr-white.png"
+                  alt="SHR - Distribuidor Exclusivo Maletti"
+                  width={120}
+                  height={48}
+                  className="mb-2"
+                />
+                <span className="block text-xs tracking-[0.2em] text-gray-400 uppercase">
                   Distribuidor Exclusivo Maletti
                 </span>
               </Link>

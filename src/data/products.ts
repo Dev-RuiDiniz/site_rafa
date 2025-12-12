@@ -27,7 +27,7 @@ export const categories: Category[] = [
     name: "Lavatórios",
     slug: "lavatorios",
     description: "Lavatórios de design italiano com tecnologia de ponta para lavagem de cabelos.",
-    image: "/images/site/Heaven 1.jpeg",
+    image: "/images/site/heaven2.jpg",
   },
   {
     id: "massagem",
@@ -82,9 +82,9 @@ export const products: Product[] = [
       "Sistema de massagem opcional",
       "Design premiado internacionalmente",
     ],
-    image: "/images/site/Heaven 1.jpeg",
+    image: "/images/site/heaven2.jpg",
     gallery: [
-      "/images/site/Heaven 1.jpeg",
+      "/images/site/heaven2.jpg",
       "/images/site/Heaven 2.jpg",
       "/images/site/Heaven 3.jpg",
       "/images/site/Heaven 4.jpg",
@@ -147,7 +147,7 @@ export const products: Product[] = [
       "Controle de temperatura",
       "Painel touch de controle",
     ],
-    image: "/images/site/total_body_mod.jpg",
+    image: "/images/site/Total-Body-356.jpg",
     gallery: [
       "/images/site/total_body_mod.jpg",
       "/images/site/2024-12-04_Scena_ShiroBody_hor.jpg",
