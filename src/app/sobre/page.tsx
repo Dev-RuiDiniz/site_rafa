@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { 
   HiArrowRight,
@@ -126,15 +127,29 @@ export default function SobrePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="aspect-[4/5] bg-gradient-to-br from-gray-200 to-gray-300 relative overflow-hidden">
-                {/* Placeholder for team/showroom image */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-6xl font-serif text-gray-400/50">SHR</span>
+              <div className="aspect-[4/5] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                {/* Showroom image */}
+                <Image
+                  src="/images/site/Shirobody_showroom.jpg"
+                  alt="Showroom SHR"
+                  fill
+                  className="object-cover"
+                />
+                {/* Overlay with logo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-8 left-8 right-8">
+                  <Image
+                    src="/logoshr-white.png"
+                    alt="SHR"
+                    width={100}
+                    height={40}
+                    className="mb-3"
+                  />
+                  <p className="text-white/80 text-sm">Distribuidor Exclusivo Maletti</p>
                 </div>
                 
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-24 h-24 border-t-2 border-r-2 border-black/20" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 border-b-2 border-l-2 border-black/20" />
+                <div className="absolute top-0 right-0 w-24 h-24 border-t-2 border-r-2 border-white/30" />
               </div>
 
               {/* Stats overlay */}
@@ -314,13 +329,40 @@ export default function SobrePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <span className="text-8xl font-serif font-bold text-gray-300">M</span>
-                  <p className="text-gray-400 text-sm mt-2 tracking-widest">MALETTI</p>
-                  <p className="text-gray-400 text-xs mt-1">Since 1965</p>
+              <div className="aspect-square bg-black relative overflow-hidden">
+                {/* Product image */}
+                <Image
+                  src="/images/site/heaven2.jpg"
+                  alt="Maletti Heaven"
+                  fill
+                  className="object-cover opacity-60"
+                />
+                {/* Overlay with Maletti logo */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+                  <Image
+                    src="/images/site/Maletti - Logo bianco.png"
+                    alt="Maletti"
+                    width={180}
+                    height={70}
+                    className="mb-4"
+                  />
+                  <p className="text-white/70 text-sm tracking-widest">SINCE 1965</p>
                 </div>
+                {/* Decorative corner */}
+                <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-white/20" />
               </div>
+              
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="absolute -bottom-6 -right-6 bg-white text-black p-6 shadow-2xl"
+              >
+                <span className="text-3xl font-serif font-bold">55+</span>
+                <p className="text-xs text-gray-500 mt-1">Anos de história</p>
+              </motion.div>
             </motion.div>
           </div>
         </div>

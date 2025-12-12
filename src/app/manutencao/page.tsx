@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { 
   HiOutlineWrenchScrewdriver,
@@ -142,8 +143,20 @@ export default function ManutencaoPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="hidden lg:block"
             >
-              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
-                <HiOutlineWrenchScrewdriver className="w-32 h-32 text-gray-700" />
+              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+                {/* Image */}
+                <Image
+                  src="/images/site/Head-spa-1.jpg"
+                  alt="Manutenção SHR"
+                  fill
+                  className="object-cover opacity-50"
+                />
+                {/* Overlay content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+                  <HiOutlineWrenchScrewdriver className="w-20 h-20 text-white/80 mb-4" />
+                  <p className="text-white/60 text-sm tracking-widest uppercase">Suporte Técnico</p>
+                  <p className="text-white font-serif text-2xl mt-2">Especializado</p>
+                </div>
                 
                 {/* Decorative */}
                 <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-white/20" />

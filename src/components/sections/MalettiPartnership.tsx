@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { HiArrowRight } from "react-icons/hi";
@@ -14,7 +15,7 @@ export function MalettiPartnership() {
     <section ref={ref} className="py-24 lg:py-32 bg-black text-white overflow-hidden">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left - Image/Video placeholder */}
+          {/* Left - Image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -22,14 +23,21 @@ export function MalettiPartnership() {
             className="relative"
           >
             <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-              {/* Placeholder for Maletti factory/showroom image */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <span className="text-6xl font-serif font-semibold text-white/20">
-                    MALETTI
-                  </span>
-                  <p className="text-white/40 text-sm mt-2">Since 1965</p>
-                </div>
+              <Image
+                src="/images/site/Shirobody_showroom.jpg"
+                alt="Showroom Maletti"
+                fill
+                className="object-cover"
+              />
+              {/* Overlay com logo */}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <Image
+                  src="/images/site/Maletti - Logo bianco.png"
+                  alt="Maletti"
+                  width={200}
+                  height={80}
+                  className="opacity-90"
+                />
               </div>
               
               {/* Decorative elements */}
