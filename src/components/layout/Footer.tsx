@@ -16,7 +16,7 @@ const footerLinks = {
   ],
   institucional: [
     { href: "/sobre", label: "Sobre a SHR" },
-    { href: "/maletti", label: "Parceria Maletti" },
+    { href: "/marcas", label: "Nossas Marcas" },
     { href: "/manutencao", label: "Manutenção" },
     { href: "/contato", label: "Contato" },
   ],

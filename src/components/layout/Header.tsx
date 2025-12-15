@@ -16,6 +16,7 @@ import {
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/produtos", label: "Produtos" },
+  { href: "/marcas", label: "Nossas Marcas" },
   { href: "/sobre", label: "Sobre" },
   { href: "/manutencao", label: "Manutenção" },
   { href: "/contato", label: "Contato" },
@@ -53,8 +54,8 @@ export function Header() {
       <div className="container mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="relative h-12 w-[120px] block">
-            <motion.div whileHover={{ scale: 1.02 }} className="relative h-full w-full">
+          <Link href="/" className="flex items-center gap-3">
+            <motion.div whileHover={{ scale: 1.02 }} className="relative h-14 w-[140px]">
               {/* Logo White - quando header transparente */}
               <Image
                 src="/logoshr-white.png"
@@ -72,6 +73,10 @@ export function Header() {
                 priority
               />
             </motion.div>
+            <div className={`hidden sm:block text-[10px] leading-tight uppercase tracking-wider transition-colors duration-300 ${showDarkElements ? "text-gray-500" : "text-white/70"}`}>
+              <span className="block">Distribuidor Exclusivo</span>
+              <span className="block font-medium">Maletti e Nilo</span>
+            </div>
           </Link>
 
           {/* Right Side - CTAs + Menu */}
