@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { 
   HiArrowLeft, 
@@ -142,22 +143,34 @@ export default function ProductPage() {
                 <span className="text-sm uppercase tracking-[0.2em] text-gray-500">
                   {product.category}
                 </span>
-                {/* Brand Logos */}
-                {product.brands && product.brands.length > 0 && (
-                  <div className="flex gap-2">
+              </div>
+              
+              {/* Brand Logos */}
+              {product.brands && product.brands.length > 0 && (
+                <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-100">
+                  <span className="text-xs text-gray-500 uppercase tracking-wider">Marcas:</span>
+                  <div className="flex items-center gap-4">
                     {product.brands.includes("maletti") && (
-                      <span className="px-2 py-1 bg-black text-white text-[10px] font-medium uppercase tracking-wider">
-                        Maletti
-                      </span>
+                      <Image
+                        src="/images/site/malliti-preto.png"
+                        alt="Maletti"
+                        width={80}
+                        height={30}
+                        className="object-contain"
+                      />
                     )}
                     {product.brands.includes("nilo") && (
-                      <span className="px-2 py-1 bg-gray-700 text-white text-[10px] font-medium uppercase tracking-wider">
-                        Nilo
-                      </span>
+                      <Image
+                        src="/images/site/nilo.jpg"
+                        alt="Nilo"
+                        width={60}
+                        height={30}
+                        className="object-contain"
+                      />
                     )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
                 {product.name}

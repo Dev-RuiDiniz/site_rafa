@@ -276,7 +276,13 @@ export default function MarcasPage() {
                   />
                 </div>
                 <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center justify-center">
-                  <span className="text-xl font-semibold text-gray-700">Marco Boni</span>
+                  <Image
+                    src="/images/site/LogoMarcoboni.png"
+                    alt="Marco Boni"
+                    width={120}
+                    height={48}
+                    className="object-contain"
+                  />
                 </div>
               </div>
             </motion.div>

@@ -189,15 +189,27 @@ export function FeaturedProducts() {
 
                     {/* Brand Logos */}
                     {product.brands && product.brands.length > 0 && (
-                      <div className="absolute top-4 right-4 flex gap-2">
+                      <div className="absolute top-4 right-4 flex gap-1">
                         {product.brands.includes("maletti") && (
-                          <div className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center p-1">
-                            <span className="text-[8px] font-bold text-black">M</span>
+                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
+                            <Image
+                              src="/images/site/malliti-preto.png"
+                              alt="Maletti"
+                              width={50}
+                              height={20}
+                              className="object-contain"
+                            />
                           </div>
                         )}
                         {product.brands.includes("nilo") && (
-                          <div className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center p-1">
-                            <span className="text-[8px] font-bold text-black">N</span>
+                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
+                            <Image
+                              src="/images/site/nilo.jpg"
+                              alt="Nilo"
+                              width={40}
+                              height={20}
+                              className="object-contain"
+                            />
                           </div>
                         )}
                       </div>
