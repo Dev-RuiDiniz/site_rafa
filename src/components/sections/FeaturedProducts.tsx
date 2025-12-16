@@ -9,6 +9,15 @@ import { Button } from "@/components/ui/button";
 
 const products = [
   {
+    id: "shirobody",
+    name: "Shirobody",
+    category: "Lavatórios",
+    description: "Tecnologia shiatsu integrada para uma experiência única.",
+    image: "/images/site/Shirobody_showroom.jpg",
+    href: "/produtos/shirobody",
+    brands: ["maletti", "nilo"],
+  },
+  {
     id: "heaven",
     name: "Heaven",
     category: "Lavatórios",
@@ -17,36 +26,38 @@ const products = [
     href: "/produtos/heaven",
   },
   {
-    id: "shirobody",
-    name: "Shirobody",
-    category: "Massagem",
-    description: "Tecnologia shiatsu integrada para uma experiência única.",
-    image: "/images/site/Shirobody_showroom.jpg",
-    href: "/produtos/shirobody",
+    id: "abu-dhabi",
+    name: "Abu Dhabi",
+    category: "Macas",
+    description: "Maca de luxo para tratamentos corporais exclusivos.",
+    image: "/images/site/nilo.jpg",
+    href: "/produtos/abu-dhabi",
+    brands: ["maletti", "nilo"],
   },
   {
     id: "total-body",
     name: "Total Body",
-    category: "Spa",
+    category: "Macas",
     description: "Experiência completa de spa com tecnologia avançada.",
     image: "/images/site/Total-Body-356.jpg",
     href: "/produtos/total-body",
+    brands: ["maletti", "nilo"],
+  },
+  {
+    id: "lioness",
+    name: "Lioness",
+    category: "Poltronas",
+    description: "Poltrona de corte com design imponente.",
+    image: "/images/site/Shirobody_showroom.jpg",
+    href: "/produtos/lioness",
   },
   {
     id: "spa-garcon",
     name: "Spa Garçon",
-    category: "Tratamento",
+    category: "Elétricos",
     description: "Tratamento capilar com tecnologia de vapor.",
     image: "/images/site/SPA_GARCON_nuovo_03.png",
     href: "/produtos/spa-garcon",
-  },
-  {
-    id: "head-spa",
-    name: "Head Spa",
-    category: "Tratamento",
-    description: "Experiência sensorial completa para tratamentos capilares.",
-    image: "/images/site/Head-spa-1.jpg",
-    href: "/produtos/head-spa",
   },
 ];
 
@@ -175,6 +186,22 @@ export function FeaturedProducts() {
                     <span className="absolute top-4 left-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-[11px] uppercase tracking-wider font-medium text-gray-800">
                       {product.category}
                     </span>
+
+                    {/* Brand Logos */}
+                    {product.brands && product.brands.length > 0 && (
+                      <div className="absolute top-4 right-4 flex gap-2">
+                        {product.brands.includes("maletti") && (
+                          <div className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center p-1">
+                            <span className="text-[8px] font-bold text-black">M</span>
+                          </div>
+                        )}
+                        {product.brands.includes("nilo") && (
+                          <div className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center p-1">
+                            <span className="text-[8px] font-bold text-black">N</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Hover Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-300">

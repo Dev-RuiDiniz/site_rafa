@@ -9,8 +9,9 @@ import {
   HiArrowRight, 
   HiOutlinePlay,
   HiOutlineCheck,
-  HiOutlineDownload,
-  HiOutlinePhone
+  HiOutlineInformationCircle,
+  HiOutlinePhone,
+  HiX
 } from "react-icons/hi";
 import { getProductBySlug, products } from "@/data/products";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ export default function ProductPage() {
   const product = getProductBySlug(slug);
   
   const [activeImage, setActiveImage] = useState(0);
+  const [showTechInfo, setShowTechInfo] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -136,9 +138,26 @@ export default function ProductPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex flex-col"
             >
-              <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-3">
-                {product.category}
-              </span>
+              <div className="flex items-center gap-4 mb-3">
+                <span className="text-sm uppercase tracking-[0.2em] text-gray-500">
+                  {product.category}
+                </span>
+                {/* Brand Logos */}
+                {product.brands && product.brands.length > 0 && (
+                  <div className="flex gap-2">
+                    {product.brands.includes("maletti") && (
+                      <span className="px-2 py-1 bg-black text-white text-[10px] font-medium uppercase tracking-wider">
+                        Maletti
+                      </span>
+                    )}
+                    {product.brands.includes("nilo") && (
+                      <span className="px-2 py-1 bg-gray-700 text-white text-[10px] font-medium uppercase tracking-wider">
+                        Nilo
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
                 {product.name}
@@ -164,29 +183,35 @@ export default function ProductPage() {
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                <Button
-                  size="lg"
-                  className="bg-black text-white hover:bg-gray-800 transition-all duration-300 group flex-1"
-                  asChild
-                >
-                  <a
-                    href={`https://wa.me/5511981982279?text=Olá! Tenho interesse no produto ${product.name}.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+              <div className="mt-auto">
+                <p className="text-gray-600 text-sm mb-4">
+                  Solicite nosso catálogo técnico e orçamento com nosso especialista.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    size="lg"
+                    className="bg-black text-white hover:bg-gray-800 transition-all duration-300 group flex-1"
+                    asChild
                   >
-                    <HiOutlinePhone className="mr-2 w-5 h-5" />
-                    Solicitar Orçamento
-                  </a>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-black text-black hover:bg-black hover:text-white transition-all duration-300 flex-1"
-                >
-                  <HiOutlineDownload className="mr-2 w-5 h-5" />
-                  Ficha Técnica
-                </Button>
+                    <a
+                      href={`https://wa.me/5511981982279?text=Olá! Tenho interesse no produto ${product.name}.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <HiOutlinePhone className="mr-2 w-5 h-5" />
+                      Fale com um Especialista
+                    </a>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-black text-black hover:bg-black hover:text-white transition-all duration-300 flex-1"
+                    onClick={() => setShowTechInfo(true)}
+                  >
+                    <HiOutlineInformationCircle className="mr-2 w-5 h-5" />
+                    Informações Técnicas
+                  </Button>
+                </div>
               </div>
 
               {/* Trust badges */}
@@ -317,6 +342,75 @@ export default function ProductPage() {
           </Button>
         </div>
       </section>
+
+      {/* Modal Informações Técnicas */}
+      {showTechInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowTechInfo(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative bg-white w-full max-w-lg p-8 shadow-2xl z-10"
+          >
+            <button
+              onClick={() => setShowTechInfo(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 transition-colors"
+            >
+              <HiX className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-2xl font-serif font-semibold text-black mb-6">
+              Informações Técnicas
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">{product.name}</p>
+
+            <div className="space-y-4">
+              <div className="flex justify-between py-3 border-b border-gray-100">
+                <span className="text-gray-600">Medidas</span>
+                <span className="text-black font-medium">Consulte o especialista</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-gray-100">
+                <span className="text-gray-600">Peso</span>
+                <span className="text-black font-medium">Consulte o especialista</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-gray-100">
+                <span className="text-gray-600">Peso Suportado</span>
+                <span className="text-black font-medium">Consulte o especialista</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-gray-100">
+                <span className="text-gray-600">Cores</span>
+                <span className="text-black font-medium">Diversas opções</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-gray-100">
+                <span className="text-gray-600">Acabamentos</span>
+                <span className="text-black font-medium">Premium</span>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <p className="text-sm text-gray-500 mb-4">
+                Para informações detalhadas, solicite o catálogo técnico.
+              </p>
+              <Button
+                className="w-full bg-black text-white hover:bg-gray-800"
+                asChild
+              >
+                <a
+                  href={`https://wa.me/5511981982279?text=Olá! Gostaria de receber o catálogo técnico do ${product.name}.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Solicitar Catálogo Técnico
+                </a>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </>
   );
 }

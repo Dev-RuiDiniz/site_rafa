@@ -12,39 +12,58 @@ const brands = [
     id: "maletti",
     name: "Maletti",
     logo: "/images/site/Maletti - Logo bianco.png",
-    logoDark: "/images/site/maletti-logo.png",
-    description: "Fundada em 1965 na Itália, a Maletti é referência mundial em mobiliário para salões de beleza. Com mais de 55 anos de história, a marca combina tradição artesanal italiana com inovação tecnológica, criando peças que são verdadeiras obras de arte funcionais.",
+    logoDark: "/images/site/malliti-preto.png",
+    description: "A referência mundial em design e inovação. Como distribuidor exclusivo no Brasil, a SHR traz a excelência da Maletti Group, unindo tradição artesanal e tecnologia avançada.",
     highlights: [
-      "Mais de 55 anos de tradição",
-      "Design italiano premiado",
-      "Tecnologia de ponta",
-      "Presença em mais de 80 países",
+      "Lavatórios com sistemas de massagem e cromoterapia",
+      "Poltronas de corte com design assinado e ergonomia superior",
+      "Bancadas, recepções e expositores de alto padrão",
     ],
     image: "/images/site/heaven2.jpg",
     featured: true,
   },
   {
-    id: "shr",
-    name: "SHR",
-    logo: "/logoshr-white.png",
-    logoDark: "/logoshr-dark.png",
-    description: "A SHR é o distribuidor exclusivo da Maletti no Brasil, trazendo o melhor do design italiano para o mercado nacional. Com uma equipe especializada e suporte técnico completo, garantimos a excelência em cada projeto.",
+    id: "nilo",
+    name: "Nilo",
+    logo: "/images/site/nilo.jpg",
+    logoDark: "/images/site/nilo.jpg",
+    description: "O design a serviço do bem-estar. A SHR representa a Nilo no Brasil, referência global em mobiliário de luxo para SPAs, hotéis e clínicas de estética.",
     highlights: [
-      "Distribuidor exclusivo Maletti",
-      "Suporte técnico especializado",
-      "Peças originais garantidas",
-      "Atendimento em todo Brasil",
+      "Macas de massagem e camas multifuncionais",
+      "Poltronas para tratamentos faciais e podologia",
+      "Mobiliário e complementos para áreas de relaxamento",
+    ],
+    image: "/images/site/nilo.jpg",
+    featured: true,
+  },
+  {
+    id: "uki",
+    name: "UKI",
+    logo: "/images/site/UKI.jpg",
+    logoDark: "/images/site/UKI.jpg",
+    description: "Inovação e estilo com a autêntica assinatura italiana. A SHR traz a UKI International, unindo moda e tecnologia para traduzir o \"Italian Sense of Beauty\".",
+    highlights: [
+      "Secadores profissionais e difusores de design exclusivo",
+      "Pranchas e modeladores com controle térmico avançado",
+      "Acessórios elétricos e carrinhos auxiliares",
+    ],
+    image: "/images/site/UKI.jpg",
+    featured: true,
+  },
+  {
+    id: "marco-boni",
+    name: "Marco Boni",
+    logo: "/images/site/marco boni.mp4",
+    logoDark: "/images/site/marco boni.mp4",
+    description: "Excelência e precisão em cada detalhe. A SHR apresenta uma seleção exclusiva da linha profissional Marco Boni, essencial para o acabamento perfeito.",
+    highlights: [
+      "Escovas de finalização e pentes técnicos",
+      "Pincéis de aplicação e acessórios de coloração",
+      "Linha completa de cutelaria em aço inox",
     ],
     image: "/images/site/Shirobody_showroom.jpg",
     featured: true,
-  },
-];
-
-const partners = [
-  {
-    name: "Maletti Group",
-    description: "Grupo empresarial italiano líder em mobiliário profissional.",
-    logo: "/images/site/Maletti - Logo bianco.png",
+    isVideo: true,
   },
 ];
 
@@ -210,7 +229,7 @@ export default function MarcasPage() {
       {/* Partnership */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-5xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -218,31 +237,47 @@ export default function MarcasPage() {
               transition={{ duration: 0.6 }}
             >
               <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-                Parceria Internacional
+                Nossas Parcerias
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-8 leading-tight">
-                Uma parceria que atravessa continentes
+                Marcas que confiam na SHR
               </h2>
-              <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                A SHR é o elo entre a tradição italiana da Maletti e o mercado 
-                brasileiro. Essa parceria exclusiva garante que você tenha acesso 
-                ao que há de melhor em mobiliário para salões, com suporte local 
-                e garantia de qualidade.
+              <p className="text-gray-600 text-lg leading-relaxed mb-12">
+                A SHR é o elo entre as maiores marcas internacionais e o mercado 
+                brasileiro. Nossas parcerias exclusivas garantem que você tenha acesso 
+                ao que há de melhor em mobiliário e equipamentos para salões.
               </p>
-              <div className="flex items-center justify-center gap-8">
-                <Image
-                  src="/logoshr-dark.png"
-                  alt="SHR"
-                  width={100}
-                  height={40}
-                />
-                <span className="text-3xl text-gray-300">×</span>
-                <Image
-                  src="/images/site/malliti-preto.png"
-                  alt="Maletti"
-                  width={140}
-                  height={50}
-                />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+                <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <Image
+                    src="/images/site/malliti-preto.png"
+                    alt="Maletti"
+                    width={120}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+                <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <Image
+                    src="/images/site/nilo.jpg"
+                    alt="Nilo"
+                    width={120}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+                <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <Image
+                    src="/images/site/UKI.jpg"
+                    alt="UKI"
+                    width={120}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+                <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center justify-center">
+                  <span className="text-xl font-semibold text-gray-700">Marco Boni</span>
+                </div>
               </div>
             </motion.div>
           </div>

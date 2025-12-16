@@ -99,9 +99,7 @@ export default function ManutencaoPage() {
                 Suporte Técnico
               </span>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-semibold mb-6 leading-tight">
-                Departamento
-                <br />
-                de Manutenção
+                Manutenção
               </h1>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
                 Nossa equipe técnica especializada está preparada para manter 
@@ -257,6 +255,39 @@ export default function ManutencaoPage() {
         </div>
       </section>
 
+      {/* CTA */}
+      <section id="solicitar" className="py-24 bg-black text-white">
+        <div className="container mx-auto px-6 lg:px-12 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
+              Precisa de suporte técnico?
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto mb-8">
+              Entre em contato conosco para agendar uma visita técnica ou 
+              solicitar orçamento de manutenção.
+            </p>
+            <Button
+              size="lg"
+              className="bg-white text-black hover:bg-gray-100 transition-all duration-300"
+              asChild
+            >
+              <a
+                href="https://wa.me/5511981982279?text=Olá! Gostaria de solicitar manutenção para meu equipamento Maletti."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Solicitar via WhatsApp
+              </a>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
@@ -294,61 +325,6 @@ export default function ManutencaoPage() {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section id="solicitar" className="py-24 bg-black text-white">
-        <div className="container mx-auto px-6 lg:px-12 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
-              Precisa de suporte técnico?
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-              Entre em contato conosco para agendar uma visita técnica ou 
-              solicitar orçamento de manutenção.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                size="lg"
-                className="bg-white text-black hover:bg-gray-100 transition-all duration-300"
-                asChild
-              >
-                <a
-                  href="https://wa.me/5511981982279?text=Olá! Gostaria de solicitar manutenção para meu equipamento Maletti."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Solicitar via WhatsApp
-                </a>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
-                asChild
-              >
-                <Link href="/contato">
-                  Formulário de Contato
-                </Link>
-              </Button>
-            </div>
-
-            <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-400">
-              <a href="tel:+5511981982279" className="hover:text-white transition-colors">
-                (11) 98198-2279
-              </a>
-              <span>|</span>
-              <a href="mailto:suporte@shrhair.com.br" className="hover:text-white transition-colors">
-                suporte@shrhair.com.br
-              </a>
-            </div>
-          </motion.div>
         </div>
       </section>
     </>
