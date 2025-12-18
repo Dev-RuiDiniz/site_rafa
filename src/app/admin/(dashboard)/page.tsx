@@ -10,6 +10,12 @@ import {
   HiOutlineArrowRight,
   HiOutlinePlus,
 } from "react-icons/hi";
+interface PageViewItem {
+  id: string;
+  path: string;
+  country: string | null;
+  createdAt: Date;
+}
 
 async function getStats() {
   const [
@@ -147,7 +153,7 @@ export default async function AdminDashboardPage() {
           <div className="border border-gray-200">
             {recentViews.length > 0 ? (
               <div className="divide-y divide-gray-100">
-                {recentViews.map((view) => (
+                {recentViews.map((view: PageViewItem) => (
                   <div
                     key={view.id}
                     className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
