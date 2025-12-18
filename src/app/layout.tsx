@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Header, Footer, WhatsAppButton } from "@/components/layout";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -48,10 +47,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${poppins.variable} ${playfair.variable} font-sans antialiased`}>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        {children}
       </body>
     </html>
   );

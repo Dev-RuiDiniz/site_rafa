@@ -4,61 +4,122 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { HiArrowRight, HiPlay } from "react-icons/hi";
+import Link from "next/link";
 
-const heroSlides = [
+interface Banner {
+  id: string;
+  badge: string | null;
+  subtitle: string | null;
+  title: string;
+  description: string | null;
+  image: string | null;
+  video: string | null;
+  button1Text: string | null;
+  button1Link: string | null;
+  button1Color: string | null;
+  button2Text: string | null;
+  button2Link: string | null;
+  button2Color: string | null;
+}
+
+const fallbackSlides: Banner[] = [
   {
-    id: 1,
+    id: "1",
+    badge: "Distribuidor Exclusivo Maletti no Brasil",
     title: "Maletti",
     subtitle: "A referência mundial em design e inovação",
     description: "Como distribuidor exclusivo no Brasil, a SHR traz a excelência da Maletti Group, unindo tradição artesanal e tecnologia avançada.",
     image: "/images/hero/1.jpg",
     video: null,
+    button1Text: "Conhecer Produtos",
+    button1Link: "/produtos",
+    button1Color: "white",
+    button2Text: "Assistir Vídeo",
+    button2Link: "#video",
+    button2Color: "outline",
   },
   {
-    id: 2,
+    id: "2",
+    badge: "Distribuidor Exclusivo Maletti no Brasil",
     title: "Nilo",
     subtitle: "O design a serviço do bem-estar",
     description: "Referência global em mobiliário de luxo para SPAs, hotéis e clínicas de estética. Soluções que transformam tratamentos em experiências sensoriais completas.",
     image: "/images/hero/2.jpg",
     video: null,
+    button1Text: "Conhecer Produtos",
+    button1Link: "/produtos",
+    button1Color: "white",
+    button2Text: null,
+    button2Link: null,
+    button2Color: null,
   },
   {
-    id: 3,
+    id: "3",
+    badge: "Distribuidor Exclusivo Maletti no Brasil",
     title: "UKI",
     subtitle: "Inovação e estilo com a autêntica assinatura italiana",
     description: "A UKI International une moda e tecnologia para traduzir o \"Italian Sense of Beauty\" em equipamentos de alta performance.",
     image: "/images/hero/3.jpg",
     video: null,
+    button1Text: "Conhecer Produtos",
+    button1Link: "/produtos",
+    button1Color: "white",
+    button2Text: null,
+    button2Link: null,
+    button2Color: null,
   },
   {
-    id: 4,
+    id: "4",
+    badge: "Distribuidor Exclusivo Maletti no Brasil",
     title: "Marco Boni",
     subtitle: "Excelência e precisão em cada detalhe",
     description: "Seleção exclusiva da linha profissional Marco Boni, essencial para o acabamento perfeito. Hair design e cuidados pessoais com alta durabilidade.",
     image: "/images/site/Shirobody_showroom.jpg",
     video: null,
+    button1Text: "Conhecer Produtos",
+    button1Link: "/produtos",
+    button1Color: "white",
+    button2Text: null,
+    button2Link: null,
+    button2Color: null,
   },
 ];
 
 export function Hero() {
+  const [slides, setSlides] = useState<Banner[]>(fallbackSlides);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    fetch("/api/banners")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.banners && data.banners.length > 0) {
+          setSlides(data.banners);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoPlaying || slides.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, slides.length]);
 
   const handleSlideChange = (index: number) => {
     setCurrentSlide(index);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
+
+  const currentBanner = slides[currentSlide];
+
+  if (!currentBanner) return null;
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black">
@@ -72,16 +133,14 @@ export function Hero() {
           transition={{ duration: 1, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* Placeholder gradient - replace with actual images */}
           <div 
             className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
             style={{
-              backgroundImage: `url(${heroSlides[currentSlide].image})`,
+              backgroundImage: currentBanner.image ? `url(${currentBanner.image})` : undefined,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
           />
-          {/* Overlay */}
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
       </AnimatePresence>
@@ -90,17 +149,19 @@ export function Hero() {
       <div className="relative z-10 container mx-auto px-6 lg:px-12 h-full flex items-center">
         <div className="max-w-3xl">
           {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-6"
-          >
-            <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm">
-              <span className="w-2 h-2 rounded-full bg-white mr-2 animate-pulse" />
-              Distribuidor Exclusivo Maletti no Brasil
-            </span>
-          </motion.div>
+          {currentBanner.badge && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-6"
+            >
+              <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm">
+                <span className="w-2 h-2 rounded-full bg-white mr-2 animate-pulse" />
+                {currentBanner.badge}
+              </span>
+            </motion.div>
+          )}
 
           {/* Title */}
           <AnimatePresence mode="wait">
@@ -111,15 +172,19 @@ export function Hero() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-white/60 text-lg md:text-xl font-light tracking-wide mb-2">
-                {heroSlides[currentSlide].subtitle}
-              </h2>
+              {currentBanner.subtitle && (
+                <h2 className="text-white/60 text-lg md:text-xl font-light tracking-wide mb-2">
+                  {currentBanner.subtitle}
+                </h2>
+              )}
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-semibold text-white tracking-tight mb-6">
-                {heroSlides[currentSlide].title}
+                {currentBanner.title}
               </h1>
-              <p className="text-white/80 text-lg md:text-xl max-w-xl leading-relaxed mb-8">
-                {heroSlides[currentSlide].description}
-              </p>
+              {currentBanner.description && (
+                <p className="text-white/80 text-lg md:text-xl max-w-xl leading-relaxed mb-8">
+                  {currentBanner.description}
+                </p>
+              )}
             </motion.div>
           </AnimatePresence>
 
@@ -130,58 +195,82 @@ export function Hero() {
             transition={{ delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button
-              size="lg"
-              className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group px-8"
-            >
-              Conhecer Produtos
-              <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/80 text-white bg-transparent hover:bg-white hover:text-black transition-all duration-300 group px-8"
-            >
-              <HiPlay className="mr-2 w-5 h-5" />
-              Assistir Vídeo
-            </Button>
+            {currentBanner.button1Text && currentBanner.button1Link && (
+              <Link href={currentBanner.button1Link}>
+                <Button
+                  size="lg"
+                  className={`transition-all duration-300 group px-8 ${
+                    currentBanner.button1Color === "white"
+                      ? "bg-white text-black hover:bg-gray-100"
+                      : currentBanner.button1Color === "black"
+                      ? "bg-black text-white hover:bg-gray-900 border border-white"
+                      : "border-white/80 text-white bg-transparent hover:bg-white hover:text-black"
+                  }`}
+                >
+                  {currentBanner.button1Text}
+                  <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            )}
+            {currentBanner.button2Text && currentBanner.button2Link && (
+              <Link href={currentBanner.button2Link}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className={`transition-all duration-300 group px-8 ${
+                    currentBanner.button2Color === "white"
+                      ? "bg-white text-black hover:bg-gray-100 border-white"
+                      : currentBanner.button2Color === "black"
+                      ? "bg-black text-white hover:bg-gray-900 border-white"
+                      : "border-white/80 text-white bg-transparent hover:bg-white hover:text-black"
+                  }`}
+                >
+                  <HiPlay className="mr-2 w-5 h-5" />
+                  {currentBanner.button2Text}
+                </Button>
+              </Link>
+            )}
           </motion.div>
         </div>
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
-        {heroSlides.map((slide, index) => (
-          <button
-            key={slide.id}
-            onClick={() => handleSlideChange(index)}
-            className={`relative h-1 rounded-full transition-all duration-300 ${
-              index === currentSlide ? "w-12 bg-white" : "w-6 bg-white/40 hover:bg-white/60"
-            }`}
-            aria-label={`Ir para slide ${index + 1}`}
-          >
-            {index === currentSlide && (
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 6, ease: "linear" }}
-                className="absolute inset-0 bg-white/50 rounded-full origin-left"
-              />
-            )}
-          </button>
-        ))}
-      </div>
+      {slides.length > 1 && (
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.id}
+              onClick={() => handleSlideChange(index)}
+              className={`relative h-1 rounded-full transition-all duration-300 ${
+                index === currentSlide ? "w-12 bg-white" : "w-6 bg-white/40 hover:bg-white/60"
+              }`}
+              aria-label={`Ir para slide ${index + 1}`}
+            >
+              {index === currentSlide && (
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 6, ease: "linear" }}
+                  className="absolute inset-0 bg-white/50 rounded-full origin-left"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Slide Counter */}
-      <div className="absolute bottom-12 right-12 z-20 hidden lg:flex items-center gap-4 text-white">
-        <span className="text-4xl font-bold">
-          {String(currentSlide + 1).padStart(2, "0")}
-        </span>
-        <span className="text-white/40">/</span>
-        <span className="text-white/40">
-          {String(heroSlides.length).padStart(2, "0")}
-        </span>
-      </div>
+      {slides.length > 1 && (
+        <div className="absolute bottom-12 right-12 z-20 hidden lg:flex items-center gap-4 text-white">
+          <span className="text-4xl font-bold">
+            {String(currentSlide + 1).padStart(2, "0")}
+          </span>
+          <span className="text-white/40">/</span>
+          <span className="text-white/40">
+            {String(slides.length).padStart(2, "0")}
+          </span>
+        </div>
+      )}
 
       {/* Scroll Indicator */}
       <motion.div

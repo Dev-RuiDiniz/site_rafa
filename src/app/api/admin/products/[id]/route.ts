@@ -1,0 +1,88 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        brands: { include: { brand: true } },
+        specifications: true,
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json({ product });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return NextResponse.json({ error: "Erro ao buscar produto" }, { status: 500 });
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const data = await request.json();
+
+    // Remove existing brand relations
+    await prisma.productBrand.deleteMany({ where: { productId: id } });
+
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        name: data.name,
+        slug: data.slug,
+        shortDescription: data.shortDescription,
+        description: data.description,
+        features: data.features || [],
+        image: data.image,
+        gallery: data.gallery || [],
+        video: data.video,
+        featured: data.featured || false,
+        active: data.active ?? true,
+        categoryId: data.categoryId || null,
+        brands: data.brandIds?.length
+          ? {
+              create: data.brandIds.map((brandId: string) => ({ brandId })),
+            }
+          : undefined,
+      },
+      include: {
+        category: true,
+        brands: { include: { brand: true } },
+      },
+    });
+
+    return NextResponse.json({ success: true, product });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return NextResponse.json({ error: "Erro ao atualizar produto" }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    await prisma.product.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return NextResponse.json({ error: "Erro ao deletar produto" }, { status: 500 });
+  }
+}
