@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,29 +14,90 @@ import {
   HiOutlinePhone,
   HiX
 } from "react-icons/hi";
-import { getProductBySlug, products } from "@/data/products";
 import { Button } from "@/components/ui/button";
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  gallery: string[];
+  features: string[];
+  video: string | null;
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+  brands: {
+    brand: {
+      id: string;
+      name: string;
+      slug: string;
+      logo: string | null;
+    };
+  }[];
+  specifications: {
+    key: string;
+    value: string;
+  }[];
+}
+
+interface RelatedProduct {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  image: string;
+  category: {
+    name: string;
+  } | null;
+}
 
 export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const product = getProductBySlug(slug);
   
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [showTechInfo, setShowTechInfo] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
+  useEffect(() => {
+    if (!slug) return;
+    
+    fetch(`/api/products/${slug}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.error) {
+          setProduct(null);
+        } else {
+          setProduct(data.product);
+          setRelatedProducts(data.relatedProducts || []);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
   if (!product) {
     notFound();
   }
 
-  // Get related products (same category, excluding current)
-  const relatedProducts = products
-    .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
-    .slice(0, 3);
-
-  const allImages = [product.image, ...product.gallery];
+  const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
 
   return (
     <>
@@ -141,7 +202,7 @@ export default function ProductPage() {
             >
               <div className="flex items-center gap-4 mb-3">
                 <span className="text-sm uppercase tracking-[0.2em] text-gray-500">
-                  {product.category}
+                  {product.category?.name}
                 </span>
               </div>
               
@@ -150,24 +211,16 @@ export default function ProductPage() {
                 <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-100">
                   <span className="text-xs text-gray-500 uppercase tracking-wider">Marcas:</span>
                   <div className="flex items-center gap-4">
-                    {product.brands.includes("maletti") && (
+                    {product.brands.map((b) => (
                       <Image
-                        src="/images/site/malliti-preto.png"
-                        alt="Maletti"
+                        key={b.brand.id}
+                        src={b.brand.logo || "/images/site/malliti-preto.png"}
+                        alt={b.brand.name}
                         width={80}
                         height={30}
                         className="object-contain"
                       />
-                    )}
-                    {product.brands.includes("nilo") && (
-                      <Image
-                        src="/images/site/nilo.jpg"
-                        alt="Nilo"
-                        width={60}
-                        height={30}
-                        className="object-contain"
-                      />
-                    )}
+                    ))}
                   </div>
                 </div>
               )}
