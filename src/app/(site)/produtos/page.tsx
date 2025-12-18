@@ -1,20 +1,50 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
-import { products, categories } from "@/data/products";
 import { Button } from "@/components/ui/button";
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  image: string;
+  category: Category | null;
+}
+
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [loading, setLoading] = useState(true);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/products").then((r) => r.json()),
+      fetch("/api/categories").then((r) => r.json()),
+    ])
+      .then(([prodData, catData]) => {
+        setProducts(prodData.products || []);
+        setCategories(catData.categories || []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
   const filteredProducts = selectedCategory
-    ? products.filter((p) => p.categorySlug === selectedCategory)
+    ? products.filter((p) => p.category?.slug === selectedCategory)
     : products;
 
   return (
@@ -131,7 +161,7 @@ export default function ProductsPage() {
                       
                       {/* Category Badge */}
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-xs uppercase tracking-wider text-gray-700">
-                        {product.category}
+                        {product.category?.name}
                       </span>
 
                       {/* Quick View */}
@@ -183,7 +213,7 @@ export default function ProductsPage() {
                     {/* Content */}
                     <div className="flex flex-col justify-center flex-1">
                       <span className="text-xs uppercase tracking-wider text-gray-500 mb-2">
-                        {product.category}
+                        {product.category?.name}
                       </span>
                       <h3 className="text-2xl font-serif font-medium text-black mb-3 group-hover:text-gray-600 transition-colors">
                         {product.name}

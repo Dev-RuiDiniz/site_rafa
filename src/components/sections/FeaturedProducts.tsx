@@ -1,72 +1,42 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
-const products = [
-  {
-    id: "shirobody",
-    name: "Shirobody",
-    category: "Lavatórios",
-    description: "Tecnologia shiatsu integrada para uma experiência única.",
-    image: "/images/site/Shirobody_showroom.jpg",
-    href: "/produtos/shirobody",
-    brands: ["maletti", "nilo"],
-  },
-  {
-    id: "heaven",
-    name: "Heaven",
-    category: "Lavatórios",
-    description: "A perfeição em design e conforto para lavagem de cabelos.",
-    image: "/images/site/heaven2.jpg",
-    href: "/produtos/heaven",
-  },
-  {
-    id: "abu-dhabi",
-    name: "Abu Dhabi",
-    category: "Macas",
-    description: "Maca de luxo para tratamentos corporais exclusivos.",
-    image: "/images/site/nilo.jpg",
-    href: "/produtos/abu-dhabi",
-    brands: ["maletti", "nilo"],
-  },
-  {
-    id: "total-body",
-    name: "Total Body",
-    category: "Macas",
-    description: "Experiência completa de spa com tecnologia avançada.",
-    image: "/images/site/Total-Body-356.jpg",
-    href: "/produtos/total-body",
-    brands: ["maletti", "nilo"],
-  },
-  {
-    id: "lioness",
-    name: "Lioness",
-    category: "Poltronas",
-    description: "Poltrona de corte com design imponente.",
-    image: "/images/site/Shirobody_showroom.jpg",
-    href: "/produtos/lioness",
-  },
-  {
-    id: "spa-garcon",
-    name: "Spa Garçon",
-    category: "Elétricos",
-    description: "Tratamento capilar com tecnologia de vapor.",
-    image: "/images/site/SPA_GARCON_nuovo_03.png",
-    href: "/produtos/spa-garcon",
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  image: string;
+  category: {
+    name: string;
+  } | null;
+  brands: {
+    brand: {
+      slug: string;
+    };
+  }[];
+}
 
 export function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
   const ref = useRef(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/products?featured=true")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products || []))
+      .catch(console.error);
+  }, []);
 
   const checkScrollButtons = () => {
     if (carouselRef.current) {
@@ -170,11 +140,11 @@ export function FeaturedProducts() {
                 transition={{ duration: 0.5, delay: 0.1 * index }}
                 className="flex-shrink-0 w-[280px] md:w-[320px] snap-start"
               >
-                <Link href={product.href} className="group block">
+                <Link href={`/produtos/${product.slug}`} className="group block">
                   {/* Image Container */}
                   <div className="relative aspect-[3/4] bg-gray-100 mb-5 overflow-hidden">
                     <Image
-                      src={product.image}
+                      src={product.image || "/images/site/heaven2.jpg"}
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -184,13 +154,13 @@ export function FeaturedProducts() {
                     
                     {/* Category Badge */}
                     <span className="absolute top-4 left-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-[11px] uppercase tracking-wider font-medium text-gray-800">
-                      {product.category}
+                      {product.category?.name}
                     </span>
 
                     {/* Brand Logos */}
                     {product.brands && product.brands.length > 0 && (
                       <div className="absolute top-4 right-4 flex gap-1">
-                        {product.brands.includes("maletti") && (
+                        {product.brands.some((b) => b.brand.slug === "maletti") && (
                           <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
                             <Image
                               src="/images/site/malliti-preto.png"
@@ -201,7 +171,7 @@ export function FeaturedProducts() {
                             />
                           </div>
                         )}
-                        {product.brands.includes("nilo") && (
+                        {product.brands.some((b) => b.brand.slug === "nilo") && (
                           <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
                             <Image
                               src="/images/site/nilo.jpg"
@@ -229,7 +199,7 @@ export function FeaturedProducts() {
                     {product.name}
                   </h3>
                   <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">
-                    {product.description}
+                    {product.shortDescription}
                   </p>
                 </Link>
               </motion.div>

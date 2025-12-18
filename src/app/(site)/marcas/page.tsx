@@ -1,75 +1,33 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
-const brands = [
-  {
-    id: "maletti",
-    name: "Maletti",
-    logo: "/images/site/Maletti - Logo bianco.png",
-    logoDark: "/images/site/malliti-preto.png",
-    description: "A referência mundial em design e inovação. Como distribuidor exclusivo no Brasil, a SHR traz a excelência da Maletti Group, unindo tradição artesanal e tecnologia avançada.",
-    highlights: [
-      "Lavatórios com sistemas de massagem e cromoterapia",
-      "Poltronas de corte com design assinado e ergonomia superior",
-      "Bancadas, recepções e expositores de alto padrão",
-    ],
-    image: "/images/site/heaven2.jpg",
-    featured: true,
-  },
-  {
-    id: "nilo",
-    name: "Nilo",
-    logo: "/images/site/nilo.jpg",
-    logoDark: "/images/site/nilo.jpg",
-    description: "O design a serviço do bem-estar. A SHR representa a Nilo no Brasil, referência global em mobiliário de luxo para SPAs, hotéis e clínicas de estética.",
-    highlights: [
-      "Macas de massagem e camas multifuncionais",
-      "Poltronas para tratamentos faciais e podologia",
-      "Mobiliário e complementos para áreas de relaxamento",
-    ],
-    image: "/images/site/nilo.jpg",
-    featured: true,
-  },
-  {
-    id: "uki",
-    name: "UKI",
-    logo: "/images/site/UKI.jpg",
-    logoDark: "/images/site/UKI.jpg",
-    description: "Inovação e estilo com a autêntica assinatura italiana. A SHR traz a UKI International, unindo moda e tecnologia para traduzir o \"Italian Sense of Beauty\".",
-    highlights: [
-      "Secadores profissionais e difusores de design exclusivo",
-      "Pranchas e modeladores com controle térmico avançado",
-      "Acessórios elétricos e carrinhos auxiliares",
-    ],
-    image: "/images/site/UKI.jpg",
-    featured: true,
-  },
-  {
-    id: "marco-boni",
-    name: "Marco Boni",
-    logo: "/images/site/marco boni.mp4",
-    logoDark: "/images/site/marco boni.mp4",
-    description: "Excelência e precisão em cada detalhe. A SHR apresenta uma seleção exclusiva da linha profissional Marco Boni, essencial para o acabamento perfeito.",
-    highlights: [
-      "Escovas de finalização e pentes técnicos",
-      "Pincéis de aplicação e acessórios de coloração",
-      "Linha completa de cutelaria em aço inox",
-    ],
-    image: "/images/site/Shirobody_showroom.jpg",
-    featured: true,
-    isVideo: true,
-  },
-];
+interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logo: string | null;
+  image: string | null;
+  highlights: string[];
+}
 
 export default function MarcasPage() {
+  const [brands, setBrands] = useState<Brand[]>([]);
   const brandsRef = useRef(null);
   const brandsInView = useInView(brandsRef, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    fetch("/api/brands")
+      .then((r) => r.json())
+      .then((data) => setBrands(data.brands || []))
+      .catch(console.error);
+  }, []);
 
   return (
     <>
@@ -177,19 +135,21 @@ export default function MarcasPage() {
                 <div className={index % 2 === 1 ? "lg:order-2" : ""}>
                   <div className="aspect-[4/3] relative overflow-hidden bg-gray-100">
                     <Image
-                      src={brand.image}
+                      src={brand.image || "/images/site/heaven2.jpg"}
                       alt={brand.name}
                       fill
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-6 left-6">
+                      {brand.logo && (
                       <Image
                         src={brand.logo}
                         alt={brand.name}
                         width={120}
                         height={48}
                       />
+                    )}
                     </div>
                   </div>
                 </div>
