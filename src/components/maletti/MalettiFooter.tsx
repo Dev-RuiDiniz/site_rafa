@@ -1,0 +1,163 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker } from "react-icons/hi";
+import { FaInstagram, FaLinkedin, FaWhatsapp } from "react-icons/fa";
+
+export function MalettiFooter() {
+  return (
+    <footer className="bg-black text-white">
+      {/* CTA Section */}
+      <section className="py-20 border-b border-white/10">
+        <div className="container mx-auto px-6 lg:px-12 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-6">
+              Sinta a excelência de perto.
+            </h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Visite nosso Showroom e conheça todo o universo Maletti.
+            </p>
+            <Link
+              href="/contato"
+              className="inline-flex items-center px-8 py-4 bg-white text-black font-medium hover:bg-gray-100 transition-colors"
+            >
+              Agendar Visita
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer Info */}
+      <div className="py-16">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {/* Logo & Description */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-4 mb-6">
+                <Image
+                  src="/images/site/Maletti - Logo bianco.png"
+                  alt="Maletti"
+                  width={120}
+                  height={48}
+                />
+                <span className="text-gray-500">×</span>
+                <Image
+                  src="/logoshr-white.png"
+                  alt="SHR Hair"
+                  width={80}
+                  height={32}
+                />
+              </div>
+              <p className="text-gray-400 leading-relaxed mb-6">
+                SHR Comércio e Manutenção de Móveis LTDA<br />
+                Distribuidor exclusivo Maletti no Brasil
+              </p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                >
+                  <FaInstagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                >
+                  <FaLinkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://wa.me/5511981982279"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                >
+                  <FaWhatsapp className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-sm uppercase tracking-wider mb-6">Contato</h4>
+              <ul className="space-y-4 text-gray-400">
+                <li className="flex items-start gap-3">
+                  <HiOutlineLocationMarker className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <span>
+                    Av. Jônia, 439 – Vila Alexandria<br />
+                    04634-011 São Paulo – SP
+                  </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <HiOutlinePhone className="w-5 h-5 flex-shrink-0" />
+                  <span>(11) 4040-1437</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <HiOutlineMail className="w-5 h-5 flex-shrink-0" />
+                  <span>sac@shrhair.com.br</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Links */}
+            <div>
+              <h4 className="text-sm uppercase tracking-wider mb-6">Links</h4>
+              <ul className="space-y-3 text-gray-400">
+                <li>
+                  <Link href="/" className="hover:text-white transition-colors">
+                    SHR Hair
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/produtos" className="hover:text-white transition-colors">
+                    Produtos
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/marcas" className="hover:text-white transition-colors">
+                    Marcas
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/manutencao" className="hover:text-white transition-colors">
+                    Manutenção
+                  </Link>
+                </li>
+                <li>
+                  <a 
+                    href="https://www.maletti.it/pt/pt" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Maletti Global
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div className="border-t border-white/10 py-6">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <p>© {new Date().getFullYear()} Maletti. Todos os direitos reservados.</p>
+            <p>Distribuído exclusivamente por SHR Hair no Brasil</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
