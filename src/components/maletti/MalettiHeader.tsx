@@ -13,7 +13,7 @@ export function MalettiHeader({ onNavigate }: MalettiHeaderProps) {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-20 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 hidden lg:block"
+      className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 hidden lg:block"
     >
       <div className="container mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-14">

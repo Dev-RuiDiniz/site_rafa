@@ -26,7 +26,7 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 lg:px-12 text-center text-white pt-32">
+        <div className="relative z-10 container mx-auto px-6 lg:px-12 text-center text-white pt-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
