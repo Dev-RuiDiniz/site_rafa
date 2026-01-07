@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         include: {
           category: true,
           brands: { include: { brand: true } },
+          specifications: true,
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -68,10 +69,19 @@ export async function POST(request: NextRequest) {
               create: data.brandIds.map((brandId: string) => ({ brandId })),
             }
           : undefined,
+        specifications: data.specifications?.length
+          ? {
+              create: data.specifications.map((spec: { label: string; value: string }) => ({
+                label: spec.label,
+                value: spec.value,
+              })),
+            }
+          : undefined,
       },
       include: {
         category: true,
         brands: { include: { brand: true } },
+        specifications: true,
       },
     });
 

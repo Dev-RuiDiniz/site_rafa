@@ -35,8 +35,9 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
 
-    // Remove existing brand relations
+    // Remove existing brand relations and specifications
     await prisma.productBrand.deleteMany({ where: { productId: id } });
+    await prisma.specification.deleteMany({ where: { productId: id } });
 
     const product = await prisma.product.update({
       where: { id },
@@ -57,10 +58,19 @@ export async function PUT(
               create: data.brandIds.map((brandId: string) => ({ brandId })),
             }
           : undefined,
+        specifications: data.specifications?.length
+          ? {
+              create: data.specifications.map((spec: { label: string; value: string }) => ({
+                label: spec.label,
+                value: spec.value,
+              })),
+            }
+          : undefined,
       },
       include: {
         category: true,
         brands: { include: { brand: true } },
+        specifications: true,
       },
     });
 

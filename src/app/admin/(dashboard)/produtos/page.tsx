@@ -38,6 +38,7 @@ const emptyProduct = {
   shortDescription: "",
   description: "",
   features: [] as string[],
+  specifications: [] as { label: string; value: string }[],
   image: "",
   gallery: [] as string[],
   video: "",
@@ -63,6 +64,8 @@ export default function ProdutosPage() {
   const [formData, setFormData] = useState(emptyProduct);
   const [saving, setSaving] = useState(false);
   const [featureInput, setFeatureInput] = useState("");
+  const [specLabel, setSpecLabel] = useState("");
+  const [specValue, setSpecValue] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -118,6 +121,7 @@ export default function ProdutosPage() {
       shortDescription: product.shortDescription || "",
       description: product.description || "",
       features: product.features || [],
+      specifications: (product as any).specifications?.map((s: any) => ({ label: s.label, value: s.value })) || [],
       image: product.image || "",
       gallery: product.gallery || [],
       video: "",
@@ -191,6 +195,21 @@ export default function ProdutosPage() {
 
   const removeFeature = (index: number) => {
     setFormData({ ...formData, features: formData.features.filter((_, i) => i !== index) });
+  };
+
+  const addSpec = () => {
+    if (specLabel.trim() && specValue.trim()) {
+      setFormData({ 
+        ...formData, 
+        specifications: [...formData.specifications, { label: specLabel.trim(), value: specValue.trim() }] 
+      });
+      setSpecLabel("");
+      setSpecValue("");
+    }
+  };
+
+  const removeSpec = (index: number) => {
+    setFormData({ ...formData, specifications: formData.specifications.filter((_, i) => i !== index) });
   };
 
   const generateSlug = (name: string) => {
@@ -421,6 +440,42 @@ export default function ProdutosPage() {
                   {feature}
                   <button type="button" onClick={() => removeFeature(index)} className="ml-1 text-gray-400 hover:text-red-500">×</button>
                 </span>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Informações Técnicas</label>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={specLabel}
+                onChange={(e) => setSpecLabel(e.target.value)}
+                placeholder="Ex: Dimensões"
+                className="flex-1 px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
+              />
+              <input
+                type="text"
+                value={specValue}
+                onChange={(e) => setSpecValue(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSpec())}
+                placeholder="Ex: 60x80x120cm"
+                className="flex-1 px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
+              />
+              <button
+                type="button"
+                onClick={addSpec}
+                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-sm hover:bg-gray-800 dark:hover:bg-gray-100"
+              >
+                Adicionar
+              </button>
+            </div>
+            <div className="space-y-2">
+              {formData.specifications.map((spec, index) => (
+                <div key={index} className="flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-zinc-800 text-sm">
+                  <span><strong>{spec.label}:</strong> {spec.value}</span>
+                  <button type="button" onClick={() => removeSpec(index)} className="text-gray-400 hover:text-red-500">×</button>
+                </div>
               ))}
             </div>
           </div>

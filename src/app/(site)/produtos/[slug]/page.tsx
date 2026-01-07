@@ -40,7 +40,7 @@ interface Product {
     };
   }[];
   specifications: {
-    key: string;
+    label: string;
     value: string;
   }[];
 }
@@ -440,26 +440,18 @@ export default function ProductPage() {
             <p className="text-sm text-gray-500 mb-6">{product.name}</p>
 
             <div className="space-y-4">
-              <div className="flex justify-between py-3 border-b border-gray-100">
-                <span className="text-gray-600">Medidas</span>
-                <span className="text-black font-medium">Consulte o especialista</span>
-              </div>
-              <div className="flex justify-between py-3 border-b border-gray-100">
-                <span className="text-gray-600">Peso</span>
-                <span className="text-black font-medium">Consulte o especialista</span>
-              </div>
-              <div className="flex justify-between py-3 border-b border-gray-100">
-                <span className="text-gray-600">Peso Suportado</span>
-                <span className="text-black font-medium">Consulte o especialista</span>
-              </div>
-              <div className="flex justify-between py-3 border-b border-gray-100">
-                <span className="text-gray-600">Cores</span>
-                <span className="text-black font-medium">Diversas opções</span>
-              </div>
-              <div className="flex justify-between py-3 border-b border-gray-100">
-                <span className="text-gray-600">Acabamentos</span>
-                <span className="text-black font-medium">Premium</span>
-              </div>
+              {product.specifications && product.specifications.length > 0 ? (
+                product.specifications.map((spec, index) => (
+                  <div key={index} className="flex justify-between py-3 border-b border-gray-100">
+                    <span className="text-gray-600">{spec.label}</span>
+                    <span className="text-black font-medium">{spec.value}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  Informações técnicas não disponíveis. Consulte um especialista.
+                </p>
+              )}
             </div>
 
             <div className="mt-8">
