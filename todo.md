@@ -3,7 +3,7 @@
 - na seção COLEÇÃO, diminuir a fonte da frase Produtos em Destaque
 - diminuir os quadros dos produtos de todo o site e deixar quadrado.
 - na seção Suporte técnico da home, reirar "Departamento de"
-- na página de Manutenção, troca a foto (enviaremos)
+- na página de Manutenção, troca a foto (enviaremos) ✅ FEITO - manutencao.webp
 - em Manutenção, trocar o telefone para 11 94537-0735
 - Nos produtos, deixar a estrutura de descrições similar ao site da maletti (teremos que colocar textos)
 - trocar as imagens da página nosssas marcas (enviaremos)

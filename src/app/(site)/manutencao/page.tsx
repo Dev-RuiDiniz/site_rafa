@@ -144,10 +144,10 @@ export default function ManutencaoPage() {
               <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
                 {/* Image */}
                 <Image
-                  src="/images/site/Head-spa-1.jpg"
+                  src="/manutencao.webp"
                   alt="Manutenção SHR"
                   fill
-                  className="object-cover opacity-50"
+                  className="object-cover"
                 />
                 {/* Overlay content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8">

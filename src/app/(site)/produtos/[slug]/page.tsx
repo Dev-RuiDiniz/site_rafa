@@ -20,8 +20,8 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  shortDescription: string;
-  description: string;
+  shortDescription: string | null;
+  description: string | null;
   image: string;
   gallery: string[];
   features: string[];
@@ -229,9 +229,11 @@ export default function ProductPage() {
                 {product.name}
               </h1>
 
-              <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                {product.shortDescription}
-              </p>
+              {product.shortDescription && (
+                <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                  {product.shortDescription}
+                </p>
+              )}
 
               {/* Features */}
               <div className="mb-10">
@@ -303,28 +305,31 @@ export default function ProductPage() {
       </section>
 
       {/* Description */}
-      <section ref={ref} className="py-16 lg:py-24 bg-gray-50">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl font-serif font-semibold text-black mb-8">
-                Sobre o {product.name}
-              </h2>
-              <div className="prose prose-lg prose-gray max-w-none">
-                {product.description.split("\n\n").map((paragraph, index) => (
-                  <p key={index} className="text-gray-600 leading-relaxed mb-4">
-                    {paragraph.trim()}
-                  </p>
-                ))}
-              </div>
-            </motion.div>
+      {product.description && product.description.trim() && (
+        <section className="py-16 lg:py-24 bg-gray-50">
+          <div className="container mx-auto px-6 lg:px-12">
+            <div className="max-w-3xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-3xl font-serif font-semibold text-black mb-8">
+                  Sobre o {product.name}
+                </h2>
+                <div className="prose prose-lg prose-gray max-w-none">
+                  {product.description.split("\n\n").filter(p => p.trim()).map((paragraph, index) => (
+                    <p key={index} className="text-gray-600 leading-relaxed mb-4">
+                      {paragraph.trim()}
+                    </p>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
