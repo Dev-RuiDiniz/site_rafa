@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,29 @@ export default function LoginPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user && (data.user.role === "ADMIN" || data.user.role === "SUPER_ADMIN")) {
+          router.replace("/admin");
+        } else {
+          setCheckingSession(false);
+        }
+      })
+      .catch(() => setCheckingSession(false));
+  }, [router]);
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Carregando...</div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
