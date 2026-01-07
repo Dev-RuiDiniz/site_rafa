@@ -146,7 +146,7 @@ export default function ProductsPage() {
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Link href={`/produtos/${product.slug}`} className="group block bg-white">
+                  <Link href={`/produtos/${product.slug}`} className="group block bg-white border border-gray-200 p-3 hover:border-gray-300 transition-colors">
                     {/* Image */}
                     <div className="relative aspect-square bg-gray-100 overflow-hidden">
                       <div
@@ -196,7 +196,7 @@ export default function ProductsPage() {
                 >
                   <Link
                     href={`/produtos/${product.slug}`}
-                    className="group flex flex-col md:flex-row gap-6 bg-white p-6 hover:shadow-lg transition-shadow duration-300"
+                    className="group flex flex-col md:flex-row gap-6 bg-white p-6 border border-gray-200 hover:border-gray-300 transition-colors"
                   >
                     {/* Image */}
                     <div className="relative w-full md:w-64 aspect-square md:aspect-auto md:h-48 bg-gray-100 overflow-hidden flex-shrink-0">

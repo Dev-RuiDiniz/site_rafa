@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye, HiOutlineSearch } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye, HiOutlineSearch, HiOutlineCog, HiX } from "react-icons/hi";
 import { Modal, ConfirmModal } from "@/components/admin/Modal";
 import { ImageUpload, GalleryUpload } from "@/components/admin/ImageUpload";
 
@@ -66,6 +66,9 @@ export default function ProdutosPage() {
   const [featureInput, setFeatureInput] = useState("");
   const [specLabel, setSpecLabel] = useState("");
   const [specValue, setSpecValue] = useState("");
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -219,6 +222,44 @@ export default function ProdutosPage() {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setSavingCategory(true);
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: newCategoryName.trim(),
+          slug: generateSlug(newCategoryName.trim())
+        }),
+      });
+      if (res.ok) {
+        fetchCategories();
+        setNewCategoryName("");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
+    try {
+      const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchCategories();
+        if (formData.categoryId === id) {
+          setFormData({ ...formData, categoryId: "" });
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -379,6 +420,30 @@ export default function ProdutosPage() {
               rows={4}
               className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none resize-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoria</label>
+            <div className="flex gap-2">
+              <select
+                value={formData.categoryId}
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none"
+              >
+                <option value="">Selecione uma categoria</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setCategoryModalOpen(true)}
+                className="px-4 py-2.5 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                title="Gerenciar categorias"
+              >
+                <HiOutlineCog className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           <div>
@@ -577,6 +642,59 @@ export default function ProdutosPage() {
         confirmText="Excluir"
         loading={saving}
       />
+
+      {/* Category Management Modal */}
+      {categoryModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setCategoryModalOpen(false)} />
+          <div className="relative bg-white dark:bg-zinc-900 w-full max-w-md p-6 shadow-xl">
+            <button
+              onClick={() => setCategoryModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <HiX className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-6">Gerenciar Categorias</h3>
+
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
+                placeholder="Nova categoria..."
+                className="flex-1 px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
+              />
+              <button
+                onClick={handleAddCategory}
+                disabled={savingCategory || !newCategoryName.trim()}
+                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-sm hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50"
+              >
+                {savingCategory ? "..." : "Adicionar"}
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {categories.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">Nenhuma categoria cadastrada</p>
+              ) : (
+                categories.map((cat) => (
+                  <div key={cat.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-zinc-800">
+                    <span className="text-sm text-black dark:text-white">{cat.name}</span>
+                    <button
+                      onClick={() => handleDeleteCategory(cat.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <HiOutlineTrash className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

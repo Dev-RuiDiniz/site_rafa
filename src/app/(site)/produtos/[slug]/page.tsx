@@ -393,7 +393,7 @@ export default function ProductPage() {
       <section className="py-16 bg-black text-white">
         <div className="container mx-auto px-6 lg:px-12 text-center">
           <h2 className="text-2xl md:text-3xl font-serif font-semibold mb-4">
-            Interessado no {product.name}?
+            Interessado neste produto?
           </h2>
           <p className="text-gray-400 mb-8">
             Entre em contato para receber um orçamento personalizado.
