@@ -157,34 +157,7 @@ export function FeaturedProducts() {
                       {product.category?.name}
                     </span>
 
-                    {/* Brand Logos */}
-                    {product.brands && product.brands.length > 0 && (
-                      <div className="absolute top-4 right-4 flex gap-1">
-                        {product.brands.some((b) => b.brand.slug === "maletti") && (
-                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
-                            <Image
-                              src="/images/site/malliti-preto.png"
-                              alt="Maletti"
-                              width={50}
-                              height={20}
-                              className="object-contain"
-                            />
-                          </div>
-                        )}
-                        {product.brands.some((b) => b.brand.slug === "nilo") && (
-                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 flex items-center justify-center">
-                            <Image
-                              src="/images/site/nilo.jpg"
-                              alt="Nilo"
-                              width={40}
-                              height={20}
-                              className="object-contain"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
+                    
                     {/* Hover Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                       <span className="inline-flex items-center text-sm font-medium text-white">
