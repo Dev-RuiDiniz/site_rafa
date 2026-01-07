@@ -316,7 +316,7 @@ export default function ProductPage() {
                 transition={{ duration: 0.6 }}
               >
                 <h2 className="text-3xl font-serif font-semibold text-black mb-8">
-                  Sobre o {product.name}
+                  {product.name}
                 </h2>
                 <div className="prose prose-lg prose-gray max-w-none">
                   {product.description.split("\n\n").filter(p => p.trim()).map((paragraph, index) => (
