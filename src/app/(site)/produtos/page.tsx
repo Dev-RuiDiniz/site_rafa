@@ -148,7 +148,7 @@ export default function ProductsPage() {
                 >
                   <Link href={`/produtos/${product.slug}`} className="group block bg-white">
                     {/* Image */}
-                    <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
+                    <div className="relative aspect-square bg-gray-100 overflow-hidden">
                       <div
                         className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 transition-transform duration-700 group-hover:scale-105"
                         style={{

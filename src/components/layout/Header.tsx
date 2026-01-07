@@ -55,7 +55,7 @@ export function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.02 }} className="relative h-14 w-[140px]">
+            <motion.div whileHover={{ scale: 1.02 }} className="relative h-16 w-[180px]">
               {/* Logo White - quando header transparente */}
               <Image
                 src="/logoshr-white.png"
@@ -86,11 +86,12 @@ export function Header() {
               <Button
                 variant="outline"
                 className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "border-black text-black hover:bg-black hover:text-white" : "border-white/80 text-white bg-transparent hover:bg-white hover:text-black"}`}
+                asChild
               >
-                Solicitar Catálogo
+                <Link href="/contato?assunto=catalogo">Solicitar Catálogo</Link>
               </Button>
-              <Button className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black hover:bg-gray-100"}`}>
-                Falar com Consultor
+              <Button className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black hover:bg-gray-100"}`} asChild>
+                <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor." target="_blank" rel="noopener noreferrer">Falar com Consultor</a>
               </Button>
             </div>
 
@@ -141,11 +142,12 @@ export function Header() {
                       <Button
                         variant="outline"
                         className="w-full border-white text-white bg-transparent hover:bg-white hover:text-black"
+                        asChild
                       >
-                        Solicitar Catálogo
+                        <Link href="/contato?assunto=catalogo">Solicitar Catálogo</Link>
                       </Button>
-                      <Button className="w-full bg-white text-black hover:bg-gray-100">
-                        Falar com Consultor
+                      <Button className="w-full bg-white text-black hover:bg-gray-100" asChild>
+                        <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor." target="_blank" rel="noopener noreferrer">Falar com Consultor</a>
                       </Button>
                     </div>
                   </div>

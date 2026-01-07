@@ -42,8 +42,6 @@ export function MaintenancePreview() {
               Suporte Técnico
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6 leading-tight">
-              Departamento de
-              <br />
               Manutenção
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">

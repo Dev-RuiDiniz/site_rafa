@@ -25,7 +25,7 @@ interface Banner {
 const fallbackSlides: Banner[] = [
   {
     id: "1",
-    badge: "Distribuidor Exclusivo Maletti no Brasil",
+    badge: null,
     title: "Maletti",
     subtitle: "A referência mundial em design e inovação",
     description: "Como distribuidor exclusivo no Brasil, a SHR traz a excelência da Maletti Group, unindo tradição artesanal e tecnologia avançada.",
@@ -40,7 +40,7 @@ const fallbackSlides: Banner[] = [
   },
   {
     id: "2",
-    badge: "Distribuidor Exclusivo Maletti no Brasil",
+    badge: null,
     title: "Nilo",
     subtitle: "O design a serviço do bem-estar",
     description: "Referência global em mobiliário de luxo para SPAs, hotéis e clínicas de estética. Soluções que transformam tratamentos em experiências sensoriais completas.",
@@ -55,7 +55,7 @@ const fallbackSlides: Banner[] = [
   },
   {
     id: "3",
-    badge: "Distribuidor Exclusivo Maletti no Brasil",
+    badge: null,
     title: "UKI",
     subtitle: "Inovação e estilo com a autêntica assinatura italiana",
     description: "A UKI International une moda e tecnologia para traduzir o \"Italian Sense of Beauty\" em equipamentos de alta performance.",
@@ -70,7 +70,7 @@ const fallbackSlides: Banner[] = [
   },
   {
     id: "4",
-    badge: "Distribuidor Exclusivo Maletti no Brasil",
+    badge: null,
     title: "Marco Boni",
     subtitle: "Excelência e precisão em cada detalhe",
     description: "Seleção exclusiva da linha profissional Marco Boni, essencial para o acabamento perfeito. Hair design e cuidados pessoais com alta durabilidade.",

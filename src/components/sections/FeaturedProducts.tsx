@@ -70,7 +70,7 @@ export function FeaturedProducts() {
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
               Coleção
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black">
+            <h2 className="text-3xl md:text-4xl font-serif font-semibold text-black">
               Produtos em Destaque
             </h2>
           </motion.div>
@@ -138,11 +138,11 @@ export function FeaturedProducts() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.1 * index }}
-                className="flex-shrink-0 w-[280px] md:w-[320px] snap-start"
+                className="flex-shrink-0 w-[220px] md:w-[260px] snap-start"
               >
                 <Link href={`/produtos/${product.slug}`} className="group block">
                   {/* Image Container */}
-                  <div className="relative aspect-[3/4] bg-gray-100 mb-5 overflow-hidden">
+                  <div className="relative aspect-square bg-gray-100 mb-5 overflow-hidden">
                     <Image
                       src={product.image || "/images/site/heaven2.jpg"}
                       alt={product.name}

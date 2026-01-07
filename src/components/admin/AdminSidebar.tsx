@@ -14,6 +14,7 @@ import {
   HiOutlineDocumentText,
   HiOutlineExternalLink,
   HiOutlinePhotograph,
+  HiOutlineTemplate,
 } from "react-icons/hi";
 
 const menuItems = [
@@ -26,6 +27,7 @@ const menuItems = [
   {
     section: "Conteúdo",
     items: [
+      { title: "Páginas", href: "/admin/paginas", icon: HiOutlineTemplate },
       { title: "Banners", href: "/admin/banners", icon: HiOutlinePhotograph },
       { title: "Produtos", href: "/admin/produtos", icon: HiOutlineCube },
       { title: "Marcas", href: "/admin/marcas", icon: HiOutlineTag },

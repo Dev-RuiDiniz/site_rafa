@@ -62,7 +62,7 @@ export function Footer() {
                 </span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed max-w-sm mb-8">
-                Somos o único distribuidor exclusivo da Maletti no Brasil, 
+                Somos representantes exclusivos da Maletti no Brasil, 
                 trazendo o que há de mais sofisticado em mobiliário para 
                 salões de beleza e spas.
               </p>

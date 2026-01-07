@@ -124,7 +124,7 @@ export default function ManutencaoPage() {
                   asChild
                 >
                   <a
-                    href="https://wa.me/5511981982279?text=Olá! Preciso de suporte técnico para meu equipamento Maletti."
+                    href="https://wa.me/5511945370735?text=Olá! Preciso de suporte técnico para meu equipamento Maletti."
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -277,7 +277,7 @@ export default function ManutencaoPage() {
               asChild
             >
               <a
-                href="https://wa.me/5511981982279?text=Olá! Gostaria de solicitar manutenção para meu equipamento Maletti."
+                href="https://wa.me/5511945370735?text=Olá! Gostaria de solicitar manutenção para meu equipamento Maletti."
                 target="_blank"
                 rel="noopener noreferrer"
               >
