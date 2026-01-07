@@ -138,7 +138,7 @@ export function FeaturedProducts() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.1 * index }}
-                className="flex-shrink-0 w-[220px] md:w-[260px] snap-start"
+                className="flex-shrink-0 w-[220px] md:w-[260px] snap-start border border-gray-200 bg-white p-3 hover:border-gray-300 transition-colors"
               >
                 <Link href={`/produtos/${product.slug}`} className="group block">
                   {/* Image Container */}

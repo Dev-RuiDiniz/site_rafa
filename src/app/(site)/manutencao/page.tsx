@@ -141,24 +141,13 @@ export default function ManutencaoPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="hidden lg:block"
             >
-              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
-                {/* Image */}
+              <div className="aspect-square relative overflow-hidden">
                 <Image
                   src="/manutencao.webp"
                   alt="Manutenção SHR"
                   fill
                   className="object-cover"
                 />
-                {/* Overlay content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <HiOutlineWrenchScrewdriver className="w-20 h-20 text-white/80 mb-4" />
-                  <p className="text-white/60 text-sm tracking-widest uppercase">Suporte Técnico</p>
-                  <p className="text-white font-serif text-2xl mt-2">Especializado</p>
-                </div>
-                
-                {/* Decorative */}
-                <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-white/20" />
-                <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-white/20" />
               </div>
             </motion.div>
           </div>

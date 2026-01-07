@@ -73,29 +73,14 @@ export default function MarcasPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="hidden lg:block"
             >
-              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden flex items-center justify-center">
                 <Image
-                  src="/images/site/DK3E3179-MOD.jpg"
-                  alt="Showroom"
-                  fill
-                  className="object-cover opacity-60"
+                  src="/logoshr-white.png"
+                  alt="SHR Hair"
+                  width={280}
+                  height={112}
+                  className="object-contain"
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <Image
-                    src="/images/site/Maletti - Logo bianco.png"
-                    alt="Maletti"
-                    width={160}
-                    height={60}
-                    className="mb-6"
-                  />
-                  <div className="w-12 h-px bg-white/30 mb-6" />
-                  <Image
-                    src="/logoshr-white.png"
-                    alt="SHR"
-                    width={100}
-                    height={40}
-                  />
-                </div>
                 <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-white/20" />
                 <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-white/20" />
               </div>
@@ -140,7 +125,6 @@ export default function MarcasPage() {
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-6 left-6">
                       {brand.logo && (
                       <Image
