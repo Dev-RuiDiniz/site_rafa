@@ -364,8 +364,8 @@ export default function ProductPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Link href={`/produtos/${relatedProduct.slug}`} className="group block">
-                    <div className="relative aspect-[4/5] bg-gray-100 mb-4 overflow-hidden">
+                  <Link href={`/produtos/${relatedProduct.slug}`} className="group block bg-white border border-gray-200 p-3 hover:border-gray-300 transition-colors">
+                    <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
                       <div
                         className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 transition-transform duration-700 group-hover:scale-105"
                         style={{
