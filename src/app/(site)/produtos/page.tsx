@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
@@ -22,7 +22,7 @@ interface Product {
   category: Category | null;
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const buscaParam = searchParams.get("busca") || "";
   
@@ -316,5 +316,23 @@ export default function ProductsPage() {
         </div>
       </section>
     </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="pt-32 pb-16 bg-white min-h-screen">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-32 mb-4"></div>
+            <div className="h-16 bg-gray-200 rounded w-96 mb-6"></div>
+            <div className="h-6 bg-gray-200 rounded w-full max-w-2xl"></div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
