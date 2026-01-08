@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { HiArrowRight, HiOutlineViewGrid, HiOutlineViewList } from "react-icons/hi";
+import { HiArrowRight, HiOutlineViewGrid, HiOutlineViewList, HiOutlineSearch, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
 interface Category {
@@ -22,13 +23,21 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const buscaParam = searchParams.get("busca") || "";
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState(buscaParam);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    setSearchQuery(buscaParam);
+  }, [buscaParam]);
 
   useEffect(() => {
     Promise.all([
@@ -43,9 +52,14 @@ export default function ProductsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredProducts = selectedCategory
-    ? products.filter((p) => p.category?.slug === selectedCategory)
-    : products;
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory = selectedCategory ? p.category?.slug === selectedCategory : true;
+    const matchesSearch = searchQuery.trim()
+      ? p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <>
@@ -77,31 +91,54 @@ export default function ProductsPage() {
       <section className="py-8 bg-white border-y border-gray-100 sticky top-20 z-40">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            {/* Category Pills */}
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                  selectedCategory === null
-                    ? "bg-black text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Todos
-              </button>
-              {categories.map((category) => (
+            {/* Search + Category Pills */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {/* Search Input */}
+              <div className="relative w-full sm:w-64">
+                <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar produtos..."
+                  className="w-full pl-10 pr-8 py-2 text-sm border border-gray-200 focus:border-black outline-none transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <HiX className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category Pills */}
+              <div className="flex flex-wrap items-center gap-3">
                 <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.slug)}
+                  onClick={() => setSelectedCategory(null)}
                   className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                    selectedCategory === category.slug
+                    selectedCategory === null
                       ? "bg-black text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {category.name}
+                  Todos
                 </button>
-              ))}
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.slug)}
+                    className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                      selectedCategory === category.slug
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* View Toggle & Count */}

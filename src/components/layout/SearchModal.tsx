@@ -223,12 +223,15 @@ export function SearchButton({ showDarkElements }: { showDarkElements: boolean }
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`p-2 transition-colors duration-300 ${
-          showDarkElements ? "text-black hover:text-gray-600" : "text-white hover:text-white/80"
+        className={`flex items-center gap-2 px-3 py-1.5 border transition-all duration-300 ${
+          showDarkElements 
+            ? "border-gray-200 text-black hover:border-black" 
+            : "border-white/30 text-white hover:border-white"
         }`}
         aria-label="Buscar"
       >
-        <HiOutlineSearch className="w-5 h-5" />
+        <HiOutlineSearch className="w-4 h-4" />
+        <span className="text-sm font-medium hidden sm:inline">Buscar produtos</span>
       </button>
       <SearchModal isOpen={isOpen} onClose={() => setIsOpen(false)} showDarkElements={showDarkElements} />
     </>
