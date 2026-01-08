@@ -112,24 +112,13 @@ export default function ManutencaoPage() {
                   className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group"
                   asChild
                 >
-                  <a href="#solicitar">
-                    Solicitar Manutenção
-                    <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
-                  asChild
-                >
                   <a
                     href="https://wa.me/5511945370735?text=Olá! Preciso de suporte técnico para meu equipamento Maletti."
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <HiOutlinePhone className="mr-2 w-5 h-5" />
-                    WhatsApp
+                    Solicitar Manutenção
                   </a>
                 </Button>
               </div>

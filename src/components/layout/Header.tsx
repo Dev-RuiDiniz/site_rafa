@@ -12,6 +12,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { SearchButton } from "./SearchModal";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -81,6 +82,9 @@ export function Header() {
 
           {/* Right Side - CTAs + Menu */}
           <div className="flex items-center gap-6">
+            {/* Search Button */}
+            <SearchButton showDarkElements={showDarkElements} />
+
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-4">
               <Button

@@ -242,48 +242,7 @@ export default function SobrePage() {
         </div>
       </section>
 
-      {/* Timeline */}
-      <section ref={timelineRef} className="py-24 bg-black text-white">
-        <div className="container mx-auto px-6 lg:px-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={timelineInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="text-sm uppercase tracking-[0.2em] text-gray-400 mb-4 block">
-              Nossa Trajetória
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif font-semibold">
-              Uma história de sucesso
-            </h2>
-          </motion.div>
-
-          <div className="max-w-4xl mx-auto">
-            {timeline.map((item, index) => (
-              <motion.div
-                key={item.year}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                animate={timelineInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: index * 0.15 }}
-                className="flex gap-8 mb-12 last:mb-0"
-              >
-                <div className="flex-shrink-0 w-20 text-right">
-                  <span className="text-2xl font-serif font-bold text-white">
-                    {item.year}
-                  </span>
-                </div>
-                <div className="relative flex-1 pb-12 border-l border-gray-700 pl-8">
-                  <div className="absolute left-0 top-0 w-3 h-3 -translate-x-1/2 bg-white rounded-full" />
-                  <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                  <p className="text-gray-400">{item.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Maletti Partnership */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
