@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { HiArrowRight, HiPlay, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
@@ -16,13 +15,18 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-        {/* Background */}
+        {/* Video Background */}
         <div className="absolute inset-0">
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/images/site/DK3E3179-MOD.jpg')" }}
-          />
-          <div className="absolute inset-0 bg-black/60" />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/Vídeo Home.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content */}
@@ -32,18 +36,9 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <Image
-              src="/images/site/Maletti - Logo bianco.png"
-              alt="Maletti"
-              width={200}
-              height={80}
-              className="mx-auto mb-8"
-            />
-            
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-semibold mb-6 leading-tight">
               Transforme Espaços.
-              <br />
-              <span className="text-gray-300">Eleve Experiências.</span>
+              <span className="text-gray-300"> Eleve Experiências.</span>
             </h1>
             
             <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
@@ -70,22 +65,6 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
                 <HiPlay className="mr-2 w-5 h-5" />
                 Assistir Vídeo
               </Button>
-            </div>
-          </motion.div>
-
-          {/* Scroll Indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2"
-          >
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1.5 h-1.5 bg-white rounded-full"
-              />
             </div>
           </motion.div>
         </div>

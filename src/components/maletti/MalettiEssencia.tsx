@@ -28,11 +28,38 @@ const features = [
   }
 ];
 
-const achievements = [
-  "Grand Prix de l'Innovation - Paris",
-  "Credit Reputation Award",
-  "Rede internacional de showrooms",
-  "Presença em todos os continentes"
+const awards = [
+  {
+    title: "Grand Prix de l'Innovation",
+    location: "Paris, França",
+    year: "2023",
+    description: "Reconhecimento pela inovação em design de mobiliário para salões"
+  },
+  {
+    title: "Credit Reputation Award",
+    location: "Itália",
+    year: "2022",
+    description: "Excelência em reputação corporativa e confiabilidade"
+  },
+  {
+    title: "Cosmoprof Excellence Award",
+    location: "Bologna, Itália",
+    year: "2024",
+    description: "Melhor design em equipamentos para bem-estar capilar"
+  },
+  {
+    title: "MCB Paris Design Award",
+    location: "Paris, França",
+    year: "2023",
+    description: "Destaque em inovação tecnológica aplicada ao design"
+  }
+];
+
+const globalPresence = [
+  { number: "60+", label: "Anos de história" },
+  { number: "90+", label: "Países atendidos" },
+  { number: "15", label: "Showrooms no mundo" },
+  { number: "500+", label: "Parceiros globais" }
 ];
 
 export function MalettiEssencia() {
@@ -83,46 +110,93 @@ export function MalettiEssencia() {
           ))}
         </div>
 
-        {/* Liderança Global */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-              <Image
-                src="/images/site/Shirobody_showroom.jpg"
-                alt="Showroom Maletti"
-                fill
-                className="object-cover"
-              />
+        {/* Global Presence Numbers */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 py-12 border-y border-gray-200"
+        >
+          {globalPresence.map((item, index) => (
+            <div key={index} className="text-center">
+              <span className="text-4xl md:text-5xl font-serif font-bold text-black block mb-2">
+                {item.number}
+              </span>
+              <span className="text-gray-600 text-sm uppercase tracking-wider">
+                {item.label}
+              </span>
             </div>
-          </motion.div>
+          ))}
+        </motion.div>
 
+        {/* Liderança Global e Prêmios */}
+        <div className="mb-16">
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mb-12"
           >
-            <h3 className="text-3xl md:text-4xl font-serif font-semibold text-black mb-6">
+            <h3 className="text-3xl md:text-4xl font-serif font-semibold text-black mb-4">
               Liderança Global e Reconhecimento
             </h3>
-            <p className="text-gray-600 text-lg leading-relaxed mb-6">
+            <p className="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
               A Maletti é líder e referência mundial no setor, com presença como protagonista 
-              nas feiras mais importantes do mundo, como a Cosmoprof Worldwide e a prestigiada 
-              MCB em Paris.
+              nas feiras mais importantes do mundo.
             </p>
-            <ul className="space-y-4">
-              {achievements.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-gray-700">
-                  <HiOutlineBadgeCheck className="w-5 h-5 text-black flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
           </motion.div>
+
+          {/* Awards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {awards.map((award, index) => (
+              <motion.div
+                key={award.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                className="bg-gray-50 p-6 hover:bg-gray-100 transition-colors group"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-black flex items-center justify-center">
+                    <HiOutlineBadgeCheck className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-2xl font-serif font-bold text-black">{award.year}</span>
+                </div>
+                <h4 className="text-lg font-semibold text-black mb-1 group-hover:text-gray-700 transition-colors">
+                  {award.title}
+                </h4>
+                <p className="text-sm text-gray-500 mb-2">{award.location}</p>
+                <p className="text-gray-600 text-sm">{award.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
+
+        {/* Showroom Image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={isInView ? { opacity: 1, scale: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="relative aspect-[21/9] bg-gray-100 overflow-hidden"
+        >
+          <Image
+            src="/images/site/Shirobody_showroom.jpg"
+            alt="Showroom Maletti"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center">
+            <div className="p-8 lg:p-16 max-w-xl">
+              <p className="text-white/80 text-sm uppercase tracking-wider mb-2">Showrooms Internacionais</p>
+              <h4 className="text-2xl md:text-3xl font-serif font-semibold text-white mb-4">
+                Experiência Premium em Todo o Mundo
+              </h4>
+              <p className="text-white/70">
+                Visite um dos nossos showrooms e descubra a excelência Maletti pessoalmente.
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
