@@ -97,20 +97,58 @@ export default function ContatoPage() {
 
   const onContactSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    // TODO: Implementar envio do formulário
-    console.log("Contact form:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+    try {
+      const response = await fetch("/api/kommo/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: `Assunto: ${data.subject}\nCidade: ${data.city || "Não informada"}\n\n${data.message}`,
+          source: "Formulário Contato Site",
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Erro ao enviar");
+      }
+      
+      setSubmitSuccess(true);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const onCatalogSubmit = async (data: CatalogFormData) => {
     setIsSubmitting(true);
-    // TODO: Implementar envio do formulário
-    console.log("Catalog form:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+    try {
+      const response = await fetch("/api/kommo/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: `Tipo de Negócio: ${data.businessType || "Não informado"}\nCidade: ${data.city || "Não informada"}\n\nSolicitou o catálogo digital.`,
+          source: "Solicitação Catálogo Site",
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Erro ao enviar");
+      }
+      
+      setSubmitSuccess(true);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erro ao enviar. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
