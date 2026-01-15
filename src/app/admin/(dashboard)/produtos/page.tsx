@@ -18,6 +18,7 @@ interface Product {
   featured: boolean;
   active: boolean;
   category: { id: string; name: string } | null;
+  categories: { category: { id: string; name: string } }[];
   brands: { brand: { id: string; name: string } }[];
 }
 
@@ -44,7 +45,7 @@ const emptyProduct = {
   video: "",
   featured: false,
   active: true,
-  categoryId: "",
+  categoryIds: [] as string[],
   brandIds: [] as string[],
 };
 
@@ -130,7 +131,7 @@ export default function ProdutosPage() {
       video: "",
       featured: product.featured,
       active: product.active,
-      categoryId: product.category?.id || "",
+      categoryIds: product.categories?.map((c) => c.category.id) || (product.category?.id ? [product.category.id] : []),
       brandIds: product.brands?.map((b) => b.brand.id) || [],
     });
     setModalOpen(true);
@@ -253,8 +254,8 @@ export default function ProdutosPage() {
       const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
       if (res.ok) {
         fetchCategories();
-        if (formData.categoryId === id) {
-          setFormData({ ...formData, categoryId: "" });
+        if (formData.categoryIds.includes(id)) {
+          setFormData({ ...formData, categoryIds: formData.categoryIds.filter(cId => cId !== id) });
         }
       }
     } catch (error) {
@@ -270,13 +271,24 @@ export default function ProdutosPage() {
           <h1 className="text-3xl font-serif font-semibold text-black dark:text-white">Produtos</h1>
           <p className="text-gray-400 mt-1 text-sm">Gerencie os produtos do catálogo</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-        >
-          <HiOutlinePlus className="h-4 w-4" />
-          Novo Produto
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setCategoryModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors text-sm"
+            title="Gerenciar categorias"
+          >
+            <HiOutlineCog className="w-5 h-5" />
+            Categorias
+          </button>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+          >
+            <HiOutlinePlus className="h-4 w-4" />
+            Novo Produto
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -328,7 +340,9 @@ export default function ProdutosPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {product.category?.name || "-"}
+                    {product.categories?.length > 0 
+                      ? product.categories.map(c => c.category.name).join(", ")
+                      : product.category?.name || "-"}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-[10px] uppercase tracking-wider font-medium ${
@@ -423,26 +437,36 @@ export default function ProdutosPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoria</label>
-            <div className="flex gap-2">
-              <select
-                value={formData.categoryId}
-                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none"
-              >
-                <option value="">Selecione uma categoria</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setCategoryModalOpen(true)}
-                className="px-4 py-2.5 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                title="Gerenciar categorias"
-              >
-                <HiOutlineCog className="w-5 h-5" />
-              </button>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categorias</label>
+            <div className="flex flex-wrap gap-3 p-4 border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/50">
+              {categories.length === 0 ? (
+                <p className="text-sm text-gray-400">Nenhuma categoria cadastrada</p>
+              ) : (
+                categories.map((cat) => (
+                  <label
+                    key={cat.id}
+                    className={`flex items-center gap-2 px-3 py-2 border cursor-pointer transition-colors ${
+                      formData.categoryIds.includes(cat.id)
+                        ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                        : "border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.categoryIds.includes(cat.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, categoryIds: [...formData.categoryIds, cat.id] });
+                        } else {
+                          setFormData({ ...formData, categoryIds: formData.categoryIds.filter((id) => id !== cat.id) });
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <span className="text-sm">{cat.name}</span>
+                  </label>
+                ))
+              )}
             </div>
           </div>
 

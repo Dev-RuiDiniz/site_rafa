@@ -71,16 +71,17 @@ enum Role {
 // ==================== PRODUTOS ====================
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String            @unique
   description String?
   image       String?
-  order       Int       @default(0)
-  active      Boolean   @default(true)
+  order       Int               @default(0)
+  active      Boolean           @default(true)
   products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  productCategories ProductCategory[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model Brand {
@@ -99,25 +100,26 @@ model Brand {
 }
 
 model Product {
-  id               String         @id @default(cuid())
+  id               String            @id @default(cuid())
   name             String
-  slug             String         @unique
+  slug             String            @unique
   shortDescription String?
-  description      String?        @db.Text
+  description      String?           @db.Text
   features         String[]
   image            String?
   gallery          String[]
   video            String?
-  featured         Boolean        @default(false)
-  active           Boolean        @default(true)
-  order            Int            @default(0)
+  featured         Boolean           @default(false)
+  active           Boolean           @default(true)
+  order            Int               @default(0)
   categoryId       String?
-  category         Category?      @relation(fields: [categoryId], references: [id])
+  category         Category?         @relation(fields: [categoryId], references: [id])
+  categories       ProductCategory[]
   brands           ProductBrand[]
   specifications   Specification[]
-  views            Int            @default(0)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  views            Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model ProductBrand {
@@ -127,6 +129,15 @@ model ProductBrand {
   brand     Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@id([productId, brandId])
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
 }
 
 model Specification {

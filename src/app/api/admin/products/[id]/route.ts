@@ -11,6 +11,7 @@ export async function GET(
       where: { id },
       include: {
         category: true,
+        categories: { include: { category: true } },
         brands: { include: { brand: true } },
         specifications: true,
       },
@@ -35,8 +36,9 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
 
-    // Remove existing brand relations and specifications
+    // Remove existing relations
     await prisma.productBrand.deleteMany({ where: { productId: id } });
+    await prisma.productCategory.deleteMany({ where: { productId: id } });
     await prisma.specification.deleteMany({ where: { productId: id } });
 
     const product = await prisma.product.update({
@@ -52,7 +54,12 @@ export async function PUT(
         video: data.video,
         featured: data.featured || false,
         active: data.active ?? true,
-        categoryId: data.categoryId || null,
+        categoryId: data.categoryIds?.[0] || null,
+        categories: data.categoryIds?.length
+          ? {
+              create: data.categoryIds.map((categoryId: string) => ({ categoryId })),
+            }
+          : undefined,
         brands: data.brandIds?.length
           ? {
               create: data.brandIds.map((brandId: string) => ({ brandId })),
@@ -69,6 +76,7 @@ export async function PUT(
       },
       include: {
         category: true,
+        categories: { include: { category: true } },
         brands: { include: { brand: true } },
         specifications: true,
       },

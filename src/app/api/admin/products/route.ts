@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           category: true,
+          categories: { include: { category: true } },
           brands: { include: { brand: true } },
           specifications: true,
         },
@@ -63,7 +64,12 @@ export async function POST(request: NextRequest) {
         video: data.video,
         featured: data.featured || false,
         active: data.active ?? true,
-        categoryId: data.categoryId || null,
+        categoryId: data.categoryIds?.[0] || null,
+        categories: data.categoryIds?.length
+          ? {
+              create: data.categoryIds.map((categoryId: string) => ({ categoryId })),
+            }
+          : undefined,
         brands: data.brandIds?.length
           ? {
               create: data.brandIds.map((brandId: string) => ({ brandId })),
@@ -80,6 +86,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         category: true,
+        categories: { include: { category: true } },
         brands: { include: { brand: true } },
         specifications: true,
       },
