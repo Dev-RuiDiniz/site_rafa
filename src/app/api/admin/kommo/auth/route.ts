@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
-// POST - Trocar código de autorização por access token
+// POST - Salvar access token diretamente (long-lived token)
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -10,66 +10,52 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    const { authorizationCode } = await request.json();
+    const { accessToken } = await request.json();
 
-    if (!authorizationCode) {
-      return NextResponse.json({ error: "Código de autorização não fornecido" }, { status: 400 });
+    if (!accessToken) {
+      return NextResponse.json({ error: "Token de acesso não fornecido" }, { status: 400 });
     }
 
     const settings = await (prisma as any).kommoSettings.findFirst();
 
-    if (!settings || !settings.subdomain || !settings.clientId || !settings.clientSecret) {
+    if (!settings || !settings.subdomain) {
       return NextResponse.json({ 
-        error: "Configure o subdomínio, Client ID e Client Secret antes de autorizar" 
+        error: "Configure o subdomínio antes de salvar o token" 
       }, { status: 400 });
     }
 
-    // Trocar código de autorização por access token
-    const tokenResponse = await fetch(`https://${settings.subdomain}.kommo.com/oauth2/access_token`, {
-      method: "POST",
+    // Validar token fazendo uma requisição de teste
+    const testResponse = await fetch(`https://${settings.subdomain}.kommo.com/api/v4/account`, {
       headers: {
-        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        client_id: settings.clientId,
-        client_secret: settings.clientSecret,
-        grant_type: "authorization_code",
-        code: authorizationCode,
-        redirect_uri: `https://${settings.subdomain}.kommo.com`,
-      }),
     });
 
-    if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.json();
-      console.error("Kommo token error:", errorData);
+    if (!testResponse.ok) {
       return NextResponse.json({ 
-        error: errorData.hint || errorData.detail || "Erro ao obter token",
-        details: errorData
+        error: "Token inválido ou expirado",
       }, { status: 400 });
     }
 
-    const tokenData = await tokenResponse.json();
+    // Token é long-lived, expira em ~3 anos
+    const expiresAt = new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000);
 
-    // Calcular data de expiração
-    const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
-
-    // Salvar tokens no banco
+    // Salvar token no banco
     await (prisma as any).kommoSettings.update({
       where: { id: settings.id },
       data: {
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
+        accessToken: accessToken,
         tokenExpiresAt: expiresAt,
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Autorização concluída com sucesso!",
+      message: "Token salvo com sucesso!",
       expiresAt: expiresAt.toISOString(),
     });
   } catch (error) {
     console.error("Error in Kommo auth:", error);
-    return NextResponse.json({ error: "Erro interno ao processar autorização" }, { status: 500 });
+    return NextResponse.json({ error: "Erro interno ao processar token" }, { status: 500 });
   }
 }

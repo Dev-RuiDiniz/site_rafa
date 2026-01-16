@@ -101,7 +101,7 @@ export default function KommoPage() {
 
   const handleAuthorize = async () => {
     if (!authCode.trim()) {
-      setMessage({ type: "error", text: "Cole o código de autorização" });
+      setMessage({ type: "error", text: "Cole o token de acesso" });
       return;
     }
 
@@ -111,20 +111,20 @@ export default function KommoPage() {
       const res = await fetch("/api/admin/kommo/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ authorizationCode: authCode }),
+        body: JSON.stringify({ accessToken: authCode }),
       });
       
       const data = await res.json();
       
       if (res.ok) {
-        setMessage({ type: "success", text: "Autorização concluída com sucesso!" });
+        setMessage({ type: "success", text: "Token salvo com sucesso!" });
         setAuthCode("");
         fetchSettings();
       } else {
-        setMessage({ type: "error", text: data.error || "Erro na autorização" });
+        setMessage({ type: "error", text: data.error || "Erro ao salvar token" });
       }
     } catch (error) {
-      setMessage({ type: "error", text: "Erro ao autorizar" });
+      setMessage({ type: "error", text: "Erro ao salvar token" });
     } finally {
       setAuthorizing(false);
     }
@@ -265,32 +265,21 @@ export default function KommoPage() {
 
       {/* Autorização */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 mb-6">
-        <h2 className="font-medium text-zinc-900 dark:text-white mb-2">Autorização</h2>
+        <h2 className="font-medium text-zinc-900 dark:text-white mb-2">Token de Acesso</h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Após salvar as credenciais, clique no link abaixo para autorizar e cole o código aqui.
+          Cole o <strong>Long-lived access token</strong> da sua integração no Kommo.
+          Acesse: Configurações → Integrações → Sua integração → Copie o token.
         </p>
-
-        {formData.subdomain && formData.clientId && (
-          <a
-            href={`https://${formData.subdomain}.kommo.com/oauth?client_id=${formData.clientId}&mode=popup`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm mb-4"
-          >
-            <HiOutlineLink className="w-4 h-4" />
-            Abrir página de autorização do Kommo
-          </a>
-        )}
 
         <div className="flex gap-3">
           <Input
             value={authCode}
             onChange={(e) => setAuthCode(e.target.value)}
-            placeholder="Cole o código de autorização aqui"
+            placeholder="Cole o token de acesso aqui (eyJ0eXAi...)"
             className="flex-1"
           />
           <Button onClick={handleAuthorize} disabled={authorizing || !authCode}>
-            {authorizing ? "Autorizando..." : "Autorizar"}
+            {authorizing ? "Salvando..." : "Salvar Token"}
           </Button>
         </div>
       </div>
