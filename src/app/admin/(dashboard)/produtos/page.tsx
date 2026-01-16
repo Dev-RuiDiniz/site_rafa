@@ -26,6 +26,9 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  parentId?: string | null;
+  parent?: Category | null;
+  children?: Category[];
 }
 
 interface Brand {
@@ -69,6 +72,7 @@ export default function ProdutosPage() {
   const [specValue, setSpecValue] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryParentId, setNewCategoryParentId] = useState<string | null>(null);
   const [savingCategory, setSavingCategory] = useState(false);
 
   useEffect(() => {
@@ -234,18 +238,31 @@ export default function ProdutosPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           name: newCategoryName.trim(),
-          slug: generateSlug(newCategoryName.trim())
+          slug: generateSlug(newCategoryName.trim()),
+          parentId: newCategoryParentId
         }),
       });
       if (res.ok) {
         fetchCategories();
         setNewCategoryName("");
+        setNewCategoryParentId(null);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setSavingCategory(false);
     }
+  };
+
+  // Helper para obter categorias principais (sem parent)
+  const rootCategories = categories.filter(c => !c.parentId);
+  
+  // Helper para obter nome com hierarquia
+  const getCategoryDisplayName = (cat: Category): string => {
+    if (cat.parent) {
+      return `${cat.parent.name} → ${cat.name}`;
+    }
+    return cat.name;
   };
 
   const handleDeleteCategory = async (id: string) => {
@@ -438,33 +455,62 @@ export default function ProdutosPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categorias</label>
-            <div className="flex flex-wrap gap-3 p-4 border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/50">
+            <div className="p-4 border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/50 space-y-4">
               {categories.length === 0 ? (
                 <p className="text-sm text-gray-400">Nenhuma categoria cadastrada</p>
               ) : (
-                categories.map((cat) => (
-                  <label
-                    key={cat.id}
-                    className={`flex items-center gap-2 px-3 py-2 border cursor-pointer transition-colors ${
-                      formData.categoryIds.includes(cat.id)
-                        ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
-                        : "border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.categoryIds.includes(cat.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({ ...formData, categoryIds: [...formData.categoryIds, cat.id] });
-                        } else {
-                          setFormData({ ...formData, categoryIds: formData.categoryIds.filter((id) => id !== cat.id) });
-                        }
-                      }}
-                      className="sr-only"
-                    />
-                    <span className="text-sm">{cat.name}</span>
-                  </label>
+                rootCategories.map((cat) => (
+                  <div key={cat.id} className="space-y-2">
+                    <label
+                      className={`flex items-center gap-2 px-3 py-2 border cursor-pointer transition-colors ${
+                        formData.categoryIds.includes(cat.id)
+                          ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                          : "border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.categoryIds.includes(cat.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, categoryIds: [...formData.categoryIds, cat.id] });
+                          } else {
+                            setFormData({ ...formData, categoryIds: formData.categoryIds.filter((id) => id !== cat.id) });
+                          }
+                        }}
+                        className="sr-only"
+                      />
+                      <span className="text-sm font-medium">{cat.name}</span>
+                    </label>
+                    {cat.children && cat.children.length > 0 && (
+                      <div className="ml-4 flex flex-wrap gap-2">
+                        {cat.children.map((sub) => (
+                          <label
+                            key={sub.id}
+                            className={`flex items-center gap-2 px-3 py-1.5 border cursor-pointer transition-colors text-xs ${
+                              formData.categoryIds.includes(sub.id)
+                                ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                                : "border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={formData.categoryIds.includes(sub.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({ ...formData, categoryIds: [...formData.categoryIds, sub.id] });
+                                } else {
+                                  setFormData({ ...formData, categoryIds: formData.categoryIds.filter((id) => id !== sub.id) });
+                                }
+                              }}
+                              className="sr-only"
+                            />
+                            <span>↳ {sub.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))
               )}
             </div>
@@ -671,7 +717,7 @@ export default function ProdutosPage() {
       {categoryModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setCategoryModalOpen(false)} />
-          <div className="relative bg-white dark:bg-zinc-900 w-full max-w-md p-6 shadow-xl">
+          <div className="relative bg-white dark:bg-zinc-900 w-full max-w-lg p-6 shadow-xl">
             <button
               onClick={() => setCategoryModalOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -681,37 +727,66 @@ export default function ProdutosPage() {
 
             <h3 className="text-xl font-semibold text-black dark:text-white mb-6">Gerenciar Categorias</h3>
 
-            <div className="flex gap-2 mb-4">
-              <input
-                type="text"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
-                placeholder="Nova categoria..."
-                className="flex-1 px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
-              />
-              <button
-                onClick={handleAddCategory}
-                disabled={savingCategory || !newCategoryName.trim()}
-                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-sm hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50"
+            <div className="space-y-3 mb-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
+                  placeholder="Nome da categoria..."
+                  className="flex-1 px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
+                />
+                <button
+                  onClick={handleAddCategory}
+                  disabled={savingCategory || !newCategoryName.trim()}
+                  className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-sm hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50"
+                >
+                  {savingCategory ? "..." : "Adicionar"}
+                </button>
+              </div>
+              <select
+                value={newCategoryParentId || ""}
+                onChange={(e) => setNewCategoryParentId(e.target.value || null)}
+                className="w-full px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none text-sm"
               >
-                {savingCategory ? "..." : "Adicionar"}
-              </button>
+                <option value="">Categoria principal (sem pai)</option>
+                {rootCategories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>Subcategoria de: {cat.name}</option>
+                ))}
+              </select>
             </div>
 
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="space-y-1 max-h-72 overflow-y-auto">
               {categories.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-4">Nenhuma categoria cadastrada</p>
               ) : (
-                categories.map((cat) => (
-                  <div key={cat.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-zinc-800">
-                    <span className="text-sm text-black dark:text-white">{cat.name}</span>
-                    <button
-                      onClick={() => handleDeleteCategory(cat.id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <HiOutlineTrash className="w-4 h-4" />
-                    </button>
+                rootCategories.map((cat) => (
+                  <div key={cat.id}>
+                    <div className="flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-zinc-800">
+                      <span className="text-sm font-medium text-black dark:text-white">{cat.name}</span>
+                      <button
+                        onClick={() => handleDeleteCategory(cat.id)}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <HiOutlineTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {cat.children && cat.children.length > 0 && (
+                      <div className="ml-4 border-l-2 border-gray-200 dark:border-zinc-700">
+                        {cat.children.map((sub) => (
+                          <div key={sub.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-zinc-800/50">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">↳ {sub.name}</span>
+                            <button
+                              onClick={() => handleDeleteCategory(sub.id)}
+                              className="text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <HiOutlineTrash className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))
               )}

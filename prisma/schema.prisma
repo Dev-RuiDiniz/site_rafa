@@ -78,6 +78,9 @@ model Category {
   image       String?
   order       Int               @default(0)
   active      Boolean           @default(true)
+  parentId    String?
+  parent      Category?         @relation("CategorySubcategories", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[]        @relation("CategorySubcategories")
   products    Product[]
   productCategories ProductCategory[]
   createdAt   DateTime          @default(now())

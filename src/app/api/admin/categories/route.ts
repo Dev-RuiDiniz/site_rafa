@@ -4,6 +4,12 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
+      include: {
+        parent: true,
+        children: {
+          orderBy: { name: "asc" },
+        },
+      },
       orderBy: { name: "asc" },
     });
     return NextResponse.json({ categories });
@@ -22,6 +28,7 @@ export async function POST(request: NextRequest) {
         slug: data.slug,
         description: data.description,
         image: data.image,
+        parentId: data.parentId || null,
       },
     });
     return NextResponse.json({ success: true, category });
