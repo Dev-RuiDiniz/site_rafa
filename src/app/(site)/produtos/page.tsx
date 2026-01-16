@@ -20,6 +20,9 @@ interface Product {
   shortDescription: string;
   image: string;
   category: Category | null;
+  categories: {
+    category: Category;
+  }[];
 }
 
 function ProductsContent() {
@@ -53,7 +56,10 @@ function ProductsContent() {
   }, []);
 
   const filteredProducts = products.filter((p) => {
-    const matchesCategory = selectedCategory ? p.category?.slug === selectedCategory : true;
+    const matchesCategory = selectedCategory 
+      ? p.category?.slug === selectedCategory || 
+        p.categories?.some(c => c.category.slug === selectedCategory)
+      : true;
     const matchesSearch = searchQuery.trim()
       ? p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -198,7 +204,9 @@ function ProductsContent() {
                       
                       {/* Category Badge */}
                       <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-xs uppercase tracking-wider text-gray-700">
-                        {product.category?.name}
+                        {product.categories && product.categories.length > 0
+                          ? product.categories.map(c => c.category.name).join(", ")
+                          : product.category?.name}
                       </span>
 
                       {/* Quick View */}
@@ -250,7 +258,9 @@ function ProductsContent() {
                     {/* Content */}
                     <div className="flex flex-col justify-center flex-1">
                       <span className="text-xs uppercase tracking-wider text-gray-500 mb-2">
-                        {product.category?.name}
+                        {product.categories && product.categories.length > 0
+                          ? product.categories.map(c => c.category.name).join(", ")
+                          : product.category?.name}
                       </span>
                       <h3 className="text-2xl font-serif font-medium text-black mb-3 group-hover:text-gray-600 transition-colors">
                         {product.name}

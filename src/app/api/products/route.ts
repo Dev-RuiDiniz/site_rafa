@@ -26,6 +26,11 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         category: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
         brands: {
           include: {
             brand: true,
