@@ -54,12 +54,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Criar o lead
+    // Nota: Não enviar status_id para usar o status padrão do pipeline
     const leadPayload: Record<string, unknown>[] = [
       {
         name: `${source || "Site SHR"} - ${name}`,
-        // Usar pipeline e status configurados no admin
+        // Usar apenas pipeline_id - o Kommo vai usar o primeiro status automaticamente
         ...(settings.pipelineId && { pipeline_id: settings.pipelineId }),
-        ...(settings.statusId && { status_id: settings.statusId }),
         ...(contactId && {
           _embedded: {
             contacts: [{ id: contactId }]
