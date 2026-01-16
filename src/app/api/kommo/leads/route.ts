@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const KOMMO_ACCESS_TOKEN = process.env.KOMMO_ACCESS_TOKEN;
-const KOMMO_API_DOMAIN = process.env.KOMMO_API_DOMAIN || "api-c.kommo.com";
+// Usar o subdomínio da conta (shrhair.kommo.com)
+const KOMMO_SUBDOMAIN = process.env.KOMMO_SUBDOMAIN || "shrhair";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const baseUrl = `https://${KOMMO_SUBDOMAIN}.kommo.com`;
+
     // 1. Criar contato primeiro
-    const contactResponse = await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/contacts`, {
+    const contactResponse = await fetch(`${baseUrl}/api/v4/contacts`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
       }
     ];
 
-    const leadResponse = await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/leads`, {
+    const leadResponse = await fetch(`${baseUrl}/api/v4/leads`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
@@ -83,7 +86,7 @@ export async function POST(request: NextRequest) {
     if (message && leadId) {
       const noteText = `📧 Email: ${email || "Não informado"}\n📱 Telefone: ${phone || "Não informado"}\n📍 Origem: ${source || "Site SHR"}\n\n💬 Mensagem:\n${message}`;
       
-      await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/leads/${leadId}/notes`, {
+      await fetch(`${baseUrl}/api/v4/leads/${leadId}/notes`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
