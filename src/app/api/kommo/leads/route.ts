@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Criar o lead no Kommo
-    const leadResponse = await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/leads/complex`, {
+    // 1. Criar contato primeiro
+    const contactResponse = await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/contacts`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
@@ -25,31 +25,46 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify([
         {
-          name: `Lead Site - ${name}`,
-          source_name: source || "Site SHR",
-          _embedded: {
-            contacts: [
-              {
-                name: name,
-                first_name: name.split(" ")[0],
-                last_name: name.split(" ").slice(1).join(" ") || "",
-                custom_fields_values: [
-                  ...(email ? [{
-                    field_code: "EMAIL",
-                    values: [{ value: email, enum_code: "WORK" }]
-                  }] : []),
-                  ...(phone ? [{
-                    field_code: "PHONE",
-                    values: [{ value: phone, enum_code: "WORK" }]
-                  }] : [])
-                ]
-              }
-            ]
-          },
-          custom_fields_values: [],
-          _embedded_tags: source ? [{ name: source }] : []
+          name: name,
+          custom_fields_values: [
+            ...(email ? [{
+              field_code: "EMAIL",
+              values: [{ value: email, enum_code: "WORK" }]
+            }] : []),
+            ...(phone ? [{
+              field_code: "PHONE",
+              values: [{ value: phone, enum_code: "WORK" }]
+            }] : [])
+          ]
         }
       ]),
+    });
+
+    let contactId = null;
+    if (contactResponse.ok) {
+      const contactData = await contactResponse.json();
+      contactId = contactData._embedded?.contacts?.[0]?.id;
+    }
+
+    // 2. Criar o lead
+    const leadPayload: Record<string, unknown>[] = [
+      {
+        name: `${source || "Site SHR"} - ${name}`,
+        ...(contactId && {
+          _embedded: {
+            contacts: [{ id: contactId }]
+          }
+        })
+      }
+    ];
+
+    const leadResponse = await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/leads`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(leadPayload),
     });
 
     if (!leadResponse.ok) {
@@ -62,10 +77,11 @@ export async function POST(request: NextRequest) {
     }
 
     const leadData = await leadResponse.json();
+    const leadId = leadData._embedded?.leads?.[0]?.id;
 
-    // Adicionar nota com a mensagem se houver
-    if (message && leadData._embedded?.leads?.[0]?.id) {
-      const leadId = leadData._embedded.leads[0].id;
+    // 3. Adicionar nota com a mensagem
+    if (message && leadId) {
+      const noteText = `📧 Email: ${email || "Não informado"}\n📱 Telefone: ${phone || "Não informado"}\n📍 Origem: ${source || "Site SHR"}\n\n💬 Mensagem:\n${message}`;
       
       await fetch(`https://${KOMMO_API_DOMAIN}/api/v4/leads/${leadId}/notes`, {
         method: "POST",
@@ -77,7 +93,7 @@ export async function POST(request: NextRequest) {
           {
             note_type: "common",
             params: {
-              text: `Mensagem do formulário:\n\n${message}`
+              text: noteText
             }
           }
         ]),
@@ -87,7 +103,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Lead criado com sucesso",
-      leadId: leadData._embedded?.leads?.[0]?.id
+      leadId: leadId,
+      contactId: contactId
     });
 
   } catch (error) {
