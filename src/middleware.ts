@@ -3,14 +3,47 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hostname = request.headers.get("host") || "";
 
-  // Skip public routes
+  // Skip static files and API routes
   if (
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon")
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
   ) {
+    return NextResponse.next();
+  }
+
+  // Multi-domain routing
+  const isMaletti = hostname.includes("maletti.com.br") || hostname.includes("localhost:3001");
+  const isSHR = hostname.includes("shrhair.com.br") || hostname.includes("localhost:3000");
+
+  // Maletti domain routing
+  if (isMaletti) {
+    // Landing pages permanecem no path original
+    if (pathname === "/tricologia" || pathname === "/salao-de-beleza") {
+      return NextResponse.next();
+    }
+    
+    // Redireciona raiz e outras rotas para /maletti
+    if (!pathname.startsWith("/maletti") && !pathname.startsWith("/login") && !pathname.startsWith("/admin")) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/maletti${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // SHR domain - serve (site) routes normally
+  if (isSHR) {
+    // Block /maletti routes on shrhair domain
+    if (pathname.startsWith("/maletti")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  // Skip login routes
+  if (pathname.startsWith("/login")) {
     return NextResponse.next();
   }
 
@@ -27,5 +60,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
