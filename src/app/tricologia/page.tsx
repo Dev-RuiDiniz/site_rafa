@@ -211,7 +211,7 @@ export default function TricologiaPage() {
               className="bg-white text-black hover:bg-gray-100"
               asChild
             >
-              <Link href="/produtos">Ver Produtos</Link>
+              <Link href="https://shrhair.com.br/produtos">Ver Produtos</Link>
             </Button>
             <Button
               size="sm"

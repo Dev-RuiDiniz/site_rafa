@@ -255,7 +255,7 @@ function TechCard({ tech, index }: { tech: typeof technologies[0]; index: number
           </div>
         </div>
         <Link
-          href={`/produtos/${tech.slug}`}
+          href={`https://shrhair.com.br/`}
           className="inline-flex items-center text-sm font-medium text-black hover:text-gray-600 transition-colors group/link"
         >
           Saiba mais
@@ -328,7 +328,7 @@ export default function SalaoDeBelezaPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Link
-              href="/produtos"
+              href="https://shrhair.com.br/produtos"
               className="hidden sm:inline-flex text-sm text-gray-600 hover:text-black transition-colors"
             >
               Ver Produtos
