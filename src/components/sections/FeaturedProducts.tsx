@@ -7,22 +7,15 @@ import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
 interface Product {
   id: string;
   name: string;
   slug: string;
   shortDescription: string;
   image: string;
-  category: Category | null;
-  categories: {
-    category: Category;
-  }[];
+  category: {
+    name: string;
+  } | null;
   brands: {
     brand: {
       slug: string;
@@ -161,9 +154,7 @@ export function FeaturedProducts() {
                     
                     {/* Category Badge */}
                     <span className="absolute top-4 left-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-[11px] uppercase tracking-wider font-medium text-gray-800">
-                      {product.categories && product.categories.length > 0
-                        ? product.categories.map(c => c.category.name).join(", ")
-                        : product.category?.name}
+                      {product.category?.name}
                     </span>
 
                     

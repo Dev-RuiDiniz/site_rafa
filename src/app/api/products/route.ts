@@ -18,7 +18,11 @@ export async function GET(request: NextRequest) {
         where: { slug: categorySlug },
       });
       if (category) {
-        where.categoryId = category.id;
+        // Filtrar por categorias (many-to-many) OU categoryId (legado)
+        where.OR = [
+          { categoryId: category.id },
+          { categories: { some: { categoryId: category.id } } }
+        ];
       }
     }
 
