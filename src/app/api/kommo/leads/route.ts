@@ -1,29 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-const KOMMO_ACCESS_TOKEN = process.env.KOMMO_ACCESS_TOKEN;
-// Usar o subdomínio da conta (shrhair.kommo.com)
-const KOMMO_SUBDOMAIN = process.env.KOMMO_SUBDOMAIN || "shrhair";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = prisma as any;
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     const { name, email, phone, message, source } = data;
 
-    if (!KOMMO_ACCESS_TOKEN) {
-      console.error("KOMMO_ACCESS_TOKEN not configured");
+    // Buscar configurações do banco de dados
+    const settings = await db.kommoSettings.findFirst();
+
+    if (!settings || !settings.enabled || !settings.accessToken || !settings.subdomain) {
+      console.error("Kommo integration not configured or disabled");
       return NextResponse.json(
         { error: "Integração não configurada" },
         { status: 500 }
       );
     }
 
-    const baseUrl = `https://${KOMMO_SUBDOMAIN}.kommo.com`;
+    const baseUrl = `https://${settings.subdomain}.kommo.com`;
+    const accessToken = settings.accessToken;
 
     // 1. Criar contato primeiro
     const contactResponse = await fetch(`${baseUrl}/api/v4/contacts`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
+        "Authorization": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify([
@@ -53,6 +57,9 @@ export async function POST(request: NextRequest) {
     const leadPayload: Record<string, unknown>[] = [
       {
         name: `${source || "Site SHR"} - ${name}`,
+        // Usar pipeline e status configurados no admin
+        ...(settings.pipelineId && { pipeline_id: settings.pipelineId }),
+        ...(settings.statusId && { status_id: settings.statusId }),
         ...(contactId && {
           _embedded: {
             contacts: [{ id: contactId }]
@@ -64,7 +71,7 @@ export async function POST(request: NextRequest) {
     const leadResponse = await fetch(`${baseUrl}/api/v4/leads`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
+        "Authorization": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(leadPayload),
@@ -89,7 +96,7 @@ export async function POST(request: NextRequest) {
       await fetch(`${baseUrl}/api/v4/leads/${leadId}/notes`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${KOMMO_ACCESS_TOKEN}`,
+          "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify([

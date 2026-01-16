@@ -331,3 +331,22 @@ model PageBlock {
 
   @@index([pageId])
 }
+
+// ==================== INTEGRAÇÕES ====================
+
+model KommoSettings {
+  id              String   @id @default(cuid())
+  enabled         Boolean  @default(false)
+  subdomain       String?  // ex: shrhair
+  clientId        String?
+  clientSecret    String?
+  accessToken     String?  @db.Text
+  refreshToken    String?  @db.Text
+  tokenExpiresAt  DateTime?
+  pipelineId      Int?     // ID do funil/pipeline
+  pipelineName    String?  // Nome do funil para exibição
+  statusId        Int?     // ID do status inicial
+  statusName      String?  // Nome do status para exibição
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

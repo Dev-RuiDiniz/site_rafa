@@ -15,6 +15,7 @@ import {
   HiOutlineExternalLink,
   HiOutlinePhotograph,
   HiOutlineTemplate,
+  HiOutlineLightningBolt,
 } from "react-icons/hi";
 
 const menuItems = [
@@ -40,6 +41,12 @@ const menuItems = [
     section: "Analytics",
     items: [
       { title: "Relatórios", href: "/admin/relatorios", icon: HiOutlineChartBar },
+    ],
+  },
+  {
+    section: "Integrações",
+    items: [
+      { title: "Kommo CRM", href: "/admin/kommo", icon: HiOutlineLightningBolt },
     ],
   },
   {
