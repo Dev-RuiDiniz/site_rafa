@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
 import { TrackingScripts, TrackingNoscript } from "@/components/TrackingScripts";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -50,6 +51,7 @@ export default function RootLayout({
       <head>
         {/* Google Site Verification - Maletti */}
         <meta name="google-site-verification" content="SkrI3t5Q5vQ_OvnnTNksc-gx1nKisw0Gq0oANsuLvM0" />
+        <DynamicFavicon />
         <TrackingScripts />
       </head>
       <body className={`${poppins.variable} ${playfair.variable} font-sans antialiased`}>

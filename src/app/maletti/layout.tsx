@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
 
 export const metadata: Metadata = {
   title: "Maletti | Design Italiano de Luxo para Salões",
@@ -10,5 +11,10 @@ export default function MalettiLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <DynamicFavicon forceFavicon="maletti" />
+      {children}
+    </>
+  );
 }

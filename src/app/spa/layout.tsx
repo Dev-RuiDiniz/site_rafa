@@ -2,23 +2,22 @@ import type { Metadata } from "next";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
 
 export const metadata: Metadata = {
-  title: "Tricologia | Tecnologia Maletti para Clínicas Premium",
-  description: "A união do Design Italiano com a Tecnologia Coreana: A revolução no tratamento capilar chegou à sua clínica. Conheça o ecossistema de equipamentos Maletti.",
+  title: "SPA Profissional | Equipamentos Maletti para Wellness",
+  description: "Transforme seu espaço em um SPA de alto padrão com equipamentos Maletti. Design italiano, tecnologia de ponta e experiências sensoriais únicas para seus clientes.",
   keywords: [
-    "tricologia",
-    "tratamento capilar",
+    "spa profissional",
+    "head spa",
     "Maletti",
     "Heaven",
     "Shirobody",
     "Total Body",
     "Spa Garçon",
-    "Vapomist",
     "wellness",
-    "clínica de estética",
+    "spa cabin",
   ],
 };
 
-export default function TricologiaLayout({
+export default function SpaLayout({
   children,
 }: {
   children: React.ReactNode;

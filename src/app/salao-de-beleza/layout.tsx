@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
 
 export const metadata: Metadata = {
   title: "Salão de Beleza Premium | Equipamentos Maletti para Head SPA",
@@ -20,5 +21,10 @@ export default function SalaoDeBelezaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <DynamicFavicon forceFavicon="maletti" />
+      {children}
+    </>
+  );
 }
