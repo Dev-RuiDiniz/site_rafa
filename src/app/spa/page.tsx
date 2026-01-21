@@ -161,7 +161,7 @@ const hotelShowcase = [
 
 function SectionBadge({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
-    <span className={`inline-block text-[11px] uppercase tracking-[0.25em] mb-6 ${light ? "text-amber-400/80" : "text-amber-700"}`}>
+    <span className={`inline-block text-[11px] uppercase tracking-[0.25em] mb-6 ${light ? "text-stone-300" : "text-stone-500"}`}>
       {children}
     </span>
   );
@@ -188,7 +188,7 @@ function ProductCard({ product, index }: { product: typeof infrastructureProduct
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-6 left-6 right-6">
-          <span className="text-amber-300 text-xs uppercase tracking-widest">{product.tagline}</span>
+          <span className="text-stone-300 text-xs uppercase tracking-widest">{product.tagline}</span>
           <h3 className="text-white text-3xl font-serif font-semibold mt-1">{product.name}</h3>
         </div>
       </div>
@@ -197,14 +197,14 @@ function ProductCard({ product, index }: { product: typeof infrastructureProduct
         {product.description}
       </p>
       
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 p-5 mb-6">
-        <span className="text-xs uppercase tracking-wider text-amber-700 block mb-2">Para o Hotel</span>
+      <div className="bg-stone-50 border-l-4 border-stone-400 p-5 mb-6">
+        <span className="text-xs uppercase tracking-wider text-stone-600 block mb-2">Para o Hotel</span>
         <p className="text-gray-800 font-medium">{product.benefit}</p>
       </div>
       
       <Link
-        href={`/produtos/${product.slug}`}
-        className="inline-flex items-center text-sm font-medium text-black hover:text-amber-700 transition-colors group/link"
+        href={`https://shrhair.com.br/produtos/${product.slug}`}
+        className="inline-flex items-center text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors group/link"
       >
         Saiba mais
         <HiArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
@@ -238,7 +238,7 @@ function TechCard({ tech, index }: { tech: typeof sensorTechnologies[0]; index: 
           <span className="text-4xl">{tech.icon}</span>
           <div>
             <h3 className="text-2xl font-serif font-semibold text-black">{tech.name}</h3>
-            <span className="text-sm text-amber-700">{tech.tagline}</span>
+            <span className="text-sm text-stone-500">{tech.tagline}</span>
           </div>
         </div>
         
@@ -251,8 +251,8 @@ function TechCard({ tech, index }: { tech: typeof sensorTechnologies[0]; index: 
             </span>
             <p className="text-gray-800 text-sm">{tech.guestBenefit}</p>
           </div>
-          <div className="bg-amber-50 p-4 rounded-sm">
-            <span className="text-[10px] uppercase tracking-wider text-amber-700 block mb-1">
+          <div className="bg-stone-100 p-4 rounded-sm">
+            <span className="text-[10px] uppercase tracking-wider text-stone-600 block mb-1">
               Diferencial
             </span>
             <p className="text-gray-800 text-sm font-medium">{tech.differential}</p>
@@ -260,8 +260,8 @@ function TechCard({ tech, index }: { tech: typeof sensorTechnologies[0]; index: 
         </div>
         
         <Link
-          href={`/produtos/${tech.slug}`}
-          className="inline-flex items-center text-sm font-medium text-black hover:text-amber-700 transition-colors group/link mt-6"
+          href={`https://shrhair.com.br/produtos/${tech.slug}`}
+          className="inline-flex items-center text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors group/link mt-6"
         >
           Saiba mais
           <HiArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
@@ -281,23 +281,23 @@ function RitualCard({ ritual, index }: { ritual: typeof rituals[0]; index: numbe
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 hover:bg-white/10 transition-all duration-500 group"
+      className="bg-stone-50 border border-stone-200 p-8 hover:shadow-lg transition-all duration-500 group rounded-sm"
     >
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-2xl">
+        <div className="w-14 h-14 bg-gradient-to-br from-stone-400 to-stone-500 rounded-full flex items-center justify-center text-2xl">
           {ritual.emoji}
         </div>
         <div>
-          <h3 className="text-xl font-serif font-semibold text-white">Ritual &quot;{ritual.name}&quot;</h3>
-          <span className="text-amber-400 text-sm">{ritual.focus}</span>
+          <h3 className="text-xl font-serif font-semibold text-stone-800">Ritual &quot;{ritual.name}&quot;</h3>
+          <span className="text-stone-500 text-sm">{ritual.focus}</span>
         </div>
       </div>
       
-      <p className="text-gray-300 mb-4">{ritual.description}</p>
+      <p className="text-stone-600 mb-4">{ritual.description}</p>
       
-      <div className="bg-white/5 p-4 rounded-sm">
-        <span className="text-[10px] uppercase tracking-wider text-amber-400 block mb-2">A Experiência</span>
-        <p className="text-white text-sm leading-relaxed">{ritual.experience}</p>
+      <div className="bg-white p-4 rounded-sm border border-stone-100">
+        <span className="text-[10px] uppercase tracking-wider text-stone-500 block mb-2">A Experiência</span>
+        <p className="text-stone-700 text-sm leading-relaxed">{ritual.experience}</p>
       </div>
     </motion.div>
   );
@@ -339,15 +339,15 @@ export default function SpaPage() {
   return (
     <>
       {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/">
-            <Image src="/logoshr-white.png" alt="SHR" width={80} height={32} />
+            <Image src="/logoshr-dark.png" alt="SHR" width={80} height={32} />
           </Link>
           <div className="flex items-center gap-4">
             <Link
-              href="/produtos"
-              className="hidden sm:inline-flex text-sm text-gray-300 hover:text-white transition-colors"
+              href="https://shrhair.com.br/produtos"
+              className="hidden sm:inline-flex text-sm text-stone-600 hover:text-stone-900 transition-colors"
             >
               Ver Produtos
             </Link>
@@ -355,7 +355,7 @@ export default function SpaPage() {
               href="https://wa.me/5511981982279?text=Olá! Gostaria de saber mais sobre os equipamentos Maletti para o spa do meu hotel."
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium hover:from-amber-600 hover:to-orange-600 transition-all rounded-sm"
+              className="flex items-center gap-2 px-5 py-2.5 bg-stone-800 text-white text-sm font-medium hover:bg-stone-700 transition-all rounded-sm"
             >
               <FaWhatsapp className="w-4 h-4" />
               <span className="hidden sm:inline">Falar com Especialista</span>
@@ -379,8 +379,8 @@ export default function SpaPage() {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-amber-500/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-[150px]" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-stone-400/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-stone-300/10 rounded-full blur-[150px]" />
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-6 lg:px-12 text-center pt-20">
@@ -394,7 +394,7 @@ export default function SpaPage() {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-semibold text-white mb-8 leading-[1.1]">
               O Padrão dos Melhores Spas do Mundo:{" "}
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-300 to-stone-100 bg-clip-text text-transparent">
                 Design Italiano e Tecnologia de Ponta.
               </span>
             </h1>
@@ -410,8 +410,8 @@ export default function SpaPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/produtos"
-                className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium hover:from-amber-600 hover:to-orange-600 transition-all group rounded-sm"
+                href="https://shrhair.com.br/produtos"
+                className="flex items-center gap-3 px-8 py-4 bg-white text-stone-800 font-medium hover:bg-stone-100 transition-all group rounded-sm"
               >
                 Explorar a Coleção Completa
                 <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -420,7 +420,7 @@ export default function SpaPage() {
                 href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um especialista sobre equipamentos para spa."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-8 py-4 border border-white/30 text-white hover:bg-white/10 transition-all rounded-sm"
+                className="flex items-center gap-2 px-8 py-4 border border-stone-400 text-white hover:bg-white/10 transition-all rounded-sm"
               >
                 <FaWhatsapp className="w-5 h-5" />
                 Falar com um Especialista
@@ -440,7 +440,7 @@ export default function SpaPage() {
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1.5 h-1.5 bg-amber-400 rounded-full"
+              className="w-1.5 h-1.5 bg-stone-400 rounded-full"
             />
           </div>
         </motion.div>
@@ -466,7 +466,7 @@ export default function SpaPage() {
               em uma <strong className="text-black">suíte completa de serviços de alto padrão</strong>.
             </p>
 
-            <div className="bg-gradient-to-r from-gray-50 to-amber-50/50 p-8 md:p-12 rounded-sm border-l-4 border-amber-500">
+            <div className="bg-stone-50 p-8 md:p-12 rounded-sm border-l-4 border-stone-400">
               <p className="text-lg text-gray-700 leading-relaxed">
                 Em um cenário onde <strong className="text-black">78% dos clientes premium</strong> buscam saúde mental 
                 integrada à beleza, nossas estações permitem realizar terapias corporais, faciais e rituais 
@@ -534,7 +534,7 @@ export default function SpaPage() {
       </section>
 
       {/* 5. MONTE UMA SPA CABIN COMPLETA */}
-      <section ref={cabinRef} className="py-28 lg:py-36 bg-black text-white">
+      <section ref={cabinRef} className="py-28 lg:py-36 bg-stone-100">
         <div className="container mx-auto px-6 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -544,11 +544,11 @@ export default function SpaPage() {
           >
             <SectionBadge light>Spa Cabin</SectionBadge>
             
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
               Monte uma Spa Cabin Completa
             </h2>
             
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-stone-600 max-w-2xl mx-auto">
               Combine os equipamentos para criar a experiência perfeita para seus hóspedes.
             </p>
           </motion.div>
@@ -576,7 +576,7 @@ export default function SpaPage() {
 
           {/* Related Products */}
           <div>
-            <h3 className="text-center text-gray-400 text-sm uppercase tracking-widest mb-8">
+            <h3 className="text-center text-stone-500 text-sm uppercase tracking-widest mb-8">
               Produtos Relacionados
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -588,10 +588,10 @@ export default function SpaPage() {
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 >
                   <Link
-                    href={`/produtos/${product.slug}`}
+                    href={`https://shrhair.com.br/produtos/${product.slug}`}
                     className="block group"
                   >
-                    <div className="relative aspect-square mb-3 overflow-hidden rounded-sm bg-white/5">
+                    <div className="relative aspect-square mb-3 overflow-hidden rounded-sm bg-white shadow-md">
                       <Image
                         src={product.image}
                         alt={product.name}
@@ -599,8 +599,8 @@ export default function SpaPage() {
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
-                    <span className="text-[10px] uppercase tracking-wider text-amber-400 block">{product.category}</span>
-                    <h4 className="text-white text-sm font-medium group-hover:text-amber-400 transition-colors">
+                    <span className="text-[10px] uppercase tracking-wider text-stone-500 block">{product.category}</span>
+                    <h4 className="text-stone-800 text-sm font-medium group-hover:text-stone-600 transition-colors">
                       {product.name}
                     </h4>
                   </Link>
@@ -612,7 +612,7 @@ export default function SpaPage() {
       </section>
 
       {/* 6. INTELIGÊNCIA DE NEGÓCIO */}
-      <section ref={businessRef} className="py-28 lg:py-36 bg-gradient-to-b from-gray-900 to-black text-white">
+      <section ref={businessRef} className="py-28 lg:py-36 bg-stone-50">
         <div className="container mx-auto px-6 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -622,13 +622,13 @@ export default function SpaPage() {
           >
             <SectionBadge light>Inteligência de Negócio</SectionBadge>
             
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
               Valorização do Ativo
             </h2>
             
-            <p className="text-gray-400 max-w-3xl mx-auto text-lg">
+            <p className="text-stone-600 max-w-3xl mx-auto text-lg">
               Incorporar a Nilo Spa Design não é apenas uma compra de mobiliário, 
-              é um <strong className="text-white">investimento na valorização da sua marca</strong> e na retenção do hóspede.
+              é um <strong className="text-stone-800">investimento na valorização da sua marca</strong> e na retenção do hóspede.
             </p>
           </motion.div>
 
@@ -639,13 +639,13 @@ export default function SpaPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={businessInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 hover:bg-white/10 transition-all group"
+                className="bg-white border border-stone-200 p-8 hover:shadow-lg transition-all group rounded-sm"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 bg-gradient-to-br from-stone-400 to-stone-500 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <benefit.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-serif font-semibold text-white mb-4">{benefit.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{benefit.description}</p>
+                <h3 className="text-xl font-serif font-semibold text-stone-800 mb-4">{benefit.title}</h3>
+                <p className="text-stone-600 leading-relaxed">{benefit.description}</p>
               </motion.div>
             ))}
           </div>
@@ -653,16 +653,16 @@ export default function SpaPage() {
       </section>
 
       {/* 7. MENU DE EXPERIÊNCIAS */}
-      <section ref={ritualsRef} className="py-28 lg:py-36 bg-gradient-to-b from-black to-gray-900 text-white">
+      <section ref={ritualsRef} className="py-28 lg:py-36 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
             <SectionBadge light>Menu de Experiências</SectionBadge>
             
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
               Rituais para o Viajante Global
             </h2>
             
-            <p className="text-gray-400 max-w-3xl mx-auto text-lg">
+            <p className="text-stone-600 max-w-3xl mx-auto text-lg">
               Desenhe protocolos exclusivos que atendam às necessidades físicas e emocionais do seu perfil de hóspede.
             </p>
           </div>
@@ -698,7 +698,7 @@ export default function SpaPage() {
           </motion.div>
 
           {/* Showcase Carousel */}
-          <div className="relative aspect-[21/9] overflow-hidden rounded-sm mb-8">
+          <div className="relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-sm mb-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentShowcase}
@@ -716,7 +716,7 @@ export default function SpaPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8">
-                  <span className="text-amber-400 text-sm uppercase tracking-widest">
+                  <span className="text-stone-300 text-sm uppercase tracking-widest">
                     {hotelShowcase[currentShowcase].location}
                   </span>
                   <h3 className="text-white text-2xl md:text-3xl font-serif font-semibold">
@@ -745,7 +745,7 @@ export default function SpaPage() {
                   key={index}
                   onClick={() => setCurrentShowcase(index)}
                   className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentShowcase ? "bg-amber-400 w-8" : "bg-white/40"
+                    index === currentShowcase ? "bg-stone-500 w-8" : "bg-stone-300"
                   }`}
                 />
               ))}
@@ -778,7 +778,7 @@ export default function SpaPage() {
               href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre equipamentos para o spa do meu hotel."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-all rounded-sm group"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-stone-800 text-white text-lg font-medium hover:bg-stone-700 transition-all rounded-sm group"
             >
               <FaWhatsapp className="w-6 h-6" />
               Falar com um Consultor
@@ -789,7 +789,7 @@ export default function SpaPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-black text-white py-16">
+      <footer className="bg-stone-800 text-white py-16">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-8">

@@ -30,10 +30,11 @@ interface Product {
 function ProductsContent() {
   const searchParams = useSearchParams();
   const buscaParam = searchParams.get("busca") || "";
+  const categoriaParam = searchParams.get("categoria") || null;
   
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoriaParam);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(buscaParam);

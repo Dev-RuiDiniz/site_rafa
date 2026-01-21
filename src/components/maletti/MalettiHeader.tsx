@@ -49,6 +49,12 @@ export function MalettiHeader({ onNavigate }: MalettiHeaderProps) {
             >
               Catálogo
             </button>
+             <button 
+              onClick={() => onNavigate("https://shrhair.com.br/blog")}
+              className="text-sm text-gray-600 hover:text-black transition-colors"
+            >
+              Blog
+            </button>
           </div>
         </div>
       </div>

@@ -107,7 +107,7 @@ export function MalettiHeadSpa() {
             className="bg-black text-white hover:bg-gray-800 transition-all duration-300 group"
             asChild
           >
-            <Link href="https://www.shrhair.com.br/produtos">
+            <Link href="https://www.shrhair.com.br/produtos?categoria=head-spa">
               Conhecer Estações Head SPA
               <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>

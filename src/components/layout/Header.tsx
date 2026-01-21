@@ -18,6 +18,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/produtos", label: "Produtos" },
   { href: "/marcas", label: "Nossas Marcas" },
+  { href: "/blog", label: "Blog" },
   { href: "/sobre", label: "Sobre" },
   { href: "/manutencao", label: "Manutenção" },
   { href: "/contato", label: "Contato" },
