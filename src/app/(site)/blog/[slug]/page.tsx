@@ -152,12 +152,12 @@ export default function BlogPostPage() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="relative pt-32 pb-16 bg-gradient-to-b from-gray-50 to-white"
+        className="relative pt-40 pb-16 bg-gradient-to-b from-gray-50 to-white"
       >
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto"
           >
