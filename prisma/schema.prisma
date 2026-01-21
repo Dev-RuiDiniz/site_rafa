@@ -184,27 +184,71 @@ model Partner {
 // ==================== BLOG ====================
 
 model BlogPost {
-  id          String       @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
-  slug        String       @unique
-  excerpt     String?
-  content     String?      @db.Text
-  image       String?
-  published   Boolean      @default(false)
+  slug        String         @unique
+  excerpt     String?        @db.Text
+  content     String?        @db.Text
+  image       String?        // Foto principal
+  cover       String?        // Capa do post
+  published   Boolean        @default(false)
   publishedAt DateTime?
-  views       Int          @default(0)
+  views       Int            @default(0)
   authorId    String?
-  tags        BlogTag[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  categories  BlogPostCategory[]
+  tags        BlogPostTag[]
+  comments    BlogComment[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model BlogCategory {
+  id          String             @id @default(cuid())
+  name        String
+  slug        String             @unique
+  description String?
+  color       String?            @default("#000000")
+  posts       BlogPostCategory[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model BlogPostCategory {
+  postId     String
+  categoryId String
+  post       BlogPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
 }
 
 model BlogTag {
-  id        String     @id @default(cuid())
+  id        String        @id @default(cuid())
   name      String
-  slug      String     @unique
-  posts     BlogPost[]
-  createdAt DateTime   @default(now())
+  slug      String        @unique
+  posts     BlogPostTag[]
+  createdAt DateTime      @default(now())
+}
+
+model BlogPostTag {
+  postId String
+  tagId  String
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model BlogComment {
+  id        String      @id @default(cuid())
+  name      String
+  email     String
+  content   String      @db.Text
+  approved  Boolean     @default(false)
+  postId    String
+  post      BlogPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 // ==================== ANALYTICS ====================

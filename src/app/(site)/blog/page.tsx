@@ -1,0 +1,288 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { HiArrowRight, HiOutlineCalendar, HiOutlineEye } from "react-icons/hi";
+
+interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  color: string | null;
+}
+
+interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  image: string | null;
+  cover: string | null;
+  published: boolean;
+  publishedAt: string | null;
+  views: number;
+  categories: { category: BlogCategory }[];
+  tags: { tag: BlogTag }[];
+  createdAt: string;
+}
+
+export default function BlogPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const heroRef = useRef(null);
+  const heroInView = useInView(heroRef, { once: true });
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch("/api/blog");
+      const data = await res.json();
+      setPosts(data.posts || []);
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPosts = selectedCategory
+    ? posts.filter((post) =>
+        post.categories.some((c) => c.category.id === selectedCategory)
+      )
+    : posts;
+
+  const featuredPost = filteredPosts[0];
+  const otherPosts = filteredPosts.slice(1);
+
+  return (
+    <>
+      {/* Hero Section */}
+      <section
+        ref={heroRef}
+        className="relative pt-32 pb-20 bg-gradient-to-b from-gray-50 to-white"
+      >
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={heroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl"
+          >
+            <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500 mb-4 block">
+              Blog
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
+              Insights & Tendências
+            </h1>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Descubra as últimas novidades em tecnologia, design e inovação para
+              o mercado de beleza e bem-estar.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Categories Filter */}
+      {categories.length > 0 && (
+        <section className="border-b border-gray-100 sticky top-20 bg-white z-30">
+          <div className="container mx-auto px-6">
+            <div className="flex items-center gap-2 py-4 overflow-x-auto">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                  !selectedCategory
+                    ? "bg-black text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                Todos
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedCategory === category.id
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Posts Grid */}
+      <section className="py-16 lg:py-24">
+        <div className="container mx-auto px-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">Nenhum post encontrado.</p>
+            </div>
+          ) : (
+            <>
+              {/* Featured Post */}
+              {featuredPost && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="mb-16"
+                >
+                  <Link href={`/blog/${featuredPost.slug}`} className="group block">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                        {(featuredPost.cover || featuredPost.image) && (
+                          <Image
+                            src={featuredPost.cover || featuredPost.image || ""}
+                            alt={featuredPost.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        )}
+                      </div>
+                      <div className="flex flex-col justify-center">
+                        <div className="flex items-center gap-3 mb-4">
+                          {featuredPost.categories.slice(0, 2).map((c) => (
+                            <span
+                              key={c.category.id}
+                              className="px-3 py-1 text-xs font-medium bg-black text-white"
+                            >
+                              {c.category.name}
+                            </span>
+                          ))}
+                        </div>
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-semibold text-black mb-4 group-hover:text-gray-700 transition-colors">
+                          {featuredPost.title}
+                        </h2>
+                        <p className="text-gray-600 leading-relaxed mb-6 line-clamp-3">
+                          {featuredPost.excerpt}
+                        </p>
+                        <div className="flex items-center gap-6 text-sm text-gray-500">
+                          <span className="flex items-center gap-2">
+                            <HiOutlineCalendar className="w-4 h-4" />
+                            {new Date(featuredPost.createdAt).toLocaleDateString(
+                              "pt-BR",
+                              { day: "numeric", month: "long", year: "numeric" }
+                            )}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <HiOutlineEye className="w-4 h-4" />
+                            {featuredPost.views} views
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* Other Posts Grid */}
+              {otherPosts.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {otherPosts.map((post, index) => (
+                    <motion.article
+                      key={post.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="group"
+                    >
+                      <Link href={`/blog/${post.slug}`}>
+                        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 mb-5">
+                          {(post.cover || post.image) && (
+                            <Image
+                              src={post.cover || post.image || ""}
+                              alt={post.title}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mb-3">
+                          {post.categories.slice(0, 1).map((c) => (
+                            <span
+                              key={c.category.id}
+                              className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-medium bg-gray-100 text-gray-600"
+                            >
+                              {c.category.name}
+                            </span>
+                          ))}
+                        </div>
+                        <h3 className="text-xl font-serif font-semibold text-black mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
+                          {post.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>
+                            {new Date(post.createdAt).toLocaleDateString("pt-BR")}
+                          </span>
+                          <span className="flex items-center gap-1 text-black font-medium group-hover:gap-2 transition-all">
+                            Ler mais
+                            <HiArrowRight className="w-4 h-4" />
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.article>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Newsletter CTA */}
+      <section className="py-20 bg-black text-white">
+        <div className="container mx-auto px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">
+              Fique por dentro das novidades
+            </h2>
+            <p className="text-gray-400 mb-8">
+              Receba insights exclusivos sobre tendências e inovações do mercado
+              de beleza diretamente no seu e-mail.
+            </p>
+            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Seu melhor e-mail"
+                className="flex-1 px-5 py-3 bg-white/10 border border-white/20 text-white placeholder:text-gray-500 outline-none focus:border-white/40 transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-8 py-3 bg-white text-black font-medium hover:bg-gray-100 transition-colors"
+              >
+                Inscrever
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
   // Maletti domain routing
   if (isMaletti) {
     // Landing pages permanecem no path original
-    if (pathname === "/tricologia" || pathname === "/salao-de-beleza") {
+    if (pathname === "/tricologia" || pathname === "/salao-de-beleza" || pathname === "/spa") {
       return NextResponse.next();
     }
     
