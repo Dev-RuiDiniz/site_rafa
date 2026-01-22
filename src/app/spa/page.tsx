@@ -307,9 +307,18 @@ function RitualCard({ ritual, index }: { ritual: typeof rituals[0]; index: numbe
 // MAIN PAGE
 // ============================================
 
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  category?: { name: string } | null;
+}
+
 export default function SpaPage() {
   const [currentShowcase, setCurrentShowcase] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
+  const [apiProducts, setApiProducts] = useState<Product[]>([]);
 
   const heroRef = useRef(null);
   const conceptRef = useRef(null);
@@ -336,13 +345,26 @@ export default function SpaPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // Buscar produtos da API SHR
+  useEffect(() => {
+    fetch("https://shrhair.com.br/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.products) {
+          // Pegar apenas os primeiros 5 produtos
+          setApiProducts(data.products.slice(0, 5));
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <>
       {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/">
-            <Image src="/logoshr-dark.png" alt="SHR" width={80} height={32} />
+            <Image src="/images/site/malliti-preto.png" alt="Maletti" width={100} height={40} />
           </Link>
           <div className="flex items-center gap-4">
             <Link
@@ -580,9 +602,9 @@ export default function SpaPage() {
               Produtos Relacionados
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {relatedProducts.map((product, index) => (
+              {(apiProducts.length > 0 ? apiProducts : relatedProducts).map((product, index) => (
                 <motion.div
-                  key={product.name}
+                  key={product.slug || product.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={cabinInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
@@ -593,13 +615,15 @@ export default function SpaPage() {
                   >
                     <div className="relative aspect-square mb-3 overflow-hidden rounded-sm bg-white shadow-md">
                       <Image
-                        src={product.image}
+                        src={product.image || "/images/site/placeholder.jpg"}
                         alt={product.name}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone-500 block">{product.category}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
+                      {(product as Product).category?.name || (product as typeof relatedProducts[0]).category || "Produto"}
+                    </span>
                     <h4 className="text-stone-800 text-sm font-medium group-hover:text-stone-600 transition-colors">
                       {product.name}
                     </h4>

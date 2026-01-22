@@ -324,7 +324,7 @@ export default function SalaoDeBelezaPage() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/">
-            <Image src="/logoshr-dark.png" alt="SHR" width={80} height={32} />
+            <Image src="/images/site/malliti-preto.png" alt="Maletti" width={100} height={40} />
           </Link>
           <div className="flex items-center gap-4">
             <Link

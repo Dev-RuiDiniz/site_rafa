@@ -25,7 +25,7 @@ export function MalettiFooter() {
               Visite nosso Showroom e conheça todo o universo Maletti.
             </p>
             <Link
-              href="/contato"
+              href="https://shrhair.com.br/contato"
               className="inline-flex items-center px-8 py-4 bg-white text-black font-medium hover:bg-gray-100 transition-colors"
             >
               Agendar Visita

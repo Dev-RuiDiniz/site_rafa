@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,10 +68,22 @@ const contactOptions = [
   },
 ];
 
-export default function ContatoPage() {
-  const [activeForm, setActiveForm] = useState<"contact" | "catalog">("contact");
+function ContatoContent() {
+  const searchParams = useSearchParams();
+  const assuntoParam = searchParams.get("assunto");
+  
+  const [activeForm, setActiveForm] = useState<"contact" | "catalog">(
+    assuntoParam === "catalogo" ? "catalog" : "contact"
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  
+  // Atualiza o form ativo se o parâmetro mudar
+  useEffect(() => {
+    if (assuntoParam === "catalogo") {
+      setActiveForm("catalog");
+    }
+  }, [assuntoParam]);
 
   const contactForm = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -560,5 +573,13 @@ export default function ContatoPage() {
         </div>
       </section>
     </>
+  );
+}
+
+export default function ContatoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <ContatoContent />
+    </Suspense>
   );
 }

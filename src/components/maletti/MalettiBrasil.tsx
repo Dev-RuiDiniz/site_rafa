@@ -60,9 +60,9 @@ export function MalettiBrasil() {
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300"
                 asChild
               >
-                <Link href="/contato">
+                <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um especialista sobre produtos Maletti." target="_blank" rel="noopener noreferrer">
                   Falar com Especialista
-                </Link>
+                </a>
               </Button>
               <Button
                 size="lg"
@@ -70,9 +70,9 @@ export function MalettiBrasil() {
                 className="border-white/30 text-white bg-transparent hover:bg-white/10"
                 asChild
               >
-                <Link href="/manutencao">
+                <a href="https://shrhair.com.br/manutencao">
                   Suporte Técnico
-                </Link>
+                </a>
               </Button>
             </div>
           </motion.div>

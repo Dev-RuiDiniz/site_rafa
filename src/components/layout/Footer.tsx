@@ -17,6 +17,7 @@ const footerLinks = {
   institucional: [
     { href: "/sobre", label: "Sobre a SHR" },
     { href: "/marcas", label: "Nossas Marcas" },
+    { href: "/blog", label: "Blog" },
     { href: "/manutencao", label: "Manutenção" },
     { href: "/contato", label: "Contato" },
   ],
