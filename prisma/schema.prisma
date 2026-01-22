@@ -112,6 +112,7 @@ model Product {
   image            String?
   gallery          String[]
   video            String?
+  catalog          String?
   featured         Boolean           @default(false)
   active           Boolean           @default(true)
   order            Int               @default(0)

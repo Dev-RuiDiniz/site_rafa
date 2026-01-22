@@ -26,6 +26,7 @@ interface Product {
   gallery: string[];
   features: string[];
   video: string | null;
+  catalog: string | null;
   category: {
     id: string;
     name: string;
@@ -456,20 +457,39 @@ export default function ProductPage() {
 
             <div className="mt-8">
               <p className="text-sm text-gray-500 mb-4">
-                Para informações detalhadas, solicite o catálogo técnico.
+                {product.catalog 
+                  ? "Clique abaixo para baixar o catálogo técnico."
+                  : "Para informações detalhadas, solicite o catálogo técnico."
+                }
               </p>
-              <Button
-                className="w-full bg-black text-white hover:bg-gray-800"
-                asChild
-              >
-                <a
-                  href={`https://wa.me/5511981982279?text=Olá! Gostaria de receber o catálogo técnico do ${product.name}.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              {product.catalog ? (
+                <Button
+                  className="w-full bg-black text-white hover:bg-gray-800"
+                  asChild
                 >
-                  Solicitar Catálogo Técnico
-                </a>
-              </Button>
+                  <a
+                    href={product.catalog}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Baixar Catálogo Técnico
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  className="w-full bg-black text-white hover:bg-gray-800"
+                  asChild
+                >
+                  <a
+                    href={`https://wa.me/5511981982279?text=Olá! Gostaria de receber o catálogo técnico do ${product.name}.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Solicitar Catálogo Técnico
+                  </a>
+                </Button>
+              )}
             </div>
           </motion.div>
         </div>

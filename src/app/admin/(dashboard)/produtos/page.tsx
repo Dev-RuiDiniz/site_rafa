@@ -15,6 +15,7 @@ interface Product {
   features: string[];
   image: string | null;
   gallery: string[];
+  catalog: string | null;
   featured: boolean;
   active: boolean;
   category: { id: string; name: string } | null;
@@ -45,6 +46,7 @@ const emptyProduct = {
   specifications: [] as { label: string; value: string }[],
   image: "",
   gallery: [] as string[],
+  catalog: "",
   video: "",
   featured: false,
   active: true,
@@ -132,6 +134,7 @@ export default function ProdutosPage() {
       specifications: (product as any).specifications?.map((s: any) => ({ label: s.label, value: s.value })) || [],
       image: product.image || "",
       gallery: product.gallery || [],
+      catalog: product.catalog || "",
       video: "",
       featured: product.featured,
       active: product.active,
@@ -627,6 +630,13 @@ export default function ProdutosPage() {
             value={formData.gallery}
             onChange={(urls) => setFormData({ ...formData, gallery: urls })}
             folder="products"
+          />
+
+          <ImageUpload
+            label="Catálogo Técnico (PDF ou Imagem)"
+            value={formData.catalog}
+            onChange={(url) => setFormData({ ...formData, catalog: url })}
+            folder="catalogs"
           />
 
           <div className="flex items-center gap-6">
