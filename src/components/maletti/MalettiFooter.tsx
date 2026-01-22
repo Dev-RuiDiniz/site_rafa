@@ -114,24 +114,24 @@ export function MalettiFooter() {
               <h4 className="text-sm uppercase tracking-wider mb-6">Links</h4>
               <ul className="space-y-3 text-gray-400">
                 <li>
-                  <Link href="/" className="hover:text-white transition-colors">
+                  <a href="https://shrhair.com.br" className="hover:text-white transition-colors">
                     SHR Hair
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link href="/produtos" className="hover:text-white transition-colors">
+                  <a href="https://shrhair.com.br/produtos" className="hover:text-white transition-colors">
                     Produtos
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link href="/marcas" className="hover:text-white transition-colors">
+                  <a href="https://shrhair.com.br/marcas" className="hover:text-white transition-colors">
                     Marcas
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link href="/manutencao" className="hover:text-white transition-colors">
+                  <a href="https://shrhair.com.br/manutencao" className="hover:text-white transition-colors">
                     Manutenção
-                  </Link>
+                  </a>
                 </li>
                 <li>
                   <a 
