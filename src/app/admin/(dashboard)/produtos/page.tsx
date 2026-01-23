@@ -637,6 +637,7 @@ export default function ProdutosPage() {
             value={formData.catalog}
             onChange={(url) => setFormData({ ...formData, catalog: url })}
             folder="catalogs"
+            accept="application/pdf,image/*"
           />
 
           <div className="flex items-center gap-6">

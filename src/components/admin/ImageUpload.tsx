@@ -2,16 +2,18 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { HiOutlinePhotograph, HiOutlineX, HiOutlinePlus } from "react-icons/hi";
+import { HiOutlinePhotograph, HiOutlineX, HiOutlinePlus, HiOutlineDocumentText } from "react-icons/hi";
 
 interface ImageUploadProps {
   value?: string;
   onChange: (url: string) => void;
   folder?: string;
   label?: string;
+  accept?: string;
 }
 
-export function ImageUpload({ value, onChange, folder = "images", label }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, folder = "images", label, accept = "image/*" }: ImageUploadProps) {
+  const isPdf = value?.toLowerCase().endsWith('.pdf');
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +53,22 @@ export function ImageUpload({ value, onChange, folder = "images", label }: Image
       <div className="relative">
         {value ? (
           <div className="relative w-full h-48 border border-gray-200 dark:border-zinc-700 group">
-            <Image src={value} alt="Preview" fill className="object-cover" />
+            {isPdf ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-zinc-800">
+                <HiOutlineDocumentText className="h-12 w-12 text-red-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">PDF Carregado</span>
+                <a 
+                  href={value} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-500 hover:underline mt-1"
+                >
+                  Visualizar PDF
+                </a>
+              </div>
+            ) : (
+              <Image src={value} alt="Preview" fill className="object-cover" />
+            )}
             <button
               type="button"
               onClick={() => onChange("")}
@@ -80,7 +97,7 @@ export function ImageUpload({ value, onChange, folder = "images", label }: Image
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={accept}
           onChange={handleUpload}
           className="hidden"
         />
