@@ -621,21 +621,21 @@ export default function ProdutosPage() {
           <ImageUpload
             label="Imagem Principal"
             value={formData.image}
-            onChange={(url) => setFormData({ ...formData, image: url })}
+            onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
             folder="products"
           />
 
           <GalleryUpload
             label="Galeria de Imagens"
             value={formData.gallery}
-            onChange={(urls) => setFormData({ ...formData, gallery: urls })}
+            onChange={(urls) => setFormData(prev => ({ ...prev, gallery: urls }))}
             folder="products"
           />
 
           <ImageUpload
             label="Catálogo Técnico (PDF ou Imagem)"
             value={formData.catalog}
-            onChange={(url) => setFormData({ ...formData, catalog: url })}
+            onChange={(url) => setFormData(prev => ({ ...prev, catalog: url }))}
             folder="catalogs"
             accept="application/pdf,image/*"
           />
