@@ -16,6 +16,7 @@ import {
   HiOutlinePhotograph,
   HiOutlineTemplate,
   HiOutlineLightningBolt,
+  HiOutlineCode,
 } from "react-icons/hi";
 
 const menuItems = [
@@ -52,6 +53,7 @@ const menuItems = [
   {
     section: "Sistema",
     items: [
+      { title: "Scripts", href: "/admin/scripts", icon: HiOutlineCode },
       { title: "Configurações", href: "/admin/configuracoes", icon: HiOutlineCog },
     ],
   },

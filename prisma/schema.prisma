@@ -398,3 +398,38 @@ model KommoSettings {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+// ==================== SCRIPTS EXTERNOS ====================
+
+model Script {
+  id          String      @id @default(cuid())
+  name        String      // Nome identificador (ex: "Google Analytics", "Meta Pixel")
+  type        ScriptType  @default(CUSTOM)
+  position    ScriptPosition @default(HEAD)
+  code        String      @db.Text // Código do script
+  active      Boolean     @default(true)
+  site        SiteTarget  @default(BOTH) // Para qual site o script é aplicado
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum ScriptType {
+  GOOGLE_ANALYTICS
+  GOOGLE_ADS
+  GOOGLE_TAG_MANAGER
+  META_PIXEL
+  CUSTOM
+}
+
+enum ScriptPosition {
+  HEAD        // Dentro do <head>
+  BODY_START  // Início do <body>
+  BODY_END    // Final do <body>
+}
+
+enum SiteTarget {
+  SHR
+  MALETTI
+  BOTH
+}
