@@ -285,7 +285,7 @@ export default function EditPagePage({ params }: { params: Promise<{ id: string 
         </div>
         <div className="flex items-center gap-3">
           <a
-            href={`/p/${page.slug}`}
+            href={`/${page.slug === 'home' ? '' : page.slug}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white border border-gray-200 dark:border-gray-700 rounded-lg transition-colors"
@@ -322,7 +322,7 @@ export default function EditPagePage({ params }: { params: Promise<{ id: string 
               Slug (URL)
             </label>
             <div className="flex items-center">
-              <span className="text-gray-500 dark:text-gray-400 mr-1">/p/</span>
+              <span className="text-gray-500 dark:text-gray-400 mr-1">/</span>
               <input
                 type="text"
                 value={page.slug}
