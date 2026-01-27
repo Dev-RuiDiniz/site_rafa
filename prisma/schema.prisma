@@ -399,6 +399,22 @@ model KommoSettings {
   updatedAt       DateTime @updatedAt
 }
 
+// ==================== SEÇÕES DA HOME ====================
+
+model HomeSection {
+  id          String   @id @default(cuid())
+  sectionId   String   @unique // ex: "why-choose-us", "maletti-partnership", "maintenance", "catalog-cta"
+  title       String?
+  subtitle    String?
+  description String?  @db.Text
+  content     Json?    // Dados específicos da seção (features, stats, items, etc)
+  image       String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // ==================== SCRIPTS EXTERNOS ====================
 
 model Script {

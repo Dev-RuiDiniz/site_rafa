@@ -1,15 +1,58 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { HiOutlineDownload, HiOutlinePhone } from "react-icons/hi";
 
+interface SectionData {
+  title: string;
+  subtitle: string;
+  description: string;
+  content: {
+    phone: string;
+    phoneRaw: string;
+    whatsappMessage: string;
+    buttonText: string;
+    consultorButtonText: string;
+  };
+}
+
+const defaultData: SectionData = {
+  title: "Receba nosso catálogo completo",
+  subtitle: "Catálogo Digital",
+  description: "Conheça toda a linha de produtos Maletti disponível no Brasil. Deixe seu e-mail e receba o catálogo digital com especificações técnicas e fotos em alta resolução.",
+  content: {
+    phone: "(11) 98198-2279",
+    phoneRaw: "+5511981982279",
+    whatsappMessage: "Olá! Gostaria de falar com um consultor sobre os produtos Maletti.",
+    buttonText: "Receber Catálogo",
+    consultorButtonText: "Falar com Consultor",
+  },
+};
+
 export function CatalogCTA() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [email, setEmail] = useState("");
+  const [data, setData] = useState<SectionData>(defaultData);
+
+  useEffect(() => {
+    fetch("/api/home-sections?sectionId=catalog-cta")
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.section) {
+          setData({
+            title: result.section.title || defaultData.title,
+            subtitle: result.section.subtitle || defaultData.subtitle,
+            description: result.section.description || defaultData.description,
+            content: result.section.content || defaultData.content,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +71,13 @@ export function CatalogCTA() {
             className="text-center mb-12"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Catálogo Digital
+              {data.subtitle}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6">
-              Receba nosso catálogo
-              <br />
-              completo
+              {data.title}
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Conheça toda a linha de produtos Maletti disponível no Brasil. 
-              Deixe seu e-mail e receba o catálogo digital com especificações 
-              técnicas e fotos em alta resolução.
+              {data.description}
             </p>
           </motion.div>
 
@@ -64,7 +103,7 @@ export function CatalogCTA() {
               className="h-14 px-8 bg-black text-white hover:bg-gray-800 transition-all duration-300 group"
             >
               <HiOutlineDownload className="mr-2 w-5 h-5" />
-              Receber Catálogo
+              {data.content.buttonText}
             </Button>
           </motion.form>
 
@@ -88,7 +127,7 @@ export function CatalogCTA() {
             className="flex flex-col sm:flex-row items-center justify-center gap-6"
           >
             <a
-              href="tel:+5511981982279"
+              href={`tel:${data.content.phoneRaw}`}
               className="flex items-center gap-3 text-gray-600 hover:text-black transition-colors group"
             >
               <span className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-black group-hover:bg-black group-hover:text-white transition-all duration-300">
@@ -96,7 +135,7 @@ export function CatalogCTA() {
               </span>
               <div className="text-left">
                 <span className="text-xs text-gray-400 block">Ligue para nós</span>
-                <span className="font-medium">(11) 98198-2279</span>
+                <span className="font-medium">{data.content.phone}</span>
               </div>
             </a>
 
@@ -108,11 +147,11 @@ export function CatalogCTA() {
               asChild
             >
               <a
-                href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre os produtos Maletti."
+                href={`https://wa.me/${data.content.phoneRaw.replace(/\D/g, '')}?text=${encodeURIComponent(data.content.whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Falar com Consultor
+                {data.content.consultorButtonText}
               </a>
             </Button>
           </motion.div>

@@ -1,15 +1,70 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { HiArrowRight } from "react-icons/hi";
 import Link from "next/link";
 
+interface SectionData {
+  title: string;
+  subtitle: string;
+  image: string;
+  content: {
+    paragraphs: string[];
+    features: string[];
+    foundationYear: string;
+    button1Text: string;
+    button1Link: string;
+    button2Text: string;
+    button2Link: string;
+  };
+}
+
+const defaultData: SectionData = {
+  title: "A tradição italiana no seu salão",
+  subtitle: "Parceria Exclusiva",
+  image: "/images/site/Shirobody_showroom.jpg",
+  content: {
+    paragraphs: [
+      "A Maletti é uma das mais prestigiadas fabricantes de mobiliário para salões de beleza do mundo. Fundada em 1965 na Itália, a marca é sinônimo de inovação, qualidade e design sofisticado.",
+      "Como distribuidor exclusivo no Brasil, a SHR traz toda a excelência Maletti para o mercado nacional, com garantia de originalidade, suporte técnico especializado e peças de reposição originais.",
+    ],
+    features: [
+      "Produtos 100% originais importados da Itália",
+      "Garantia estendida e suporte técnico nacional",
+      "Showroom exclusivo para visitação",
+      "Consultoria personalizada para seu projeto",
+    ],
+    foundationYear: "1965",
+    button1Text: "Conhecer a Maletti",
+    button1Link: "/maletti",
+    button2Text: "Agendar Visita",
+    button2Link: "/contato",
+  },
+};
+
 export function MalettiPartnership() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [data, setData] = useState<SectionData>(defaultData);
+
+  useEffect(() => {
+    fetch("/api/home-sections?sectionId=maletti-partnership")
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.section) {
+          setData({
+            title: result.section.title || defaultData.title,
+            subtitle: result.section.subtitle || defaultData.subtitle,
+            image: result.section.image || defaultData.image,
+            content: result.section.content || defaultData.content,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section ref={ref} className="py-24 lg:py-32 bg-black text-white overflow-hidden">
@@ -24,7 +79,7 @@ export function MalettiPartnership() {
           >
             <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
               <Image
-                src="/images/site/Shirobody_showroom.jpg"
+                src={data.image}
                 alt="Showroom Maletti"
                 fill
                 className="object-cover"
@@ -52,7 +107,7 @@ export function MalettiPartnership() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="absolute -bottom-6 -right-6 lg:bottom-8 lg:-right-8 bg-white text-black p-6 shadow-2xl"
             >
-              <span className="text-4xl font-serif font-bold">1965</span>
+              <span className="text-4xl font-serif font-bold">{data.content.foundationYear}</span>
               <p className="text-xs uppercase tracking-wider text-gray-600 mt-1">
                 Fundação Maletti
               </p>
@@ -66,34 +121,22 @@ export function MalettiPartnership() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-400 mb-4 block">
-              Parceria Exclusiva
+              {data.subtitle}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold mb-6 leading-tight">
-              A tradição italiana
+              {data.title.split(" ").slice(0, 3).join(" ")}
               <br />
-              no seu salão
+              {data.title.split(" ").slice(3).join(" ")}
             </h2>
             <div className="space-y-4 text-gray-300 leading-relaxed mb-8">
-              <p>
-                A Maletti é uma das mais prestigiadas fabricantes de mobiliário 
-                para salões de beleza do mundo. Fundada em 1965 na Itália, a marca 
-                é sinônimo de inovação, qualidade e design sofisticado.
-              </p>
-              <p>
-                Como distribuidor exclusivo no Brasil, a SHR traz toda a excelência 
-                Maletti para o mercado nacional, com garantia de originalidade, 
-                suporte técnico especializado e peças de reposição originais.
-              </p>
+              {data.content.paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
 
             {/* Features list */}
             <ul className="space-y-3 mb-10">
-              {[
-                "Produtos 100% originais importados da Itália",
-                "Garantia estendida e suporte técnico nacional",
-                "Showroom exclusivo para visitação",
-                "Consultoria personalizada para seu projeto",
-              ].map((item, index) => (
+              {data.content.features.map((item, index) => (
                 <motion.li
                   key={index}
                   initial={{ opacity: 0, x: 20 }}
@@ -108,22 +151,22 @@ export function MalettiPartnership() {
             </ul>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/maletti">
+              <Link href={data.content.button1Link}>
                 <Button
                   size="lg"
                   className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group"
                 >
-                  Conhecer a Maletti
+                  {data.content.button1Text}
                   <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/contato">
+              <Link href={data.content.button2Link}>
                 <Button
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
                 >
-                  Agendar Visita
+                  {data.content.button2Text}
                 </Button>
               </Link>
             </div>
