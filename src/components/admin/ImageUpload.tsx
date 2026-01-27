@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
+import { upload } from "@vercel/blob/client";
 import { HiOutlinePhotograph, HiOutlineX, HiOutlinePlus, HiOutlineDocumentText } from "react-icons/hi";
 
 interface ImageUploadProps {
@@ -15,6 +16,7 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange, folder = "images", label, accept = "image/*" }: ImageUploadProps) {
   const isPdf = value?.toLowerCase().endsWith('.pdf');
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,24 +24,29 @@ export function ImageUpload({ value, onChange, folder = "images", label, accept 
     if (!file) return;
 
     setUploading(true);
+    setProgress(0);
+    
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", folder);
+      // Upload direto para Vercel Blob (bypassa limite de 4.5MB)
+      const timestamp = Date.now();
+      const ext = file.name.split(".").pop();
+      const filename = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+      const blob = await upload(filename, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload/client",
+        onUploadProgress: (progressEvent) => {
+          setProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+        },
       });
 
-      const data = await res.json();
-      if (data.success) {
-        onChange(data.url);
-      }
+      onChange(blob.url);
     } catch (error) {
       console.error("Upload error:", error);
+      alert("Erro ao fazer upload. Tente novamente.");
     } finally {
       setUploading(false);
+      setProgress(0);
     }
   };
 
@@ -85,7 +92,10 @@ export function ImageUpload({ value, onChange, folder = "images", label, accept 
             className="w-full h-48 border-2 border-dashed border-gray-300 dark:border-zinc-700 hover:border-black dark:hover:border-white flex flex-col items-center justify-center gap-2 transition-colors"
           >
             {uploading ? (
-              <div className="animate-spin h-6 w-6 border-2 border-black dark:border-white border-t-transparent rounded-full" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="animate-spin h-6 w-6 border-2 border-black dark:border-white border-t-transparent rounded-full" />
+                {progress > 0 && <span className="text-sm text-gray-500">{progress}%</span>}
+              </div>
             ) : (
               <>
                 <HiOutlinePhotograph className="h-8 w-8 text-gray-400" />
@@ -126,23 +136,21 @@ export function GalleryUpload({ value = [], onChange, folder = "gallery", label,
     try {
       const newUrls: string[] = [];
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("folder", folder);
+        const timestamp = Date.now();
+        const ext = file.name.split(".").pop();
+        const filename = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
+        const blob = await upload(filename, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/client",
         });
 
-        const data = await res.json();
-        if (data.success) {
-          newUrls.push(data.url);
-        }
+        newUrls.push(blob.url);
       }
       onChange([...value, ...newUrls].slice(0, max));
     } catch (error) {
       console.error("Upload error:", error);
+      alert("Erro ao fazer upload. Tente novamente.");
     } finally {
       setUploading(false);
     }

@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put, del } from "@vercel/blob";
 
+// Aumentar limite de tamanho para uploads (50MB)
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// Para Next.js 13+ App Router
+export const maxDuration = 60; // 60 segundos timeout
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
