@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -18,8 +18,39 @@ import {
 import { FaWhatsapp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 
+// Types
+interface PageBlock {
+  id: string;
+  type: string;
+  content: Record<string, unknown>;
+  order: number;
+  active: boolean;
+}
+
+interface PageData {
+  heroTitle?: string;
+  heroHighlight?: string;
+  heroDescription?: string;
+  heroButtonText?: string;
+  heroVideo?: string;
+  heroOverlay?: number;
+  problemTitle?: string;
+  problemDescription?: string;
+  problemPainPoints?: string[];
+  solutionTitle?: string;
+  solutionDescription?: string;
+  solutionFeatures?: typeof defaultSolutionFeatures;
+  products?: typeof defaultProducts;
+  technologies?: typeof defaultTechnologies;
+  ritualSteps?: typeof defaultRitualSteps;
+  galleryImages?: typeof defaultGalleryImages;
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaButtonText?: string;
+}
+
 // Products data
-const products = [
+const defaultProducts = [
   {
     name: "Heaven",
     tagline: "O Símbolo do Bem-Estar",
@@ -67,7 +98,7 @@ const products = [
 ];
 
 // Technologies data
-const technologies = [
+const defaultTechnologies = [
   {
     name: "VAPOMIST",
     subtitle: "Infusão a Vapor",
@@ -103,7 +134,7 @@ const technologies = [
 ];
 
 // Ritual steps
-const ritualSteps = [
+const defaultRitualSteps = [
   {
     step: 1,
     title: "Preparação",
@@ -132,7 +163,7 @@ const ritualSteps = [
 ];
 
 // Gallery images
-const galleryImages = [
+const defaultGalleryImages = [
   { src: "/images/site/Shirobody_showroom.jpg", alt: "Shirobody Showroom" },
   { src: "/images/site/heaven2.jpg", alt: "Heaven" },
   { src: "/images/site/Total-Body-356.jpg", alt: "Total Body" },
@@ -142,14 +173,14 @@ const galleryImages = [
 ];
 
 // Pain points
-const painPoints = [
+const defaultPainPoints = [
   "O atendimento é longo e cansativo para o paciente?",
   "É difícil justificar um ticket mais alto apenas pelos ativos utilizados?",
   "Falta um diferencial visual que separe sua clínica da concorrência?",
 ];
 
 // Solution features
-const solutionFeatures = [
+const defaultSolutionFeatures = [
   {
     title: 'Ergonomia "Zero Gravity"',
     description: "Conforto absoluto para terapias de longa duração.",
@@ -169,6 +200,7 @@ export default function TricologiaPage() {
   const [currentGalleryImage, setCurrentGalleryImage] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [pageData, setPageData] = useState<PageData>({});
 
   const heroRef = useRef(null);
   const problemRef = useRef(null);
@@ -184,13 +216,37 @@ export default function TricologiaPage() {
   const ritualInView = useInView(ritualRef, { once: true, margin: "-100px" });
   const galleryInView = useInView(galleryRef, { once: true, margin: "-100px" });
 
+  // Carregar dados da API
+  useEffect(() => {
+    fetch("/api/pages/tricologia")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.page?.blocks) {
+          const content: PageData = {};
+          data.page.blocks.forEach((block: PageBlock) => {
+            Object.assign(content, block.content);
+          });
+          setPageData(content);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  // Dados com fallback para defaults
+  const products = pageData.products || defaultProducts;
+  const technologies = pageData.technologies || defaultTechnologies;
+  const ritualSteps = pageData.ritualSteps || defaultRitualSteps;
+  const galleryImages = pageData.galleryImages || defaultGalleryImages;
+  const painPoints = pageData.problemPainPoints || defaultPainPoints;
+  const solutionFeatures = pageData.solutionFeatures || defaultSolutionFeatures;
+
   // Auto-rotate gallery
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentGalleryImage((prev) => (prev + 1) % galleryImages.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [galleryImages.length]);
 
   const openYoutubeVideo = (url: string) => {
     setVideoUrl(url);

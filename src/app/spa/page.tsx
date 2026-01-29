@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -22,10 +22,43 @@ import {
 } from "react-icons/tb";
 
 // ============================================
+// TYPES
+// ============================================
+
+interface PageBlock {
+  id: string;
+  type: string;
+  content: Record<string, unknown>;
+  order: number;
+  active: boolean;
+}
+
+interface PageData {
+  heroTitle?: string;
+  heroHighlight?: string;
+  heroDescription?: string;
+  heroSubDescription?: string;
+  heroButtonText?: string;
+  heroButtonLink?: string;
+  heroVideo?: string;
+  heroOverlay?: number;
+  conceptTitle?: string;
+  conceptDescription?: string;
+  infrastructureProducts?: typeof defaultInfrastructureProducts;
+  sensorTechnologies?: typeof defaultSensorTechnologies;
+  businessBenefits?: Array<{ title: string; description: string }>;
+  rituals?: typeof defaultRituals;
+  hotelShowcase?: typeof defaultHotelShowcase;
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaButtonText?: string;
+}
+
+// ============================================
 // DATA
 // ============================================
 
-const infrastructureProducts = [
+const defaultInfrastructureProducts = [
   {
     name: "Total Body",
     tagline: "Otimização Máxima de Espaço",
@@ -58,7 +91,7 @@ const infrastructureProducts = [
   },
 ];
 
-const sensorTechnologies = [
+const defaultSensorTechnologies = [
   {
     name: "Vapomist",
     icon: "💨",
@@ -86,7 +119,7 @@ const sensorTechnologies = [
   },
 ];
 
-const relatedProducts = [
+const defaultRelatedProducts = [
   { name: "Heaven", image: "/images/site/heaven2.jpg", slug: "heaven", category: "Macas" },
   { name: "Shirobody", image: "/images/site/Shirobody_showroom.jpg", slug: "shirobody", category: "Macas" },
   { name: "Total Body", image: "/images/site/Total-Body-356.jpg", slug: "total-body", category: "Macas" },
@@ -94,7 +127,7 @@ const relatedProducts = [
   { name: "Vapomist", image: "/images/site/SPA_GARCON_nuovo_04.png", slug: "vapomist", category: "Tecnologia" },
 ];
 
-const businessBenefits = [
+const defaultBusinessBenefits = [
   {
     icon: TbBuildingSkyscraper,
     title: "Diferenciação de Bandeira",
@@ -115,7 +148,7 @@ const businessBenefits = [
   },
 ];
 
-const rituals = [
+const defaultRituals = [
   {
     icon: TbPlane,
     name: 'Jet Lag Recovery',
@@ -146,7 +179,7 @@ const rituals = [
   },
 ];
 
-const hotelShowcase = [
+const defaultHotelShowcase = [
   { image: "/images/site/heaven2.jpg", location: "Maldivas", hotel: "Soneva Fushi" },
   { image: "/images/site/Shirobody_showroom.jpg", location: "Paris, França", hotel: "Le Bristol Paris" },
   { image: "/images/site/Total-Body-356.jpg", location: "Dubai, UAE", hotel: "Burj Al Arab" },
@@ -167,7 +200,7 @@ function SectionBadge({ children, light = false }: { children: React.ReactNode; 
   );
 }
 
-function ProductCard({ product, index }: { product: typeof infrastructureProducts[0]; index: number }) {
+function ProductCard({ product, index }: { product: typeof defaultInfrastructureProducts[0]; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -213,7 +246,7 @@ function ProductCard({ product, index }: { product: typeof infrastructureProduct
   );
 }
 
-function TechCard({ tech, index }: { tech: typeof sensorTechnologies[0]; index: number }) {
+function TechCard({ tech, index }: { tech: typeof defaultSensorTechnologies[0]; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -271,7 +304,7 @@ function TechCard({ tech, index }: { tech: typeof sensorTechnologies[0]; index: 
   );
 }
 
-function RitualCard({ ritual, index }: { ritual: typeof rituals[0]; index: number }) {
+function RitualCard({ ritual, index }: { ritual: typeof defaultRituals[0]; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -319,6 +352,7 @@ export default function SpaPage() {
   const [currentShowcase, setCurrentShowcase] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
   const [apiProducts, setApiProducts] = useState<Product[]>([]);
+  const [pageData, setPageData] = useState<PageData>({});
 
   const heroRef = useRef(null);
   const conceptRef = useRef(null);
@@ -338,24 +372,57 @@ export default function SpaPage() {
   const socialInView = useInView(socialRef, { once: true, margin: "-100px" });
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
+  // Carregar dados da API
+  useEffect(() => {
+    fetch("/api/pages/spa")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.page?.blocks) {
+          const content: PageData = {};
+          data.page.blocks.forEach((block: PageBlock) => {
+            Object.assign(content, block.content);
+          });
+          setPageData(content);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Dados com fallback para defaults
+  const infrastructureProducts = pageData.infrastructureProducts || defaultInfrastructureProducts;
+  const sensorTechnologies = pageData.sensorTechnologies || defaultSensorTechnologies;
+  const rituals = pageData.rituals || defaultRituals;
+  const hotelShowcase = pageData.hotelShowcase || defaultHotelShowcase;
+  const relatedProducts = defaultRelatedProducts;
+  
+  // businessBenefits precisa manter os ícones React, então merge com defaults
+  const benefitIcons = [TbBuildingSkyscraper, TbTrendingUp, TbShieldCheck];
+  const businessBenefits = useMemo(() => {
+    const dbBenefits = pageData.businessBenefits;
+    if (!dbBenefits) return defaultBusinessBenefits;
+    return dbBenefits.map((b, i) => ({
+      ...b,
+      icon: benefitIcons[i] || TbBuildingSkyscraper
+    }));
+  }, [pageData.businessBenefits]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentShowcase((prev) => (prev + 1) % hotelShowcase.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [hotelShowcase.length]);
 
-  // Buscar produtos da API SHR
+  // Buscar produtos da API local
   useEffect(() => {
-    fetch("https://shrhair.com.br/api/products")
+    fetch("/api/products?limit=5")
       .then((res) => res.json())
       .then((data) => {
         if (data.products) {
-          // Pegar apenas os primeiros 5 produtos
           setApiProducts(data.products.slice(0, 5));
         }
       })
-      .catch(console.error);
+      .catch(() => {});
   }, []);
 
   return (

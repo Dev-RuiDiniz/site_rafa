@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -15,10 +15,60 @@ import {
 import { FaWhatsapp } from "react-icons/fa";
 
 // ============================================
-// DATA
+// TYPES
 // ============================================
 
-const workstations = [
+interface PageBlock {
+  id: string;
+  type: string;
+  content: Record<string, unknown>;
+  order: number;
+  active: boolean;
+}
+
+interface PageData {
+  heroTitle?: string;
+  heroHighlight?: string;
+  heroBadge?: string;
+  heroDescription?: string;
+  heroButtonText?: string;
+  heroImage?: string;
+  problemTitle?: string;
+  problemDescription?: string;
+  problemPainPoints?: string[];
+  solutionTitle?: string;
+  solutionDescription?: string;
+  solutionNote?: string;
+  workstationsTitle?: string;
+  workstationsBadge?: string;
+  workstationsDescription?: string;
+  workstations?: typeof defaultWorkstations;
+  techTitle?: string;
+  techBadge?: string;
+  techDescription?: string;
+  technologies?: typeof defaultTechnologies;
+  journeyTitle?: string;
+  journeyBadge?: string;
+  journeyDescription?: string;
+  journeyResult?: string;
+  journeyImage?: string;
+  journeySteps?: typeof defaultJourneySteps;
+  galleryTitle?: string;
+  galleryBadge?: string;
+  galleryDescription?: string;
+  galleryImages?: { src: string; alt: string }[];
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaNote?: string;
+  ctaSubtitle?: string;
+  ctaButtons?: { text: string; link: string; style: string }[];
+}
+
+// ============================================
+// DEFAULT DATA
+// ============================================
+
+const defaultWorkstations = [
   {
     name: "Heaven",
     tagline: "Para Rituais de Longa Duração",
@@ -48,7 +98,7 @@ const workstations = [
   },
 ];
 
-const technologies = [
+const defaultTechnologies = [
   {
     name: "Vapomist",
     tagline: "Potencializador de Ativos",
@@ -78,7 +128,7 @@ const technologies = [
   },
 ];
 
-const journeySteps = [
+const defaultJourneySteps = [
   {
     step: 1,
     title: "Recepção Premium",
@@ -106,7 +156,7 @@ const journeySteps = [
   },
 ];
 
-const galleryImages = [
+const defaultGalleryImages = [
   { src: "/images/site/Shirobody_showroom.jpg", alt: "Shirobody Showroom" },
   { src: "/images/site/heaven2.jpg", alt: "Heaven" },
   { src: "/images/site/Total-Body-356.jpg", alt: "Total Body" },
@@ -115,7 +165,7 @@ const galleryImages = [
   { src: "/images/site/Head-spa-2.jpg", alt: "Head Spa Treatment" },
 ];
 
-const painPoints = [
+const defaultPainPoints = [
   "Você sente que sua estrutura atual limita a percepção de valor dos seus tratamentos?",
   "Falta um diferencial tecnológico visível que separe o seu salão da concorrência?",
 ];
@@ -154,7 +204,7 @@ function SectionTitle({
   );
 }
 
-function WorkstationCard({ station, index }: { station: typeof workstations[0]; index: number }) {
+function WorkstationCard({ station, index }: { station: typeof defaultWorkstations[0]; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -212,7 +262,7 @@ function WorkstationCard({ station, index }: { station: typeof workstations[0]; 
   );
 }
 
-function TechCard({ tech, index }: { tech: typeof technologies[0]; index: number }) {
+function TechCard({ tech, index }: { tech: typeof defaultTechnologies[0]; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -266,7 +316,7 @@ function TechCard({ tech, index }: { tech: typeof technologies[0]; index: number
   );
 }
 
-function JourneyStep({ item, index, total }: { item: typeof journeySteps[0]; index: number; total: number }) {
+function JourneyStep({ item, index, total }: { item: typeof defaultJourneySteps[0]; index: number; total: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -300,6 +350,7 @@ function JourneyStep({ item, index, total }: { item: typeof journeySteps[0]; ind
 
 export default function SalaoDeBelezaPage() {
   const [currentGalleryImage, setCurrentGalleryImage] = useState(0);
+  const [pageData, setPageData] = useState<PageData>({});
   
   const heroRef = useRef(null);
   const problemRef = useRef(null);
@@ -311,12 +362,35 @@ export default function SalaoDeBelezaPage() {
   const journeyInView = useInView(journeyRef, { once: true, margin: "-100px" });
   const galleryInView = useInView(galleryRef, { once: true, margin: "-100px" });
 
+  // Carregar dados da API
+  useEffect(() => {
+    fetch("/api/pages/salao-de-beleza")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.page?.blocks) {
+          const content: PageData = {};
+          data.page.blocks.forEach((block: PageBlock) => {
+            Object.assign(content, block.content);
+          });
+          setPageData(content);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  // Dados com fallback para defaults
+  const workstations = pageData.workstations || defaultWorkstations;
+  const technologies = pageData.technologies || defaultTechnologies;
+  const journeySteps = pageData.journeySteps || defaultJourneySteps;
+  const galleryImages = pageData.galleryImages || defaultGalleryImages;
+  const painPoints = pageData.problemPainPoints || defaultPainPoints;
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentGalleryImage((prev) => (prev + 1) % galleryImages.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [galleryImages.length]);
 
   return (
     <>

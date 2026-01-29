@@ -90,6 +90,12 @@ export function VisualBlockEditor({ type, content, onChange }: VisualBlockEditor
       return <MalettiDesignEditor content={content} onChange={onChange} />;
     case "maletti-catalogo":
       return <MalettiCatalogoEditor content={content} onChange={onChange} />;
+    case "lp-salao-content":
+      return <LPSalaoContentEditor content={content} onChange={onChange} />;
+    case "lp-tricologia-content":
+      return <LPTricologiaContentEditor content={content} onChange={onChange} />;
+    case "lp-spa-content":
+      return <LPSpaContentEditor content={content} onChange={onChange} />;
     default:
       return <div className="text-gray-500 text-sm">Editor não disponível</div>;
   }
@@ -2036,6 +2042,625 @@ function MalettiCatalogoEditor({ content, onChange }: { content: Record<string, 
       <InputField label="Título do Formulário" value={(content.formTitle as string) || ""} onChange={(v) => onChange({ ...content, formTitle: v })} placeholder="Solicite seu Catálogo" />
       <InputField label="Descrição do Formulário" value={(content.formDescription as string) || ""} onChange={(v) => onChange({ ...content, formDescription: v })} />
       <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
+    </div>
+  );
+}
+
+// Landing Page Salão de Beleza - Editor Completo
+function LPSalaoContentEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [uploading, setUploading] = useState<string | null>(null);
+  
+  const workstations = (content.workstations as Array<{ name: string; tagline: string; concept: string; operational: string; application: string; image: string; slug: string }>) || [];
+  const technologies = (content.technologies as Array<{ name: string; tagline: string; icon: string; function: string; impact: string; image: string; slug: string }>) || [];
+  const journeySteps = (content.journeySteps as Array<{ step: number; title: string; description: string }>) || [];
+  const galleryImages = (content.galleryImages as Array<{ src: string; alt: string }>) || [];
+  const painPoints = (content.problemPainPoints as string[]) || [];
+
+  // Função de upload de imagem
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldKey: string,
+    arrayField?: string,
+    arrayIndex?: number,
+    arrayImageKey?: string
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploading(fieldKey);
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        if (arrayField && arrayIndex !== undefined && arrayImageKey) {
+          // Upload para item de array (workstations, technologies, gallery)
+          const arr = [...(content[arrayField] as Array<Record<string, unknown>>)];
+          arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: data.url };
+          onChange({ ...content, [arrayField]: arr });
+        } else {
+          // Upload para campo simples
+          onChange({ ...content, [fieldKey]: data.url });
+        }
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  // Componente de upload de imagem com preview
+  const ImageUploadField = ({ 
+    label, 
+    value, 
+    fieldKey,
+    arrayField,
+    arrayIndex,
+    arrayImageKey
+  }: { 
+    label: string; 
+    value: string; 
+    fieldKey: string;
+    arrayField?: string;
+    arrayIndex?: number;
+    arrayImageKey?: string;
+  }) => (
+    <div>
+      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+      <div className="flex gap-2 items-start">
+        {value && (
+          <div className="relative w-20 h-20 rounded overflow-hidden border bg-gray-100 flex-shrink-0">
+            <img src={value} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="flex-1">
+          <label 
+            className={`flex items-center justify-center w-full h-10 border-2 border-dashed rounded cursor-pointer hover:border-gray-400 transition-colors ${uploading === fieldKey ? 'opacity-50' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleImageUpload(e, fieldKey, arrayField, arrayIndex, arrayImageKey)}
+              onClick={(e) => e.stopPropagation()}
+              disabled={uploading === fieldKey}
+            />
+            <span className="text-xs text-gray-500">
+              {uploading === fieldKey ? "Enviando..." : "Clique para trocar"}
+            </span>
+          </label>
+          <input 
+            type="text" 
+            value={value} 
+            onChange={(e) => {
+              if (arrayField && arrayIndex !== undefined && arrayImageKey) {
+                const arr = [...(content[arrayField] as Array<Record<string, unknown>>)];
+                arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: e.target.value };
+                onChange({ ...content, [arrayField]: arr });
+              } else {
+                onChange({ ...content, [fieldKey]: e.target.value });
+              }
+            }}
+            placeholder="/images/site/..."
+            className="w-full mt-1 px-2 py-1 text-xs border rounded"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const sections = [
+    { id: "hero", label: "Hero" },
+    { id: "problem", label: "Problema" },
+    { id: "workstations", label: "Estações" },
+    { id: "tech", label: "Tecnologia" },
+    { id: "journey", label: "Jornada" },
+    { id: "gallery", label: "Galeria" },
+    { id: "cta", label: "CTA Final" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-1 border-b pb-2">
+        {sections.map((s) => (
+          <button
+            key={s.id}
+            onClick={(e) => { e.stopPropagation(); setActiveSection(s.id); }}
+            className={`px-2 py-1 text-xs rounded ${activeSection === s.id ? "bg-black text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {activeSection === "hero" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Hero</h4>
+          <ImageUploadField label="Imagem Hero" value={(content.heroImage as string) || ""} fieldKey="heroImage" />
+          <InputField label="Badge" value={(content.heroBadge as string) || ""} onChange={(v) => onChange({ ...content, heroBadge: v })} placeholder="Head SPA Premium" />
+          <InputField label="Título Principal" value={(content.heroTitle as string) || ""} onChange={(v) => onChange({ ...content, heroTitle: v })} placeholder="O Padrão Ouro do Head SPA:" />
+          <InputField label="Título Destaque" value={(content.heroHighlight as string) || ""} onChange={(v) => onChange({ ...content, heroHighlight: v })} placeholder="Design Italiano e Tecnologia de Wellness." />
+          <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
+          <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} placeholder="Conhecer a Coleção Maletti" />
+        </div>
+      )}
+
+      {activeSection === "problem" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Problema</h4>
+          <InputField label="Título" value={(content.problemTitle as string) || ""} onChange={(v) => onChange({ ...content, problemTitle: v })} />
+          <TextareaField label="Descrição" value={(content.problemDescription as string) || ""} onChange={(v) => onChange({ ...content, problemDescription: v })} rows={3} />
+          <label className="block text-xs font-medium text-gray-600">Pain Points (um por linha)</label>
+          <textarea
+            className="w-full px-3 py-2 text-sm border rounded"
+            rows={4}
+            value={painPoints.join("\n")}
+            onChange={(e) => onChange({ ...content, problemPainPoints: e.target.value.split("\n").filter(Boolean) })}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <InputField label="Título da Solução" value={(content.solutionTitle as string) || ""} onChange={(v) => onChange({ ...content, solutionTitle: v })} placeholder="A Solução Maletti" />
+          <TextareaField label="Descrição da Solução" value={(content.solutionDescription as string) || ""} onChange={(v) => onChange({ ...content, solutionDescription: v })} rows={3} />
+          <InputField label="Nota da Solução" value={(content.solutionNote as string) || ""} onChange={(v) => onChange({ ...content, solutionNote: v })} />
+        </div>
+      )}
+
+      {activeSection === "workstations" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Estações de Trabalho</h4>
+          <InputField label="Badge" value={(content.workstationsBadge as string) || ""} onChange={(v) => onChange({ ...content, workstationsBadge: v })} />
+          <InputField label="Título" value={(content.workstationsTitle as string) || ""} onChange={(v) => onChange({ ...content, workstationsTitle: v })} />
+          <TextareaField label="Descrição" value={(content.workstationsDescription as string) || ""} onChange={(v) => onChange({ ...content, workstationsDescription: v })} rows={2} />
+          {workstations.map((w, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Estação {i + 1}: {w.name}</span>
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, workstations: workstations.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+              </div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={w.name} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], name: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Tagline" value={w.tagline} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], tagline: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Conceito" rows={2} value={w.concept} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], concept: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Operacional" rows={2} value={w.operational} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], operational: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Aplicação" rows={2} value={w.application} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], application: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={w.image} fieldKey={`workstation-${i}`} arrayField="workstations" arrayIndex={i} arrayImageKey="image" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug" value={w.slug} onChange={(e) => { const nw = [...workstations]; nw[i] = { ...nw[i], slug: e.target.value }; onChange({ ...content, workstations: nw }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, workstations: [...workstations, { name: "", tagline: "", concept: "", operational: "", application: "", image: "", slug: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Estação</button>
+        </div>
+      )}
+
+      {activeSection === "tech" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Tecnologias</h4>
+          <InputField label="Badge" value={(content.techBadge as string) || ""} onChange={(v) => onChange({ ...content, techBadge: v })} />
+          <InputField label="Título" value={(content.techTitle as string) || ""} onChange={(v) => onChange({ ...content, techTitle: v })} />
+          <TextareaField label="Descrição" value={(content.techDescription as string) || ""} onChange={(v) => onChange({ ...content, techDescription: v })} rows={2} />
+          {technologies.map((t, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Tech {i + 1}: {t.name}</span>
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: technologies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+              </div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={t.name} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], name: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Tagline" value={t.tagline} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], tagline: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Ícone (emoji)" value={t.icon} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], icon: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Função Técnica" rows={2} value={t.function} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], function: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Impacto" rows={2} value={t.impact} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], impact: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={t.image} fieldKey={`tech-${i}`} arrayField="technologies" arrayIndex={i} arrayImageKey="image" />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: [...technologies, { name: "", tagline: "", icon: "", function: "", impact: "", image: "", slug: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Tecnologia</button>
+        </div>
+      )}
+
+      {activeSection === "journey" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Jornada do Cliente</h4>
+          <InputField label="Badge" value={(content.journeyBadge as string) || ""} onChange={(v) => onChange({ ...content, journeyBadge: v })} />
+          <InputField label="Título" value={(content.journeyTitle as string) || ""} onChange={(v) => onChange({ ...content, journeyTitle: v })} />
+          <TextareaField label="Descrição" value={(content.journeyDescription as string) || ""} onChange={(v) => onChange({ ...content, journeyDescription: v })} rows={2} />
+          <InputField label="Resultado" value={(content.journeyResult as string) || ""} onChange={(v) => onChange({ ...content, journeyResult: v })} />
+          <ImageUploadField label="Imagem" value={(content.journeyImage as string) || ""} fieldKey="journeyImage" />
+          {journeySteps.map((j, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Passo {j.step}</span>
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, journeySteps: journeySteps.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+              </div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={j.title} onChange={(e) => { const nj = [...journeySteps]; nj[i] = { ...nj[i], title: e.target.value }; onChange({ ...content, journeySteps: nj }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={j.description} onChange={(e) => { const nj = [...journeySteps]; nj[i] = { ...nj[i], description: e.target.value }; onChange({ ...content, journeySteps: nj }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, journeySteps: [...journeySteps, { step: journeySteps.length + 1, title: "", description: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Passo</button>
+        </div>
+      )}
+
+      {activeSection === "gallery" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Galeria</h4>
+          <InputField label="Badge" value={(content.galleryBadge as string) || ""} onChange={(v) => onChange({ ...content, galleryBadge: v })} />
+          <InputField label="Título" value={(content.galleryTitle as string) || ""} onChange={(v) => onChange({ ...content, galleryTitle: v })} />
+          <TextareaField label="Descrição" value={(content.galleryDescription as string) || ""} onChange={(v) => onChange({ ...content, galleryDescription: v })} rows={2} />
+          {galleryImages.map((g, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Imagem {i + 1}</span>
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, galleryImages: galleryImages.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+              </div>
+              <ImageUploadField label="" value={g.src} fieldKey={`gallery-${i}`} arrayField="galleryImages" arrayIndex={i} arrayImageKey="src" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Alt text" value={g.alt} onChange={(e) => { const ng = [...galleryImages]; ng[i] = { ...ng[i], alt: e.target.value }; onChange({ ...content, galleryImages: ng }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, galleryImages: [...galleryImages, { src: "", alt: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Imagem</button>
+        </div>
+      )}
+
+      {activeSection === "cta" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">CTA Final</h4>
+          <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
+          <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
+          <InputField label="Nota" value={(content.ctaNote as string) || ""} onChange={(v) => onChange({ ...content, ctaNote: v })} />
+          <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Landing Page Tricologia - Editor Completo
+function LPTricologiaContentEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [uploading, setUploading] = useState<string | null>(null);
+  
+  const products = (content.products as Array<{ name: string; tagline: string; description: string; highlight: string; ideal: string; image: string; cta: string; slug: string }>) || [];
+  const technologies = (content.technologies as Array<{ name: string; subtitle: string; icon: string; description: string; benefit: string; hasVideo: boolean }>) || [];
+  const ritualSteps = (content.ritualSteps as Array<{ step: number; title: string; description: string }>) || [];
+  const galleryImages = (content.galleryImages as Array<{ src: string; alt: string }>) || [];
+  const painPoints = (content.problemPainPoints as string[]) || [];
+  const solutionFeatures = (content.solutionFeatures as Array<{ title: string; description: string }>) || [];
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldKey: string, arrayField?: string, arrayIndex?: number, arrayImageKey?: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(fieldKey);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        if (arrayField && arrayIndex !== undefined && arrayImageKey) {
+          const arr = [...(content[arrayField] as Array<Record<string, unknown>>)];
+          arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: data.url };
+          onChange({ ...content, [arrayField]: arr });
+        } else {
+          onChange({ ...content, [fieldKey]: data.url });
+        }
+      }
+    } catch (err) { console.error(err); } finally { setUploading(null); }
+  };
+
+  const ImageUploadField = ({ label, value, fieldKey, arrayField, arrayIndex, arrayImageKey }: { label: string; value: string; fieldKey: string; arrayField?: string; arrayIndex?: number; arrayImageKey?: string }) => (
+    <div>
+      {label && <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>}
+      <div className="flex gap-2 items-start">
+        {value && <div className="relative w-20 h-20 rounded overflow-hidden border bg-gray-100 flex-shrink-0"><img src={value} alt="" className="w-full h-full object-cover" /></div>}
+        <div className="flex-1">
+          <label className={`flex items-center justify-center w-full h-10 border-2 border-dashed rounded cursor-pointer hover:border-gray-400 ${uploading === fieldKey ? 'opacity-50' : ''}`} onClick={(e) => e.stopPropagation()}>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, fieldKey, arrayField, arrayIndex, arrayImageKey)} onClick={(e) => e.stopPropagation()} disabled={uploading === fieldKey} />
+            <span className="text-xs text-gray-500">{uploading === fieldKey ? "Enviando..." : "Clique para trocar"}</span>
+          </label>
+          <input type="text" value={value} onChange={(e) => { if (arrayField && arrayIndex !== undefined && arrayImageKey) { const arr = [...(content[arrayField] as Array<Record<string, unknown>>)]; arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: e.target.value }; onChange({ ...content, [arrayField]: arr }); } else { onChange({ ...content, [fieldKey]: e.target.value }); } }} placeholder="/images/site/..." className="w-full mt-1 px-2 py-1 text-xs border rounded" onClick={(e) => e.stopPropagation()} />
+        </div>
+      </div>
+    </div>
+  );
+
+  const sections = [
+    { id: "hero", label: "Hero" },
+    { id: "problem", label: "Problema" },
+    { id: "products", label: "Produtos" },
+    { id: "tech", label: "Tecnologias" },
+    { id: "ritual", label: "Ritual" },
+    { id: "gallery", label: "Galeria" },
+    { id: "cta", label: "CTA" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-1 border-b pb-2">
+        {sections.map((s) => (
+          <button key={s.id} onClick={(e) => { e.stopPropagation(); setActiveSection(s.id); }} className={`px-2 py-1 text-xs rounded ${activeSection === s.id ? "bg-black text-white" : "bg-gray-100 hover:bg-gray-200"}`}>{s.label}</button>
+        ))}
+      </div>
+
+      {activeSection === "hero" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Hero</h4>
+          <InputField label="Título Principal" value={(content.heroTitle as string) || ""} onChange={(v) => onChange({ ...content, heroTitle: v })} placeholder="A união do Design Italiano..." />
+          <InputField label="Título Destaque" value={(content.heroHighlight as string) || ""} onChange={(v) => onChange({ ...content, heroHighlight: v })} placeholder="A revolução no tratamento capilar..." />
+          <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
+          <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} placeholder="Explorar a Coleção Completa" />
+          <InputField label="URL do Vídeo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} placeholder="/Video Home.mp4" />
+          <InputField label="Overlay %" value={String((content.heroOverlay as number) || 60)} onChange={(v) => onChange({ ...content, heroOverlay: Number(v) })} type="number" />
+        </div>
+      )}
+
+      {activeSection === "problem" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Problema</h4>
+          <InputField label="Título" value={(content.problemTitle as string) || ""} onChange={(v) => onChange({ ...content, problemTitle: v })} />
+          <TextareaField label="Descrição" value={(content.problemDescription as string) || ""} onChange={(v) => onChange({ ...content, problemDescription: v })} rows={3} />
+          <label className="block text-xs font-medium text-gray-600">Pain Points (um por linha)</label>
+          <textarea className="w-full px-3 py-2 text-sm border rounded" rows={4} value={painPoints.join("\n")} onChange={(e) => onChange({ ...content, problemPainPoints: e.target.value.split("\n").filter(Boolean) })} onClick={(e) => e.stopPropagation()} />
+          <InputField label="Título da Solução" value={(content.solutionTitle as string) || ""} onChange={(v) => onChange({ ...content, solutionTitle: v })} />
+          <TextareaField label="Descrição da Solução" value={(content.solutionDescription as string) || ""} onChange={(v) => onChange({ ...content, solutionDescription: v })} rows={3} />
+          <label className="block text-xs font-medium text-gray-600">Features da Solução</label>
+          {solutionFeatures.map((f, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+              <div className="flex justify-between"><span className="text-xs">Feature {i+1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, solutionFeatures: solutionFeatures.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={f.title} onChange={(e) => { const nf = [...solutionFeatures]; nf[i] = { ...nf[i], title: e.target.value }; onChange({ ...content, solutionFeatures: nf }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" value={f.description} onChange={(e) => { const nf = [...solutionFeatures]; nf[i] = { ...nf[i], description: e.target.value }; onChange({ ...content, solutionFeatures: nf }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, solutionFeatures: [...solutionFeatures, { title: "", description: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Feature</button>
+        </div>
+      )}
+
+      {activeSection === "products" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Produtos</h4>
+          {products.map((p, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Produto {i + 1}: {p.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, products: products.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={p.name} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], name: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Tagline" value={p.tagline} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], tagline: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={p.description} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], description: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Destaque" value={p.highlight} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], highlight: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Ideal para" value={p.ideal} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], ideal: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={p.image} fieldKey={`product-${i}`} arrayField="products" arrayIndex={i} arrayImageKey="image" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto CTA" value={p.cta} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], cta: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug" value={p.slug} onChange={(e) => { const np = [...products]; np[i] = { ...np[i], slug: e.target.value }; onChange({ ...content, products: np }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, products: [...products, { name: "", tagline: "", description: "", highlight: "", ideal: "", image: "", cta: "", slug: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
+        </div>
+      )}
+
+      {activeSection === "tech" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Tecnologias</h4>
+          {technologies.map((t, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Tech {i + 1}: {t.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: technologies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={t.name} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], name: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Subtítulo" value={t.subtitle} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], subtitle: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Ícone (emoji)" value={t.icon} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], icon: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={t.description} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], description: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Benefício" rows={2} value={t.benefit} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], benefit: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: [...technologies, { name: "", subtitle: "", icon: "", description: "", benefit: "", hasVideo: false }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Tecnologia</button>
+        </div>
+      )}
+
+      {activeSection === "ritual" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Passos do Ritual</h4>
+          {ritualSteps.map((r, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Passo {r.step}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ritualSteps: ritualSteps.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={r.title} onChange={(e) => { const nr = [...ritualSteps]; nr[i] = { ...nr[i], title: e.target.value }; onChange({ ...content, ritualSteps: nr }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={r.description} onChange={(e) => { const nr = [...ritualSteps]; nr[i] = { ...nr[i], description: e.target.value }; onChange({ ...content, ritualSteps: nr }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ritualSteps: [...ritualSteps, { step: ritualSteps.length + 1, title: "", description: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Passo</button>
+        </div>
+      )}
+
+      {activeSection === "gallery" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Galeria</h4>
+          {galleryImages.map((g, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-2">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Imagem {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, galleryImages: galleryImages.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <ImageUploadField label="" value={g.src} fieldKey={`gallery-${i}`} arrayField="galleryImages" arrayIndex={i} arrayImageKey="src" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Alt text" value={g.alt} onChange={(e) => { const ng = [...galleryImages]; ng[i] = { ...ng[i], alt: e.target.value }; onChange({ ...content, galleryImages: ng }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, galleryImages: [...galleryImages, { src: "", alt: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Imagem</button>
+        </div>
+      )}
+
+      {activeSection === "cta" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">CTA Final</h4>
+          <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
+          <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
+          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Landing Page SPA - Editor Completo
+function LPSpaContentEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [uploading, setUploading] = useState<string | null>(null);
+  
+  const infrastructureProducts = (content.infrastructureProducts as Array<{ name: string; tagline: string; description: string; benefit: string; image: string; slug: string }>) || [];
+  const sensorTechnologies = (content.sensorTechnologies as Array<{ name: string; icon: string; tagline: string; description: string; guestBenefit: string; differential: string; image: string; slug: string }>) || [];
+  const businessBenefits = (content.businessBenefits as Array<{ title: string; description: string }>) || [];
+  const rituals = (content.rituals as Array<{ name: string; emoji: string; focus: string; description: string; experience: string }>) || [];
+  const hotelShowcase = (content.hotelShowcase as Array<{ image: string; location: string; hotel: string }>) || [];
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldKey: string, arrayField?: string, arrayIndex?: number, arrayImageKey?: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(fieldKey);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        if (arrayField && arrayIndex !== undefined && arrayImageKey) {
+          const arr = [...(content[arrayField] as Array<Record<string, unknown>>)];
+          arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: data.url };
+          onChange({ ...content, [arrayField]: arr });
+        } else {
+          onChange({ ...content, [fieldKey]: data.url });
+        }
+      }
+    } catch (err) { console.error(err); } finally { setUploading(null); }
+  };
+
+  const ImageUploadField = ({ label, value, fieldKey, arrayField, arrayIndex, arrayImageKey }: { label: string; value: string; fieldKey: string; arrayField?: string; arrayIndex?: number; arrayImageKey?: string }) => (
+    <div>
+      {label && <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>}
+      <div className="flex gap-2 items-start">
+        {value && <div className="relative w-20 h-20 rounded overflow-hidden border bg-gray-100 flex-shrink-0"><img src={value} alt="" className="w-full h-full object-cover" /></div>}
+        <div className="flex-1">
+          <label className={`flex items-center justify-center w-full h-10 border-2 border-dashed rounded cursor-pointer hover:border-gray-400 ${uploading === fieldKey ? 'opacity-50' : ''}`} onClick={(e) => e.stopPropagation()}>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, fieldKey, arrayField, arrayIndex, arrayImageKey)} onClick={(e) => e.stopPropagation()} disabled={uploading === fieldKey} />
+            <span className="text-xs text-gray-500">{uploading === fieldKey ? "Enviando..." : "Clique para trocar"}</span>
+          </label>
+          <input type="text" value={value} onChange={(e) => { if (arrayField && arrayIndex !== undefined && arrayImageKey) { const arr = [...(content[arrayField] as Array<Record<string, unknown>>)]; arr[arrayIndex] = { ...arr[arrayIndex], [arrayImageKey]: e.target.value }; onChange({ ...content, [arrayField]: arr }); } else { onChange({ ...content, [fieldKey]: e.target.value }); } }} placeholder="/images/site/..." className="w-full mt-1 px-2 py-1 text-xs border rounded" onClick={(e) => e.stopPropagation()} />
+        </div>
+      </div>
+    </div>
+  );
+
+  const sections = [
+    { id: "hero", label: "Hero" },
+    { id: "infra", label: "Infraestrutura" },
+    { id: "tech", label: "Tecnologias" },
+    { id: "business", label: "Negócio" },
+    { id: "rituals", label: "Rituais" },
+    { id: "showcase", label: "Showcase" },
+    { id: "cta", label: "CTA" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-1 border-b pb-2">
+        {sections.map((s) => (
+          <button key={s.id} onClick={(e) => { e.stopPropagation(); setActiveSection(s.id); }} className={`px-2 py-1 text-xs rounded ${activeSection === s.id ? "bg-black text-white" : "bg-gray-100 hover:bg-gray-200"}`}>{s.label}</button>
+        ))}
+      </div>
+
+      {activeSection === "hero" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Hero</h4>
+          <InputField label="Título Principal" value={(content.heroTitle as string) || ""} onChange={(v) => onChange({ ...content, heroTitle: v })} placeholder="O Padrão dos Melhores Spas do Mundo" />
+          <InputField label="Título Destaque" value={(content.heroHighlight as string) || ""} onChange={(v) => onChange({ ...content, heroHighlight: v })} placeholder="Design Italiano e Tecnologia de Ponta" />
+          <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
+          <TextareaField label="Sub-Descrição" value={(content.heroSubDescription as string) || ""} onChange={(v) => onChange({ ...content, heroSubDescription: v })} rows={2} />
+          <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} />
+          <InputField label="URL do Vídeo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} />
+          <InputField label="Overlay %" value={String((content.heroOverlay as number) || 50)} onChange={(v) => onChange({ ...content, heroOverlay: Number(v) })} type="number" />
+        </div>
+      )}
+
+      {activeSection === "infra" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Produtos de Infraestrutura</h4>
+          {infrastructureProducts.map((p, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Produto {i + 1}: {p.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, infrastructureProducts: infrastructureProducts.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={p.name} onChange={(e) => { const np = [...infrastructureProducts]; np[i] = { ...np[i], name: e.target.value }; onChange({ ...content, infrastructureProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Tagline" value={p.tagline} onChange={(e) => { const np = [...infrastructureProducts]; np[i] = { ...np[i], tagline: e.target.value }; onChange({ ...content, infrastructureProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={p.description} onChange={(e) => { const np = [...infrastructureProducts]; np[i] = { ...np[i], description: e.target.value }; onChange({ ...content, infrastructureProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Benefício" rows={2} value={p.benefit} onChange={(e) => { const np = [...infrastructureProducts]; np[i] = { ...np[i], benefit: e.target.value }; onChange({ ...content, infrastructureProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={p.image} fieldKey={`infra-${i}`} arrayField="infrastructureProducts" arrayIndex={i} arrayImageKey="image" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug" value={p.slug} onChange={(e) => { const np = [...infrastructureProducts]; np[i] = { ...np[i], slug: e.target.value }; onChange({ ...content, infrastructureProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, infrastructureProducts: [...infrastructureProducts, { name: "", tagline: "", description: "", benefit: "", image: "", slug: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
+        </div>
+      )}
+
+      {activeSection === "tech" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Tecnologias Sensoriais</h4>
+          {sensorTechnologies.map((t, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Tech {i + 1}: {t.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, sensorTechnologies: sensorTechnologies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={t.name} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], name: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Ícone (emoji)" value={t.icon} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], icon: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Tagline" value={t.tagline} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], tagline: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={t.description} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], description: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Benefício para Hóspede" rows={2} value={t.guestBenefit} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], guestBenefit: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Diferencial" rows={2} value={t.differential} onChange={(e) => { const nt = [...sensorTechnologies]; nt[i] = { ...nt[i], differential: e.target.value }; onChange({ ...content, sensorTechnologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={t.image} fieldKey={`tech-${i}`} arrayField="sensorTechnologies" arrayIndex={i} arrayImageKey="image" />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, sensorTechnologies: [...sensorTechnologies, { name: "", icon: "", tagline: "", description: "", guestBenefit: "", differential: "", image: "", slug: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Tecnologia</button>
+        </div>
+      )}
+
+      {activeSection === "business" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Benefícios para o Negócio</h4>
+          {businessBenefits.map((b, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Benefício {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, businessBenefits: businessBenefits.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={b.title} onChange={(e) => { const nb = [...businessBenefits]; nb[i] = { ...nb[i], title: e.target.value }; onChange({ ...content, businessBenefits: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={b.description} onChange={(e) => { const nb = [...businessBenefits]; nb[i] = { ...nb[i], description: e.target.value }; onChange({ ...content, businessBenefits: nb }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, businessBenefits: [...businessBenefits, { title: "", description: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Benefício</button>
+        </div>
+      )}
+
+      {activeSection === "rituals" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Rituais</h4>
+          {rituals.map((r, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Ritual {i + 1}: {r.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, rituals: rituals.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={r.name} onChange={(e) => { const nr = [...rituals]; nr[i] = { ...nr[i], name: e.target.value }; onChange({ ...content, rituals: nr }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Emoji" value={r.emoji} onChange={(e) => { const nr = [...rituals]; nr[i] = { ...nr[i], emoji: e.target.value }; onChange({ ...content, rituals: nr }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Foco" value={r.focus} onChange={(e) => { const nr = [...rituals]; nr[i] = { ...nr[i], focus: e.target.value }; onChange({ ...content, rituals: nr }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={r.description} onChange={(e) => { const nr = [...rituals]; nr[i] = { ...nr[i], description: e.target.value }; onChange({ ...content, rituals: nr }); }} onClick={(e) => e.stopPropagation()} />
+              <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Experiência" rows={2} value={r.experience} onChange={(e) => { const nr = [...rituals]; nr[i] = { ...nr[i], experience: e.target.value }; onChange({ ...content, rituals: nr }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, rituals: [...rituals, { name: "", emoji: "", focus: "", description: "", experience: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Ritual</button>
+        </div>
+      )}
+
+      {activeSection === "showcase" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Showcase de Hotéis</h4>
+          {hotelShowcase.map((h, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-2">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Hotel {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, hotelShowcase: hotelShowcase.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <ImageUploadField label="Imagem" value={h.image} fieldKey={`showcase-${i}`} arrayField="hotelShowcase" arrayIndex={i} arrayImageKey="image" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Localização" value={h.location} onChange={(e) => { const nh = [...hotelShowcase]; nh[i] = { ...nh[i], location: e.target.value }; onChange({ ...content, hotelShowcase: nh }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Hotel" value={h.hotel} onChange={(e) => { const nh = [...hotelShowcase]; nh[i] = { ...nh[i], hotel: e.target.value }; onChange({ ...content, hotelShowcase: nh }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, hotelShowcase: [...hotelShowcase, { image: "", location: "", hotel: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Hotel</button>
+        </div>
+      )}
+
+      {activeSection === "cta" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">CTA Final</h4>
+          <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
+          <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
+          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
+        </div>
+      )}
     </div>
   );
 }
