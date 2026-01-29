@@ -27,6 +27,7 @@ interface Product {
   features: string[];
   video: string | null;
   catalog: string | null;
+  warranty: string | null;
   category: {
     id: string;
     name: string;
@@ -292,7 +293,7 @@ export default function ProductPage() {
                 </div>
                 <div className="w-px h-10 bg-gray-200" />
                 <div className="text-center">
-                  <span className="text-2xl font-serif font-semibold text-black">2 anos</span>
+                  <span className="text-2xl font-serif font-semibold text-black">{product.warranty || "2 anos"}</span>
                   <p className="text-xs text-gray-500 mt-1">Garantia</p>
                 </div>
                 <div className="w-px h-10 bg-gray-200" />

@@ -151,6 +151,7 @@ interface Product {
   image: string | null;
   gallery: string[];
   catalog: string | null;
+  warranty: string | null;
   featured: boolean;
   active: boolean;
   category: { id: string; name: string } | null;
@@ -182,6 +183,7 @@ const emptyProduct = {
   image: "",
   gallery: [] as string[],
   catalog: "",
+  warranty: "",
   video: "",
   featured: false,
   active: true,
@@ -270,6 +272,7 @@ export default function ProdutosPage() {
       image: product.image || "",
       gallery: product.gallery || [],
       catalog: product.catalog || "",
+      warranty: product.warranty || "",
       video: "",
       featured: product.featured,
       active: product.active,
@@ -774,6 +777,19 @@ export default function ProdutosPage() {
             folder="catalogs"
             accept="application/pdf,image/*"
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Garantia
+            </label>
+            <input
+              type="text"
+              value={formData.warranty}
+              onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+              placeholder="Ex: 2 anos"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all text-sm"
+            />
+          </div>
 
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 cursor-pointer">

@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
         image: data.image,
         gallery: data.gallery || [],
         catalog: data.catalog || null,
+        warranty: data.warranty || null,
         video: data.video,
         featured: data.featured || false,
         active: data.active ?? true,
