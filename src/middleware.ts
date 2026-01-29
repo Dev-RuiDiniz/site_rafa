@@ -16,8 +16,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Multi-domain routing
-  const isMaletti = hostname.includes("maletti.com.br") || hostname.includes("localhost:3001");
-  const isSHR = hostname.includes("shrhair.com.br") || hostname.includes("localhost:3000");
+  const isMaletti = hostname.includes("maletti.com.br") || hostname.includes("localhost:3001") || hostname.includes("maletti.local");
+  const isSHR = hostname.includes("shrhair.com.br") || hostname.includes("localhost:3000") || hostname.includes("localhost:3002") || hostname.includes("localhost:3003");
 
   // Maletti domain routing
   if (isMaletti) {
@@ -36,8 +36,9 @@ export async function middleware(request: NextRequest) {
 
   // SHR domain - serve (site) routes normally
   if (isSHR) {
-    // Block /maletti routes on shrhair domain
-    if (pathname.startsWith("/maletti")) {
+    // Block /maletti routes on shrhair domain (except for admin preview)
+    const isPreview = request.nextUrl.searchParams.get("preview") === "true";
+    if (pathname.startsWith("/maletti") && !isPreview) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

@@ -27,6 +27,14 @@ interface Product {
   categories?: ProductCategory[];
 }
 
+interface PageBlock {
+  id: string;
+  type: string;
+  content: Record<string, unknown>;
+  order: number;
+  active: boolean;
+}
+
 function ProductsContent() {
   const searchParams = useSearchParams();
   const buscaParam = searchParams.get("busca") || "";
@@ -38,8 +46,14 @@ function ProductsContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(buscaParam);
+  const [blocks, setBlocks] = useState<PageBlock[]>([]);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  // Buscar blocos da página
+  const heroBlock = blocks.find(b => b.type === "products-hero")?.content || {};
+  const gridBlock = blocks.find(b => b.type === "products-grid")?.content || {};
+  const ctaBlock = blocks.find(b => b.type === "products-cta")?.content || {};
 
   useEffect(() => {
     setSearchQuery(buscaParam);
@@ -49,10 +63,35 @@ function ProductsContent() {
     Promise.all([
       fetch("/api/products").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
+      fetch("/api/pages/produtos").then((r) => r.json()),
     ])
-      .then(([prodData, catData]) => {
-        setProducts(prodData.products || []);
+      .then(([prodData, catData, pageData]) => {
+        let prods = prodData.products || [];
         setCategories(catData.categories || []);
+        
+        // Carregar blocos
+        const pageBlocks = pageData.page?.blocks || [];
+        setBlocks(pageBlocks);
+        
+        // Aplicar filtro do bloco grid
+        const gridContent = pageBlocks.find((b: PageBlock) => b.type === "products-grid")?.content || {};
+        const mode = gridContent.mode || "all";
+        const selectedCats = gridContent.selectedCategories || [];
+        const selectedProds = gridContent.selectedProducts || [];
+        const limit = gridContent.limit;
+        
+        if (mode === "categories" && selectedCats.length > 0) {
+          prods = prods.filter((p: Product) => {
+            const matchesSingle = p.category && selectedCats.includes(p.category.slug);
+            const matchesMultiple = p.categories?.some(pc => selectedCats.includes(pc.category.slug));
+            return matchesSingle || matchesMultiple;
+          });
+        } else if (mode === "selected" && selectedProds.length > 0) {
+          prods = prods.filter((p: Product) => selectedProds.includes(p.id));
+        }
+        
+        if (limit) prods = prods.slice(0, limit);
+        setProducts(prods);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -82,15 +121,13 @@ function ProductsContent() {
             className="max-w-3xl"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Catálogo
+              {(heroBlock.badge as string) || "Catálogo"}
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-semibold text-black mb-6">
-              Nossos Produtos
+              {(heroBlock.title as string) || "Nossos Produtos"}
             </h1>
             <p className="text-gray-600 text-lg leading-relaxed">
-              Conheça a linha completa de produtos Maletti disponível exclusivamente 
-              através da SHR no Brasil. Design italiano, qualidade premium e tecnologia 
-              de ponta para transformar seu salão.
+              {(heroBlock.description as string) || "Conheça a linha completa de produtos Maletti disponível exclusivamente através da SHR no Brasil. Design italiano, qualidade premium e tecnologia de ponta para transformar seu salão."}
             </p>
           </motion.div>
         </div>
@@ -294,11 +331,10 @@ function ProductsContent() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
-              Precisa de ajuda para escolher?
+              {(ctaBlock.title as string) || "Precisa de ajuda para escolher?"}
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-              Nossa equipe de consultores está pronta para ajudar você a encontrar 
-              os produtos ideais para o seu salão.
+              {(ctaBlock.description as string) || "Nossa equipe de consultores está pronta para ajudar você a encontrar os produtos ideais para o seu salão."}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button
@@ -307,11 +343,11 @@ function ProductsContent() {
                 asChild
               >
                 <a
-                  href="https://wa.me/5511981982279?text=Olá! Preciso de ajuda para escolher produtos Maletti."
+                  href={(ctaBlock.whatsappLink as string) || "https://wa.me/5511981982279?text=Olá! Preciso de ajuda para escolher produtos Maletti."}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Falar com Consultor
+                  {(ctaBlock.buttonText as string) || "Falar com Consultor"}
                 </a>
               </Button>
               <Button
@@ -320,8 +356,8 @@ function ProductsContent() {
                 className="border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
                 asChild
               >
-                <Link href="/contato">
-                  Solicitar Catálogo
+                <Link href={(ctaBlock.secondaryLink as string) || "/contato"}>
+                  {(ctaBlock.secondaryButtonText as string) || "Solicitar Catálogo"}
                 </Link>
               </Button>
             </div>

@@ -10,59 +10,38 @@ import {
   HiOutlineBadgeCheck
 } from "react-icons/hi";
 
-const features = [
-  {
-    icon: HiOutlineSparkles,
-    title: "Design Italiano",
-    description: "Cada peça é uma obra de arte que combina estética refinada com funcionalidade superior."
-  },
-  {
-    icon: HiOutlineLightBulb,
-    title: "Inovação Tecnológica",
-    description: "Tecnologia de ponta integrada para proporcionar experiências únicas aos seus clientes."
-  },
-  {
-    icon: HiOutlineHeart,
-    title: "Experiência Sensorial",
-    description: "Sistemas de massagem, cromoterapia e aromaterapia para o bem-estar completo."
-  }
+const defaultFeatures = [
+  { icon: HiOutlineSparkles, title: "Design Italiano", description: "Cada peça é uma obra de arte que combina estética refinada com funcionalidade superior." },
+  { icon: HiOutlineLightBulb, title: "Inovação Tecnológica", description: "Tecnologia de ponta integrada para proporcionar experiências únicas aos seus clientes." },
+  { icon: HiOutlineHeart, title: "Experiência Sensorial", description: "Sistemas de massagem, cromoterapia e aromaterapia para o bem-estar completo." }
 ];
 
-const awards = [
-  {
-    title: "Grand Prix de l'Innovation",
-    location: "Paris, França",
-    year: "2023",
-    description: "Reconhecimento pela inovação em design de mobiliário para salões"
-  },
-  {
-    title: "Credit Reputation Award",
-    location: "Itália",
-    year: "2022",
-    description: "Excelência em reputação corporativa e confiabilidade"
-  },
-  {
-    title: "Cosmoprof Excellence Award",
-    location: "Bologna, Itália",
-    year: "2024",
-    description: "Melhor design em equipamentos para bem-estar capilar"
-  },
-  {
-    title: "MCB Paris Design Award",
-    location: "Paris, França",
-    year: "2023",
-    description: "Destaque em inovação tecnológica aplicada ao design"
-  }
+const defaultAwards = [
+  { title: "Grand Prix de l'Innovation", location: "Paris, França", year: "2023", description: "Reconhecimento pela inovação em design de mobiliário para salões" },
+  { title: "Credit Reputation Award", location: "Itália", year: "2022", description: "Excelência em reputação corporativa e confiabilidade" },
+  { title: "Cosmoprof Excellence Award", location: "Bologna, Itália", year: "2024", description: "Melhor design em equipamentos para bem-estar capilar" },
+  { title: "MCB Paris Design Award", location: "Paris, França", year: "2023", description: "Destaque em inovação tecnológica aplicada ao design" }
 ];
 
-const globalPresence = [
+const defaultStats = [
   { number: "60+", label: "Anos de história" },
   { number: "90+", label: "Países atendidos" },
   { number: "15", label: "Showrooms no mundo" },
   { number: "500+", label: "Parceiros globais" }
 ];
 
-export function MalettiEssencia() {
+interface MalettiEssenciaProps {
+  content?: Record<string, unknown>;
+}
+
+export function MalettiEssencia({ content = {} }: MalettiEssenciaProps) {
+  const badge = (content.badge as string) || "Nossa História";
+  const title = (content.title as string) || "A Essência Maletti";
+  const description = (content.description as string) || "Nossa essência vai além da criação de móveis para salão de beleza de luxo. É uma tradição que une a arte do design italiano à inovação tecnológica em cada detalhe. O resultado são peças que encantam pelo estilo, entregam performance, conforto absoluto e a experiência de bem-estar que define a sua marca.";
+  const showroomImage = (content.showroomImage as string) || "/images/site/Shirobody_showroom.jpg";
+  const stats = (content.stats as Array<{ number: string; label: string }>) || defaultStats;
+  const features = defaultFeatures;
+  const awards = defaultAwards;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -76,16 +55,13 @@ export function MalettiEssencia() {
           className="text-center mb-16"
         >
           <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-            Nossa História
+            {badge}
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
-            A Essência Maletti
+            {title}
           </h2>
           <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-            Nossa essência vai além da criação de móveis para salão de beleza de luxo. 
-            É uma tradição que une a arte do design italiano à inovação tecnológica em cada detalhe. 
-            O resultado são peças que encantam pelo estilo, entregam performance, conforto absoluto 
-            e a experiência de bem-estar que define a sua marca.
+            {description}
           </p>
         </motion.div>
 
@@ -117,7 +93,7 @@ export function MalettiEssencia() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 py-12 border-y border-gray-200"
         >
-          {globalPresence.map((item, index) => (
+          {stats.map((item: { number: string; label: string }, index: number) => (
             <div key={index} className="text-center">
               <span className="text-4xl md:text-5xl font-serif font-bold text-black block mb-2">
                 {item.number}
@@ -180,7 +156,7 @@ export function MalettiEssencia() {
           className="relative aspect-[21/9] bg-gray-100 overflow-hidden"
         >
           <Image
-            src="/images/site/Shirobody_showroom.jpg"
+            src={showroomImage}
             alt="Showroom Maletti"
             fill
             className="object-cover"

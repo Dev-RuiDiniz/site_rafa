@@ -11,6 +11,7 @@ import {
   HiOutlineEyeOff,
   HiOutlineExternalLink,
   HiOutlineTemplate,
+  HiOutlineColorSwatch,
 } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
@@ -224,6 +225,13 @@ export default function PaginasPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/editor/${page.id}`}
+                        className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                        title="Editor Visual"
+                      >
+                        <HiOutlineColorSwatch className="w-4 h-4" />
+                      </Link>
                       <Link
                         href={`/admin/paginas/${page.id}`}
                         className="p-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors"

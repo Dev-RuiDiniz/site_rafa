@@ -1,10 +1,145 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye, HiOutlineSearch, HiOutlineCog, HiX } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye, HiOutlineSearch, HiOutlineCog, HiX, HiOutlineLink } from "react-icons/hi";
 import { Modal, ConfirmModal } from "@/components/admin/Modal";
 import { ImageUpload, GalleryUpload } from "@/components/admin/ImageUpload";
+
+// Rich Text Editor Component
+function RichTextEditor({ value, onChange, rows = 4, placeholder }: { value: string; onChange: (v: string) => void; rows?: number; placeholder?: string }) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value || "";
+    }
+  }, [value]);
+
+  const execCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+    handleInput();
+  };
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      setSavedSelection(sel.getRangeAt(0).cloneRange());
+    }
+  };
+
+  const restoreSelection = () => {
+    if (savedSelection) {
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(savedSelection);
+    }
+  };
+
+  const handleLink = () => {
+    saveSelection();
+    setLinkUrl("");
+    setShowLinkModal(true);
+  };
+
+  const insertLink = () => {
+    restoreSelection();
+    if (linkUrl) {
+      execCommand("createLink", linkUrl);
+    }
+    setShowLinkModal(false);
+  };
+
+  return (
+    <div className="border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+      <div className="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900">
+        <button
+          type="button"
+          onClick={() => execCommand("bold")}
+          className="p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded font-bold text-sm"
+          title="Negrito (Ctrl+B)"
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand("italic")}
+          className="p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded italic text-sm"
+          title="Itálico (Ctrl+I)"
+        >
+          I
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand("underline")}
+          className="p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded underline text-sm"
+          title="Sublinhado (Ctrl+U)"
+        >
+          U
+        </button>
+        <div className="w-px h-5 bg-gray-300 dark:bg-zinc-600 mx-1" />
+        <button
+          type="button"
+          onClick={handleLink}
+          className="p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded text-sm"
+          title="Inserir Link"
+        >
+          <HiOutlineLink className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand("unlink")}
+          className="p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded text-xs text-red-500"
+          title="Remover Link"
+        >
+          ✕
+        </button>
+      </div>
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onBlur={handleInput}
+        className="px-4 py-2.5 text-black dark:text-white focus:outline-none min-h-[80px] prose prose-sm dark:prose-invert max-w-none"
+        style={{ minHeight: rows * 24 + 20 }}
+        data-placeholder={placeholder}
+      />
+      {showLinkModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowLinkModal(false)}>
+          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-xl w-80" onClick={e => e.stopPropagation()}>
+            <h4 className="font-medium mb-3 text-black dark:text-white">Inserir Link</h4>
+            <input
+              type="url"
+              value={linkUrl}
+              onChange={e => setLinkUrl(e.target.value)}
+              placeholder="https://exemplo.com"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-black dark:text-white rounded mb-3"
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <button type="button" onClick={() => setShowLinkModal(false)} className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded">
+                Cancelar
+              </button>
+              <button type="button" onClick={insertLink} className="px-3 py-1.5 text-sm bg-black text-white hover:bg-gray-800 rounded">
+                Inserir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface Product {
   id: string;
@@ -438,21 +573,21 @@ export default function ProdutosPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição Curta</label>
-            <textarea
+            <RichTextEditor
               value={formData.shortDescription}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+              onChange={(v) => setFormData({ ...formData, shortDescription: v })}
               rows={2}
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none resize-none"
+              placeholder="Descrição curta do produto..."
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição Completa</label>
-            <textarea
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-black dark:focus:border-white outline-none resize-none"
+              onChange={(v) => setFormData({ ...formData, description: v })}
+              rows={6}
+              placeholder="Descrição completa do produto..."
             />
           </div>
 

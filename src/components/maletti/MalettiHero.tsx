@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 
 interface MalettiHeroProps {
   onNavigate: (id: string) => void;
+  content?: Record<string, unknown>;
 }
 
-export function MalettiHero({ onNavigate }: MalettiHeroProps) {
+export function MalettiHero({ onNavigate, content = {} }: MalettiHeroProps) {
+  const title = (content.title as string) || "Transforme Espaços.";
+  const titleHighlight = (content.titleHighlight as string) || "Eleve Experiências.";
+  const description = (content.description as string) || "Apresentamos a revolução do bem-estar capilar no Brasil. As estações Maletti Head SPA unem o design italiano a uma tecnologia inovadora para criar uma experiência sensorial que redefine o luxo em seu salão, spa ou clínica.";
+  const videoUrl = (content.videoUrl as string) || "/Vídeo Home.mp4";
+  const buttonText = (content.buttonText as string) || "Solicitar Catálogo";
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
         {/* Video Background */}
@@ -20,7 +27,7 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/Vídeo Home.mp4" type="video/mp4" />
+            <source src={videoUrl} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-black/50" />
         </div>
@@ -33,14 +40,12 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-semibold mb-6 leading-tight">
-              Transforme Espaços.
-              <span className="text-gray-300"> Eleve Experiências.</span>
+              {title}
+              <span className="text-gray-300"> {titleHighlight}</span>
             </h1>
             
             <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Apresentamos a revolução do bem-estar capilar no Brasil. As estações Maletti Head SPA 
-              unem o design italiano a uma tecnologia inovadora para criar uma experiência sensorial 
-              que redefine o luxo em seu salão, spa ou clínica.
+              {description}
             </p>
 
             <Button
@@ -48,7 +53,7 @@ export function MalettiHero({ onNavigate }: MalettiHeroProps) {
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group"
                 onClick={() => onNavigate("catalogo")}
               >
-                Solicitar Catálogo
+                {buttonText}
                 <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
           </motion.div>

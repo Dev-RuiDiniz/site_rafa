@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
-const carouselImages = [
+const defaultCarouselImages = [
   { src: "/images/site/Shirobody_showroom.jpg", alt: "Shirobody Showroom" },
   { src: "/images/site/heaven2.jpg", alt: "Heaven" },
   { src: "/images/site/Total-Body-356.jpg", alt: "Total Body" },
@@ -15,7 +14,20 @@ const carouselImages = [
   { src: "/images/site/Head-spa-1.jpg", alt: "Head Spa" },
 ];
 
-export function MalettiBrasil() {
+interface MalettiBrasilProps {
+  content?: Record<string, unknown>;
+}
+
+export function MalettiBrasil({ content = {} }: MalettiBrasilProps) {
+  const badge = (content.badge as string) || "Distribuidor Exclusivo";
+  const title = (content.title as string) || "Maletti no Brasil";
+  const description = (content.description as string) || "Como parceira exclusiva da Maletti no Brasil, a SHR HAIR garante o sucesso do seu negócio, transformando seu investimento em alta rentabilidade e experiências inesquecíveis.";
+  const description2 = (content.description2 as string) || "Nosso suporte completo assegura essa excelência com instalação, treinamento e manutenção preventiva.";
+  const buttonText = (content.buttonText as string) || "Falar com Especialista";
+  const whatsappLink = (content.whatsappLink as string) || "https://wa.me/5511981982279?text=Olá! Gostaria de falar com um especialista sobre produtos Maletti.";
+  const secondaryButtonText = (content.secondaryButtonText as string) || "Suporte Técnico";
+  const secondaryLink = (content.secondaryLink as string) || "https://shrhair.com.br/manutencao";
+  const carouselImages = (content.carouselImages as Array<{ src: string; alt: string }>) || defaultCarouselImages;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -40,19 +52,16 @@ export function MalettiBrasil() {
             transition={{ duration: 0.6 }}
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-400 mb-4 block">
-              Distribuidor Exclusivo
+              {badge}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold mb-6">
-              Maletti no Brasil
+              {title}
             </h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-8">
-              Como parceira exclusiva da Maletti no Brasil, a <strong className="text-white">SHR HAIR</strong> garante 
-              o sucesso do seu negócio, transformando seu investimento em alta rentabilidade 
-              e experiências inesquecíveis.
+              {description}
             </p>
             <p className="text-gray-400 mb-8">
-              Nosso suporte completo assegura essa excelência com instalação, 
-              treinamento e manutenção preventiva.
+              {description2}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -60,8 +69,8 @@ export function MalettiBrasil() {
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300"
                 asChild
               >
-                <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um especialista sobre produtos Maletti." target="_blank" rel="noopener noreferrer">
-                  Falar com Especialista
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                  {buttonText}
                 </a>
               </Button>
               <Button
@@ -70,8 +79,8 @@ export function MalettiBrasil() {
                 className="border-white/30 text-white bg-transparent hover:bg-white/10"
                 asChild
               >
-                <a href="https://shrhair.com.br/manutencao">
-                  Suporte Técnico
+                <a href={secondaryLink}>
+                  {secondaryButtonText}
                 </a>
               </Button>
             </div>

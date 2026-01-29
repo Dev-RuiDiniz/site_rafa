@@ -5,30 +5,24 @@ import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { HiPlay, HiX } from "react-icons/hi";
 
-const products = [
-  {
-    name: "Shirobody",
-    image: "/images/site/Shirobody_showroom.jpg",
-    description: "Lavatório com tecnologia shiatsu integrada"
-  },
-  {
-    name: "Heaven",
-    image: "/images/site/heaven2.jpg",
-    description: "Design e conforto para lavagem de cabelos"
-  },
-  {
-    name: "Total Body",
-    image: "/images/site/Total-Body-356.jpg",
-    description: "Maca de luxo para tratamentos corporais"
-  },
-  {
-    name: "SPA Garçon",
-    image: "/images/site/SPA_GARCON_nuovo_03.png",
-    description: "Tratamento capilar com tecnologia de vapor"
-  }
+const defaultProducts = [
+  { name: "Shirobody", image: "/images/site/Shirobody_showroom.jpg", description: "Lavatório com tecnologia shiatsu integrada" },
+  { name: "Heaven", image: "/images/site/heaven2.jpg", description: "Design e conforto para lavagem de cabelos" },
+  { name: "Total Body", image: "/images/site/Total-Body-356.jpg", description: "Maca de luxo para tratamentos corporais" },
+  { name: "SPA Garçon", image: "/images/site/SPA_GARCON_nuovo_03.png", description: "Tratamento capilar com tecnologia de vapor" }
 ];
 
-export function MalettiDesign() {
+interface MalettiDesignProps {
+  content?: Record<string, unknown>;
+}
+
+export function MalettiDesign({ content = {} }: MalettiDesignProps) {
+  const badge = (content.badge as string) || "Excelência em Mobiliário";
+  const title = (content.title as string) || "Design e Experiências";
+  const description = (content.description as string) || "A excelência em móveis para salão de beleza de luxo: Veja o autêntico design italiano em sua máxima performance. Assista e sinta por que o mobiliário de alto padrão Maletti é a escolha perfeita para transformar seu espaço.";
+  const videoThumbnail = (content.videoThumbnail as string) || "/images/site/DK3E3179-MOD.jpg";
+  const videoUrl = (content.videoUrl as string) || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  const products = (content.products as Array<{ name: string; image: string; description: string }>) || defaultProducts;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [showVideo, setShowVideo] = useState(false);
@@ -44,15 +38,13 @@ export function MalettiDesign() {
             className="text-center mb-16"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Excelência em Mobiliário
+              {badge}
             </span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
-              Design e Experiências
+              {title}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-              A excelência em móveis para salão de beleza de luxo: Veja o autêntico design italiano 
-              em sua máxima performance. Assista e sinta por que o mobiliário de alto padrão Maletti 
-              é a escolha perfeita para transformar seu espaço.
+              {description}
             </p>
           </motion.div>
 
@@ -65,7 +57,7 @@ export function MalettiDesign() {
             onClick={() => setShowVideo(true)}
           >
             <Image
-              src="/images/site/DK3E3179-MOD.jpg"
+              src={videoThumbnail}
               alt="Maletti Design"
               fill
               className="object-cover opacity-80 group-hover:opacity-60 transition-opacity"
@@ -122,7 +114,7 @@ export function MalettiDesign() {
           </button>
           <div className="w-full max-w-5xl aspect-video bg-black">
             <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+              src={`${videoUrl}?autoplay=1`}
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

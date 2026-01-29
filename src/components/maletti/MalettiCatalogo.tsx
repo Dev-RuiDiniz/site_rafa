@@ -6,7 +6,18 @@ import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiOutlineDocumentDownload } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
-export function MalettiCatalogo() {
+interface MalettiCatalogoProps {
+  content?: Record<string, unknown>;
+}
+
+export function MalettiCatalogo({ content = {} }: MalettiCatalogoProps) {
+  const badge = (content.badge as string) || "Material Exclusivo";
+  const title = (content.title as string) || "Catálogo Maletti";
+  const description = (content.description as string) || "Acesse o Catálogo Maletti e tenha em mãos a ferramenta completa para o seu projeto. Conheça todas as linhas de produtos, especificações técnicas e opções de personalização.";
+  const catalogImage = (content.catalogImage as string) || "/images/site/PLANIMETRIA-La-Beautique---Mongolia-Multifunzione.jpg";
+  const formTitle = (content.formTitle as string) || "Solicite seu Catálogo";
+  const formDescription = (content.formDescription as string) || "Preencha seus dados e receba o catálogo Maletti.";
+  const buttonText = (content.buttonText as string) || "Receber Catálogo";
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [formData, setFormData] = useState({
@@ -33,19 +44,18 @@ export function MalettiCatalogo() {
             transition={{ duration: 0.6 }}
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Material Exclusivo
+              {badge}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6">
-              Catálogo Maletti
+              {title}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
-              Acesse o Catálogo Maletti e tenha em mãos a ferramenta completa para o seu projeto. 
-              Conheça todas as linhas de produtos, especificações técnicas e opções de personalização.
+              {description}
             </p>
 
             <div className="relative aspect-[4/3] bg-gray-200 overflow-hidden">
               <Image
-                src="/images/site/PLANIMETRIA-La-Beautique---Mongolia-Multifunzione.jpg"
+                src={catalogImage}
                 alt="Catálogo Maletti"
                 fill
                 className="object-cover"
@@ -66,10 +76,10 @@ export function MalettiCatalogo() {
             {!submitted ? (
               <div className="bg-white p-8 lg:p-10">
                 <h3 className="text-2xl font-serif font-semibold text-black mb-6">
-                  Solicite seu Catálogo
+                  {formTitle}
                 </h3>
                 <p className="text-gray-600 mb-8">
-                  Preencha seus dados e receba o catálogo Maletti.
+                  {formDescription}
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
@@ -128,7 +138,7 @@ export function MalettiCatalogo() {
                     size="lg"
                     className="w-full bg-black text-white hover:bg-gray-800 transition-all duration-300 group mt-4"
                   >
-                    Receber Catálogo
+                    {buttonText}
                     <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </form>

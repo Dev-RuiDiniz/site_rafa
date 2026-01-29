@@ -231,9 +231,10 @@ export default function ProductPage() {
               </h1>
 
               {product.shortDescription && (
-                <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                  {product.shortDescription}
-                </p>
+                <div 
+                  className="text-gray-600 text-lg leading-relaxed mb-8 prose prose-lg max-w-none"
+                  dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+                />
               )}
 
               {/* Features */}
@@ -319,13 +320,10 @@ export default function ProductPage() {
                 <h2 className="text-3xl font-serif font-semibold text-black mb-8">
                   {product.name}
                 </h2>
-                <div className="prose prose-lg prose-gray max-w-none">
-                  {product.description.split("\n\n").filter(p => p.trim()).map((paragraph, index) => (
-                    <p key={index} className="text-gray-600 leading-relaxed mb-4">
-                      {paragraph.trim()}
-                    </p>
-                  ))}
-                </div>
+                <div 
+                  className="prose prose-lg prose-gray max-w-none [&_a]:text-black [&_a]:underline [&_a]:hover:text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
               </motion.div>
             </div>
           </div>

@@ -17,17 +17,36 @@ interface Brand {
   highlights: string[];
 }
 
+interface PageBlock {
+  id: string;
+  type: string;
+  content: Record<string, unknown>;
+  order: number;
+  active: boolean;
+}
+
 export default function MarcasPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [blocks, setBlocks] = useState<PageBlock[]>([]);
   const brandsRef = useRef(null);
   const brandsInView = useInView(brandsRef, { once: true, margin: "-100px" });
 
+  const heroBlock = blocks.find(b => b.type === "brands-hero")?.content || {};
+  const sectionBlock = blocks.find(b => b.type === "brands-section")?.content || {};
+  const partnershipBlock = blocks.find(b => b.type === "brands-partnership")?.content || {};
+  const ctaBlock = blocks.find(b => b.type === "brands-cta")?.content || {};
+
   useEffect(() => {
-    fetch("/api/brands")
-      .then((r) => r.json())
-      .then((data) => setBrands(data.brands || []))
-      .catch(console.error);
+    Promise.all([
+      fetch("/api/brands").then(r => r.json()),
+      fetch("/api/pages/marcas").then(r => r.json()),
+    ]).then(([brandData, pageData]) => {
+      setBrands(brandData.brands || []);
+      setBlocks(pageData.page?.blocks || []);
+    }).catch(console.error);
   }, []);
+
+  const titleParts = ((heroBlock.title as string) || "Excelência|em cada|detalhe").split("|");
 
   return (
     <>
@@ -41,27 +60,21 @@ export default function MarcasPage() {
               transition={{ duration: 0.6 }}
             >
               <span className="text-sm uppercase tracking-[0.2em] text-gray-400 mb-4 block">
-                Nossas Marcas
+                {(heroBlock.badge as string) || "Nossas Marcas"}
               </span>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-semibold mb-6 leading-tight">
-                Excelência
-                <br />
-                em cada
-                <br />
-                detalhe
+                {titleParts.map((part, i) => <span key={i}>{part}{i < titleParts.length - 1 && <br />}</span>)}
               </h1>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                Trabalhamos com as marcas mais prestigiadas do mercado mundial 
-                de mobiliário para salões de beleza e spas. Cada marca em nosso 
-                portfólio representa o compromisso com qualidade, inovação e design.
+                {(heroBlock.description as string) || "Trabalhamos com as marcas mais prestigiadas do mercado mundial de mobiliário para salões de beleza e spas. Cada marca em nosso portfólio representa o compromisso com qualidade, inovação e design."}
               </p>
               <Button
                 size="lg"
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group"
                 asChild
               >
-                <Link href="/produtos">
-                  Ver Produtos
+                <Link href={(heroBlock.buttonLink as string) || "/produtos"}>
+                  {(heroBlock.buttonText as string) || "Ver Produtos"}
                   <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -99,10 +112,10 @@ export default function MarcasPage() {
             className="text-center mb-16"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Portfólio
+              {(sectionBlock.badge as string) || "Portfólio"}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black">
-              Marcas que representamos
+              {(sectionBlock.title as string) || "Marcas que representamos"}
             </h2>
           </motion.div>
 
@@ -181,15 +194,13 @@ export default function MarcasPage() {
               transition={{ duration: 0.6 }}
             >
               <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-                Nossas Parcerias
+                {(partnershipBlock.badge as string) || "Nossas Parcerias"}
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-8 leading-tight">
-                Marcas que confiam na SHR
+                {(partnershipBlock.title as string) || "Marcas que confiam na SHR"}
               </h2>
               <p className="text-gray-600 text-lg leading-relaxed mb-12">
-                A SHR é o elo entre as maiores marcas internacionais e o mercado 
-                brasileiro. Nossas parcerias exclusivas garantem que você tenha acesso 
-                ao que há de melhor em mobiliário e equipamentos para salões.
+                {(partnershipBlock.description as string) || "A SHR é o elo entre as maiores marcas internacionais e o mercado brasileiro. Nossas parcerias exclusivas garantem que você tenha acesso ao que há de melhor em mobiliário e equipamentos para salões."}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
                 <div className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -244,11 +255,10 @@ export default function MarcasPage() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
-              Quer conhecer nossos produtos?
+              {(ctaBlock.title as string) || "Quer conhecer nossos produtos?"}
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-              Explore nosso catálogo completo e descubra como as marcas que 
-              representamos podem transformar seu salão.
+              {(ctaBlock.description as string) || "Explore nosso catálogo completo e descubra como as marcas que representamos podem transformar seu salão."}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button
@@ -256,8 +266,8 @@ export default function MarcasPage() {
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300"
                 asChild
               >
-                <Link href="/produtos">
-                  Ver Produtos
+                <Link href={(ctaBlock.buttonLink as string) || "/produtos"}>
+                  {(ctaBlock.buttonText as string) || "Ver Produtos"}
                 </Link>
               </Button>
               <Button
@@ -266,8 +276,8 @@ export default function MarcasPage() {
                 className="border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
                 asChild
               >
-                <Link href="/contato">
-                  Falar com Consultor
+                <Link href={(ctaBlock.secondaryLink as string) || "/contato"}>
+                  {(ctaBlock.secondaryButtonText as string) || "Falar com Consultor"}
                 </Link>
               </Button>
             </div>
