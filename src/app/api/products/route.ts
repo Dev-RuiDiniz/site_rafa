@@ -6,6 +6,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get("featured");
     const categorySlug = searchParams.get("category");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "9");
+    const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = { active: true };
     
@@ -26,25 +29,42 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const products = await prisma.product.findMany({
-      where,
-      include: {
-        category: true,
-        categories: {
-          include: {
-            category: true,
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortDescription: true,
+          image: true,
+          category: {
+            select: { id: true, name: true, slug: true },
+          },
+          categories: {
+            select: {
+              category: {
+                select: { id: true, name: true, slug: true },
+              },
+            },
           },
         },
-        brands: {
-          include: {
-            brand: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+    ]);
 
-    return NextResponse.json({ products });
+    return NextResponse.json({ 
+      products, 
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      }
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });

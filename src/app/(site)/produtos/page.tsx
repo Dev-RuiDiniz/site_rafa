@@ -47,6 +47,9 @@ function ProductsContent() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(buscaParam);
   const [blocks, setBlocks] = useState<PageBlock[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -59,54 +62,48 @@ function ProductsContent() {
     setSearchQuery(buscaParam);
   }, [buscaParam]);
 
+  // Carregar categorias e blocos uma vez
   useEffect(() => {
     Promise.all([
-      fetch("/api/products").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
       fetch("/api/pages/produtos").then((r) => r.json()),
     ])
-      .then(([prodData, catData, pageData]) => {
-        let prods = prodData.products || [];
+      .then(([catData, pageData]) => {
         setCategories(catData.categories || []);
-        
-        // Carregar blocos
-        const pageBlocks = pageData.page?.blocks || [];
-        setBlocks(pageBlocks);
-        
-        // Aplicar filtro do bloco grid
-        const gridContent = pageBlocks.find((b: PageBlock) => b.type === "products-grid")?.content || {};
-        const mode = gridContent.mode || "all";
-        const selectedCats = gridContent.selectedCategories || [];
-        const selectedProds = gridContent.selectedProducts || [];
-        const limit = gridContent.limit;
-        
-        if (mode === "categories" && selectedCats.length > 0) {
-          prods = prods.filter((p: Product) => {
-            const matchesSingle = p.category && selectedCats.includes(p.category.slug);
-            const matchesMultiple = p.categories?.some(pc => selectedCats.includes(pc.category.slug));
-            return matchesSingle || matchesMultiple;
-          });
-        } else if (mode === "selected" && selectedProds.length > 0) {
-          prods = prods.filter((p: Product) => selectedProds.includes(p.id));
-        }
-        
-        if (limit) prods = prods.slice(0, limit);
-        setProducts(prods);
+        setBlocks(pageData.page?.blocks || []);
+      })
+      .catch(console.error);
+  }, []);
+
+  // Carregar produtos com paginação
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    params.set("page", currentPage.toString());
+    params.set("limit", "9");
+    if (selectedCategory) params.set("category", selectedCategory);
+    
+    fetch(`/api/products?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setProducts(data.products || []);
+        setTotalPages(data.pagination?.totalPages || 1);
+        setTotalProducts(data.pagination?.total || 0);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [currentPage, selectedCategory]);
 
+  // Reset página ao mudar categoria
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
+  // Filtro local apenas para busca (categoria já filtrada na API)
   const filteredProducts = products.filter((p) => {
-    // Verificar categoria única (legado) OU múltiplas categorias
-    const matchesSingleCategory = p.category?.slug === selectedCategory;
-    const matchesMultipleCategories = p.categories?.some(pc => pc.category.slug === selectedCategory);
-    const matchesCategory = selectedCategory ? (matchesSingleCategory || matchesMultipleCategories) : true;
-    const matchesSearch = searchQuery.trim()
-      ? p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    return matchesCategory && matchesSearch;
+    if (!searchQuery.trim()) return true;
+    return p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   return (
@@ -318,6 +315,45 @@ function ProductsContent() {
               ))}
             </div>
           )}
+
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-12">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-sm border border-gray-200 hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Anterior
+              </button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 text-sm transition-colors ${
+                    currentPage === page
+                      ? "bg-black text-white"
+                      : "border border-gray-200 hover:border-black"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-sm border border-gray-200 hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
+
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Mostrando {filteredProducts.length} de {totalProducts} produtos
+          </p>
         </div>
       </section>
 
