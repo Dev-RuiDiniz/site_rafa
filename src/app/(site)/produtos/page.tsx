@@ -7,6 +7,12 @@ import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiOutlineViewGrid, HiOutlineViewList, HiOutlineSearch, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
+// Função para limpar tags HTML
+function stripHtml(html: string): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
 interface Category {
   id: string;
   name: string;
@@ -259,8 +265,8 @@ function ProductsContent() {
                       <h3 className="text-xl font-serif font-medium text-black mb-2 group-hover:text-gray-600 transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">
-                        {product.shortDescription}
+                      <p className="text-gray-500 text-sm leading-relaxed line-clamp-1">
+                        {stripHtml(product.shortDescription)}
                       </p>
                     </div>
                   </Link>
@@ -302,8 +308,8 @@ function ProductsContent() {
                       <h3 className="text-2xl font-serif font-medium text-black mb-3 group-hover:text-gray-600 transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-gray-500 leading-relaxed mb-4">
-                        {product.shortDescription}
+                      <p className="text-gray-500 leading-relaxed mb-4 line-clamp-3">
+                        {stripHtml(product.shortDescription)}
                       </p>
                       <span className="inline-flex items-center text-sm font-medium text-black group-hover:text-gray-600 transition-colors">
                         Ver detalhes
