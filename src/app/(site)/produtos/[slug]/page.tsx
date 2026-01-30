@@ -322,7 +322,7 @@ export default function ProductPage() {
                   {product.name}
                 </h2>
                 <div 
-                  className="prose prose-lg prose-gray max-w-none [&_a]:text-black [&_a]:underline [&_a]:hover:text-gray-600"
+                  className="text-gray-600 text-lg leading-relaxed [&_p]:mb-4 [&_a]:text-black [&_a]:underline [&_a]:hover:text-gray-600"
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               </motion.div>
