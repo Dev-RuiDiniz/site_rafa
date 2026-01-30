@@ -233,7 +233,7 @@ export default function ProductPage() {
 
               {product.shortDescription && (
                 <div 
-                  className="text-gray-600 text-lg leading-relaxed mb-8 prose prose-lg max-w-none"
+                  className="text-gray-600 text-lg leading-relaxed mb-8 [&_*]:!font-sans [&_span]:!font-sans"
                   dangerouslySetInnerHTML={{ __html: product.shortDescription }}
                 />
               )}
@@ -322,7 +322,7 @@ export default function ProductPage() {
                   {product.name}
                 </h2>
                 <div 
-                  className="text-gray-600 text-lg leading-relaxed [&_p]:mb-4 [&_a]:text-black [&_a]:underline [&_a]:hover:text-gray-600"
+                  className="text-gray-600 text-lg leading-relaxed [&_p]:mb-4 [&_a]:text-black [&_a]:underline [&_a]:hover:text-gray-600 [&_*]:!font-sans [&_span]:!font-sans"
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               </motion.div>
