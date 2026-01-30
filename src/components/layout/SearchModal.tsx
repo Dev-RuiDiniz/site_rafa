@@ -7,6 +7,11 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineSearch, HiX } from "react-icons/hi";
 
+function stripHtml(html: string | null): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
 interface Product {
   id: string;
   name: string;
@@ -178,7 +183,7 @@ export function SearchModal({ isOpen, onClose, showDarkElements }: SearchModalPr
                                   {product.name}
                                 </h4>
                                 <p className="text-sm text-gray-500 line-clamp-1">
-                                  {product.shortDescription}
+                                  {stripHtml(product.shortDescription)}
                                 </p>
                               </div>
                             </Link>
