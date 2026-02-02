@@ -7,6 +7,11 @@ import { motion, useInView } from "framer-motion";
 import { HiArrowRight, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
+function stripHtml(html: string): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
 interface Product {
   id: string;
   name: string;
@@ -172,7 +177,7 @@ export function FeaturedProducts() {
                     {product.name}
                   </h3>
                   <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">
-                    {product.shortDescription}
+                    {stripHtml(product.shortDescription)}
                   </p>
                 </Link>
               </motion.div>

@@ -9,6 +9,11 @@ import { HiOutlineWrenchScrewdriver, HiOutlineClock, HiOutlineCheckCircle } from
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+function stripHtml(html: string): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
 interface Block {
   id: string;
   type: string;
@@ -732,7 +737,7 @@ function FeaturedProductsBlock({ content }: { content: Record<string, unknown> }
                     {product.name}
                   </h3>
                   <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">
-                    {product.shortDescription}
+                    {stripHtml(product.shortDescription)}
                   </p>
                 </Link>
               </motion.div>
@@ -1409,7 +1414,7 @@ function ProductsGridBlock({ content }: { content: Record<string, unknown> }) {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-serif font-medium text-black mb-2 group-hover:text-gray-600 transition-colors">{product.name}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{product.shortDescription}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed line-clamp-1">{stripHtml(product.shortDescription)}</p>
                 </div>
               </a>
             </motion.div>
