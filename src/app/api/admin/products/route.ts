@@ -65,6 +65,10 @@ export async function POST(request: NextRequest) {
         warranty: data.warranty || null,
         video: data.video,
         featured: data.featured || false,
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
+        metaKeywords: data.metaKeywords || null,
+        ogImage: data.ogImage || null,
         active: data.active ?? true,
         categoryId: data.categoryIds?.[0] || null,
         categories: data.categoryIds?.length

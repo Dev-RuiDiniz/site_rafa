@@ -22,6 +22,7 @@ import {
 } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import { BlockEditor } from "@/components/admin/page-builder/BlockEditor";
+import SEOFields from "@/components/admin/SEOFields";
 
 interface PageBlock {
   id?: string;
@@ -40,6 +41,10 @@ interface Page {
   published: boolean;
   isSystem: boolean;
   blocks: PageBlock[];
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  ogImage: string | null;
 }
 
 const BLOCK_TYPES = [
@@ -95,6 +100,10 @@ export default function EditPagePage({ params }: { params: Promise<{ id: string 
           title: page.title,
           description: page.description,
           published: page.published,
+          metaTitle: page.metaTitle,
+          metaDescription: page.metaDescription,
+          metaKeywords: page.metaKeywords,
+          ogImage: page.ogImage,
           blocks: page.blocks.map((block, index) => ({
             type: block.type,
             content: block.content,
@@ -333,18 +342,6 @@ export default function EditPagePage({ params }: { params: Promise<{ id: string 
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Título SEO
-            </label>
-            <input
-              type="text"
-              value={page.title || ""}
-              onChange={(e) => setPage({ ...page, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Título para SEO"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Status
             </label>
             <select
@@ -356,6 +353,16 @@ export default function EditPagePage({ params }: { params: Promise<{ id: string 
               <option value="published">Publicada</option>
             </select>
           </div>
+        </div>
+        <div className="mt-6">
+          <SEOFields
+            metaTitle={page.metaTitle || ""}
+            metaDescription={page.metaDescription || ""}
+            metaKeywords={page.metaKeywords || ""}
+            ogImage={page.ogImage || ""}
+            slug={page.slug}
+            onChange={(field, value) => setPage({ ...page, [field]: value })}
+          />
         </div>
       </div>
 

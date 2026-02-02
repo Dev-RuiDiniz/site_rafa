@@ -46,7 +46,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, slug, title, description, published, blocks } = body;
+    const { name, slug, title, description, published, blocks, metaTitle, metaDescription, metaKeywords, ogImage } = body;
 
     const existingPage = await prisma.page.findUnique({ where: { id } });
     if (!existingPage) {
@@ -73,6 +73,10 @@ export async function PUT(
           title: title !== undefined ? title : existingPage.title,
           description: description !== undefined ? description : existingPage.description,
           published: published !== undefined ? published : existingPage.published,
+          metaTitle: metaTitle !== undefined ? metaTitle : existingPage.metaTitle,
+          metaDescription: metaDescription !== undefined ? metaDescription : existingPage.metaDescription,
+          metaKeywords: metaKeywords !== undefined ? metaKeywords : existingPage.metaKeywords,
+          ogImage: ogImage !== undefined ? ogImage : existingPage.ogImage,
         },
       });
 

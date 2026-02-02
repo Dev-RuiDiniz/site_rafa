@@ -123,6 +123,11 @@ model Product {
   brands           ProductBrand[]
   specifications   Specification[]
   views            Int               @default(0)
+  // SEO
+  metaTitle        String?
+  metaDescription  String?           @db.Text
+  metaKeywords     String?
+  ogImage          String?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }
@@ -200,6 +205,11 @@ model BlogPost {
   categories  BlogPostCategory[]
   tags        BlogPostTag[]
   comments    BlogComment[]
+  // SEO
+  metaTitle        String?
+  metaDescription  String?   @db.Text
+  metaKeywords     String?
+  ogImage          String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 }
@@ -363,6 +373,11 @@ model Page {
   isSystem    Boolean     @default(false)
   published   Boolean     @default(false)
   blocks      PageBlock[]
+  // SEO
+  metaTitle        String?
+  metaDescription  String?  @db.Text
+  metaKeywords     String?
+  ogImage          String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }

@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
         image: data.image,
         cover: data.cover,
         published: data.published || false,
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
+        metaKeywords: data.metaKeywords || null,
+        ogImage: data.ogImage || null,
         publishedAt: data.published ? new Date() : null,
         categories: data.categoryIds?.length ? {
           create: data.categoryIds.map((categoryId: string) => ({ categoryId })),

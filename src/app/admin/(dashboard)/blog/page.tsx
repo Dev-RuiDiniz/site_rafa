@@ -5,6 +5,8 @@ import Image from "next/image";
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
 import { Modal, ConfirmModal } from "@/components/admin/Modal";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import SEOFields from "@/components/admin/SEOFields";
+import SEOIndicator from "@/components/admin/SEOIndicator";
 
 interface Post {
   id: string;
@@ -16,9 +18,13 @@ interface Post {
   published: boolean;
   publishedAt: string | null;
   createdAt: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  ogImage: string | null;
 }
 
-const emptyPost = { title: "", slug: "", excerpt: "", content: "", image: "", published: false };
+const emptyPost = { title: "", slug: "", excerpt: "", content: "", image: "", published: false, metaTitle: "", metaDescription: "", metaKeywords: "", ogImage: "" };
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -49,7 +55,7 @@ export default function BlogPage() {
 
   const openEdit = (post: Post) => {
     setSelectedPost(post);
-    setFormData({ title: post.title, slug: post.slug, excerpt: post.excerpt || "", content: post.content || "", image: post.image || "", published: post.published });
+    setFormData({ title: post.title, slug: post.slug, excerpt: post.excerpt || "", content: post.content || "", image: post.image || "", published: post.published, metaTitle: post.metaTitle || "", metaDescription: post.metaDescription || "", metaKeywords: post.metaKeywords || "", ogImage: post.ogImage || "" });
     setModalOpen(true);
   };
 
@@ -98,15 +104,16 @@ export default function BlogPage() {
             <tr className="border-b border-gray-200 dark:border-zinc-800">
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Post</th>
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Data</th>
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">SEO</th>
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Status</th>
               <th className="px-6 py-4 text-right text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
             {loading ? (
-              <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400">Carregando...</td></tr>
             ) : posts.length === 0 ? (
-              <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400">Nenhum post encontrado</td></tr>
+              <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400">Nenhum post encontrado</td></tr>
             ) : (
               posts.map((post) => (
                 <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors">
@@ -123,6 +130,9 @@ export default function BlogPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     {new Date(post.createdAt).toLocaleDateString("pt-BR")}
+                  </td>
+                  <td className="px-6 py-4">
+                    <SEOIndicator metaTitle={post.metaTitle} metaDescription={post.metaDescription} />
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-[10px] uppercase tracking-wider font-medium ${post.published ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"}`}>
@@ -166,6 +176,14 @@ export default function BlogPage() {
             <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={10} className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white outline-none resize-none font-mono text-sm" />
           </div>
           <ImageUpload label="Imagem de Capa" value={formData.image} onChange={(url) => setFormData({ ...formData, image: url })} folder="blog" />
+          <SEOFields
+            metaTitle={formData.metaTitle}
+            metaDescription={formData.metaDescription}
+            metaKeywords={formData.metaKeywords}
+            ogImage={formData.ogImage}
+            slug={`blog/${formData.slug}`}
+            onChange={(field, value) => setFormData({ ...formData, [field]: value })}
+          />
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} className="accent-black" />
             <span className="text-sm text-gray-600 dark:text-gray-400">Publicar</span>

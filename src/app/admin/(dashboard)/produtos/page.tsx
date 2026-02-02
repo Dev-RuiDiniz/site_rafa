@@ -5,6 +5,8 @@ import Image from "next/image";
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye, HiOutlineSearch, HiOutlineCog, HiX, HiOutlineLink } from "react-icons/hi";
 import { Modal, ConfirmModal } from "@/components/admin/Modal";
 import { ImageUpload, GalleryUpload } from "@/components/admin/ImageUpload";
+import SEOFields from "@/components/admin/SEOFields";
+import SEOIndicator from "@/components/admin/SEOIndicator";
 
 // Rich Text Editor Component
 function RichTextEditor({ value, onChange, rows = 4, placeholder }: { value: string; onChange: (v: string) => void; rows?: number; placeholder?: string }) {
@@ -157,6 +159,10 @@ interface Product {
   category: { id: string; name: string } | null;
   categories: { category: { id: string; name: string } }[];
   brands: { brand: { id: string; name: string } }[];
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  ogImage: string | null;
 }
 
 interface Category {
@@ -189,6 +195,10 @@ const emptyProduct = {
   active: true,
   categoryIds: [] as string[],
   brandIds: [] as string[],
+  metaTitle: "",
+  metaDescription: "",
+  metaKeywords: "",
+  ogImage: "",
 };
 
 export default function ProdutosPage() {
@@ -278,6 +288,10 @@ export default function ProdutosPage() {
       active: product.active,
       categoryIds: product.categories?.map((c) => c.category.id) || (product.category?.id ? [product.category.id] : []),
       brandIds: product.brands?.map((b) => b.brand.id) || [],
+      metaTitle: product.metaTitle || "",
+      metaDescription: product.metaDescription || "",
+      metaKeywords: product.metaKeywords || "",
+      ogImage: product.ogImage || "",
     });
     setModalOpen(true);
   };
@@ -468,6 +482,7 @@ export default function ProdutosPage() {
             <tr className="border-b border-gray-200 dark:border-zinc-800">
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Produto</th>
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Categoria</th>
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">SEO</th>
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Status</th>
               <th className="px-6 py-4 text-right text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Ações</th>
             </tr>
@@ -475,11 +490,11 @@ export default function ProdutosPage() {
           <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-gray-400">Carregando...</td>
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-400">Carregando...</td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-gray-400">Nenhum produto encontrado</td>
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-400">Nenhum produto encontrado</td>
               </tr>
             ) : (
               products.map((product) => (
@@ -501,6 +516,9 @@ export default function ProdutosPage() {
                     {product.categories?.length > 0 
                       ? product.categories.map(c => c.category.name).join(", ")
                       : product.category?.name || "-"}
+                  </td>
+                  <td className="px-6 py-4">
+                    <SEOIndicator metaTitle={product.metaTitle} metaDescription={product.metaDescription} />
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-[10px] uppercase tracking-wider font-medium ${
@@ -790,6 +808,15 @@ export default function ProdutosPage() {
               className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all text-sm"
             />
           </div>
+
+          <SEOFields
+            metaTitle={formData.metaTitle}
+            metaDescription={formData.metaDescription}
+            metaKeywords={formData.metaKeywords}
+            ogImage={formData.ogImage}
+            slug={`produtos/${formData.slug}`}
+            onChange={(field, value) => setFormData({ ...formData, [field]: value })}
+          />
 
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
