@@ -16,6 +16,11 @@ import {
 } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
+function stripHtml(html: string | null): string {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
 interface Product {
   id: string;
   name: string;
@@ -378,8 +383,8 @@ export default function ProductPage() {
                     <h3 className="text-xl font-serif font-medium text-black group-hover:text-gray-600 transition-colors">
                       {relatedProduct.name}
                     </h3>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {relatedProduct.shortDescription}
+                    <p className="text-gray-500 text-sm mt-1 line-clamp-1">
+                      {stripHtml(relatedProduct.shortDescription)}
                     </p>
                   </Link>
                 </motion.div>
