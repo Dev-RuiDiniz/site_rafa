@@ -66,11 +66,11 @@ export function TrackingScripts() {
         }}
       />
 
-      {/* Meta Pixel - apenas para SHR */}
+      {/* Meta Pixel - apenas para SHR (carrega após página completa) */}
       {!isMaletti && config.metaPixelId && (
         <Script
           id="meta-pixel"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
