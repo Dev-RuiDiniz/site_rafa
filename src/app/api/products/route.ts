@@ -6,14 +6,25 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get("featured");
     const categorySlug = searchParams.get("category");
+    const search = searchParams.get("search");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "9");
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = { active: true };
+    const andConditions: Record<string, unknown>[] = [];
     
     if (featured === "true") {
       where.featured = true;
+    }
+
+    if (search) {
+      andConditions.push({
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { shortDescription: { contains: search, mode: "insensitive" } },
+        ]
+      });
     }
     
     if (categorySlug) {
@@ -21,12 +32,17 @@ export async function GET(request: NextRequest) {
         where: { slug: categorySlug },
       });
       if (category) {
-        // Filtrar por categorias (many-to-many) OU categoryId (legado)
-        where.OR = [
-          { categoryId: category.id },
-          { categories: { some: { categoryId: category.id } } }
-        ];
+        andConditions.push({
+          OR: [
+            { categoryId: category.id },
+            { categories: { some: { categoryId: category.id } } }
+          ]
+        });
       }
+    }
+
+    if (andConditions.length > 0) {
+      where.AND = andConditions;
     }
 
     const [products, total] = await Promise.all([

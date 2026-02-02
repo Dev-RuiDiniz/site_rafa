@@ -88,6 +88,7 @@ function ProductsContent() {
     params.set("page", currentPage.toString());
     params.set("limit", "9");
     if (selectedCategory) params.set("category", selectedCategory);
+    if (searchQuery.trim()) params.set("search", searchQuery.trim());
     
     fetch(`/api/products?${params.toString()}`)
       .then((r) => r.json())
@@ -98,19 +99,15 @@ function ProductsContent() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [currentPage, selectedCategory]);
+  }, [currentPage, selectedCategory, searchQuery]);
 
-  // Reset página ao mudar categoria
+  // Reset página ao mudar categoria ou busca
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
 
-  // Filtro local apenas para busca (categoria já filtrada na API)
-  const filteredProducts = products.filter((p) => {
-    if (!searchQuery.trim()) return true;
-    return p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Produtos já filtrados pela API
+  const filteredProducts = products;
 
   return (
     <>
