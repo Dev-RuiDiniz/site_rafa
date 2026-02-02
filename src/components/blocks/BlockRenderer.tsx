@@ -133,7 +133,10 @@ function HeroBlock({ content }: { content: Record<string, unknown> }) {
             src={content.image as string}
             alt=""
             fill
+            priority
+            sizes="100vw"
             className="object-cover"
+            quality={85}
           />
           <div
             className="absolute inset-0 bg-black"
@@ -576,20 +579,23 @@ function HeroSliderBlock({ content }: { content: Record<string, unknown> }) {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
-            style={{
-              backgroundImage: currentBanner.image ? `url(${currentBanner.image})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
+          {currentBanner.image && (
+            <Image
+              src={currentBanner.image}
+              alt={currentBanner.title}
+              fill
+              priority={currentSlide === 0}
+              sizes="100vw"
+              className="object-cover"
+              quality={85}
+            />
+          )}
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
       </AnimatePresence>
