@@ -4,10 +4,18 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 interface MalettiHeaderProps {
-  onNavigate: (id: string) => void;
+  onNavigate?: (id: string) => void;
 }
 
+const scrollToSection = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
 export function MalettiHeader({ onNavigate }: MalettiHeaderProps) {
+  const handleNavigate = onNavigate || scrollToSection;
   return (
     <motion.nav 
       initial={{ y: -100 }}
@@ -26,31 +34,31 @@ export function MalettiHeader({ onNavigate }: MalettiHeaderProps) {
           />
           <div className="flex items-center gap-8">
             <button 
-              onClick={() => onNavigate("essencia")}
+              onClick={() => handleNavigate("essencia")}
               className="text-sm text-gray-600 hover:text-black transition-colors"
             >
               A Essência
             </button>
             <button 
-              onClick={() => onNavigate("head-spa")}
+              onClick={() => handleNavigate("head-spa")}
               className="text-sm text-gray-600 hover:text-black transition-colors"
             >
               Head SPA
             </button>
             <button 
-              onClick={() => onNavigate("design")}
+              onClick={() => handleNavigate("design")}
               className="text-sm text-gray-600 hover:text-black transition-colors"
             >
               Design & Experiências
             </button>
             <button 
-              onClick={() => onNavigate("catalogo")}
+              onClick={() => handleNavigate("catalogo")}
               className="text-sm text-gray-600 hover:text-black transition-colors"
             >
               Catálogo
             </button>
              <button 
-              onClick={() => onNavigate("https://shrhair.com.br/blog")}
+              onClick={() => handleNavigate("https://shrhair.com.br/blog")}
               className="text-sm text-gray-600 hover:text-black transition-colors"
             >
               Blog

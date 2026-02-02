@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { prisma } from "@/lib/prisma";
 import {
   MalettiHeader,
   MalettiHero,
@@ -20,26 +18,32 @@ interface PageBlock {
   active: boolean;
 }
 
-export default function MalettiPage() {
-  const [blocks, setBlocks] = useState<PageBlock[]>([]);
+async function getPageBlocks(): Promise<PageBlock[]> {
+  try {
+    const page = await prisma.page.findFirst({
+      where: { slug: "maletti" },
+      include: {
+        blocks: {
+          where: { active: true },
+          orderBy: { order: "asc" },
+        },
+      },
+    });
+    return (page?.blocks || []) as PageBlock[];
+  } catch {
+    return [];
+  }
+}
 
-  useEffect(() => {
-    fetch("/api/pages/maletti").then(r => r.json()).then(data => setBlocks(data.page?.blocks || [])).catch(console.error);
-  }, []);
-
+export default async function MalettiPage() {
+  const blocks = await getPageBlocks();
+  
   const getBlockContent = (type: string) => blocks.find(b => b.type === type)?.content || {};
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <div className="maletti-page">
-      <MalettiHeader onNavigate={scrollToSection} />
-      <MalettiHero onNavigate={scrollToSection} content={getBlockContent("maletti-hero")} />
+      <MalettiHeader />
+      <MalettiHero content={getBlockContent("maletti-hero")} />
       <MalettiEssencia content={getBlockContent("maletti-essencia")} />
       <MalettiBrasil content={getBlockContent("maletti-brasil")} />
       <MalettiHeadSpa content={getBlockContent("maletti-headspa")} />

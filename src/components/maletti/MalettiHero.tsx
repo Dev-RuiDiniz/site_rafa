@@ -5,11 +5,19 @@ import { HiArrowRight } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
 interface MalettiHeroProps {
-  onNavigate: (id: string) => void;
+  onNavigate?: (id: string) => void;
   content?: Record<string, unknown>;
 }
 
+const scrollToSection = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
 export function MalettiHero({ onNavigate, content = {} }: MalettiHeroProps) {
+  const handleNavigate = onNavigate || scrollToSection;
   const title = (content.title as string) || "Transforme Espaços.";
   const titleHighlight = (content.titleHighlight as string) || "Eleve Experiências.";
   const description = (content.description as string) || "Apresentamos a revolução do bem-estar capilar no Brasil. As estações Maletti Head SPA unem o design italiano a uma tecnologia inovadora para criar uma experiência sensorial que redefine o luxo em seu salão, spa ou clínica.";
@@ -51,7 +59,7 @@ export function MalettiHero({ onNavigate, content = {} }: MalettiHeroProps) {
             <Button
                 size="lg"
                 className="bg-white text-black hover:bg-gray-100 transition-all duration-300 group"
-                onClick={() => onNavigate("catalogo")}
+                onClick={() => handleNavigate("catalogo")}
               >
                 {buttonText}
                 <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

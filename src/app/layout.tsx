@@ -9,12 +9,16 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -52,6 +56,11 @@ export default function RootLayout({
       <head>
         {/* Google Site Verification - Maletti */}
         <meta name="google-site-verification" content="SkrI3t5Q5vQ_OvnnTNksc-gx1nKisw0Gq0oANsuLvM0" />
+        {/* Preconnect para recursos externos */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <DynamicFavicon />
         <TrackingScripts />
       </head>

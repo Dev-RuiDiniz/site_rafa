@@ -13,7 +13,13 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 31536000,
   },
+  experimental: {
+    optimizeCss: true,
+  },
+  compress: true,
 };
 
 export default nextConfig;
