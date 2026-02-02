@@ -59,6 +59,9 @@ function ProductsContent() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
+  // Usar buscaParam diretamente para a API (evita problemas de timing)
+  const searchTerm = buscaParam || searchQuery;
+
   // Buscar blocos da página
   const heroBlock = blocks.find(b => b.type === "products-hero")?.content || {};
   const gridBlock = blocks.find(b => b.type === "products-grid")?.content || {};
@@ -88,7 +91,7 @@ function ProductsContent() {
     params.set("page", currentPage.toString());
     params.set("limit", "9");
     if (selectedCategory) params.set("category", selectedCategory);
-    if (searchQuery.trim()) params.set("search", searchQuery.trim());
+    if (searchTerm.trim()) params.set("search", searchTerm.trim());
     
     fetch(`/api/products?${params.toString()}`)
       .then((r) => r.json())
@@ -99,12 +102,12 @@ function ProductsContent() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [currentPage, selectedCategory, searchQuery]);
+  }, [currentPage, selectedCategory, searchTerm]);
 
   // Reset página ao mudar categoria ou busca
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchTerm]);
 
   // Produtos já filtrados pela API
   const filteredProducts = products;
