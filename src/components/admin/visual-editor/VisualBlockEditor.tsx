@@ -2454,7 +2454,7 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
   const [uploading, setUploading] = useState<string | null>(null);
   
   const products = (content.products as Array<{ name: string; tagline: string; description: string; highlight: string; ideal: string; image: string; cta: string; slug: string }>) || [];
-  const technologies = (content.technologies as Array<{ name: string; subtitle: string; icon: string; description: string; benefit: string; hasVideo: boolean }>) || [];
+  const technologies = (content.technologies as Array<{ name: string; subtitle: string; icon: string; description: string; benefit: string; hasVideo: boolean; videoButtonText?: string; videoUrl?: string }>) || [];
   const ritualSteps = (content.ritualSteps as Array<{ step: number; title: string; description: string }>) || [];
   const galleryImages = (content.galleryImages as Array<{ src: string; alt: string }>) || [];
   const painPoints = (content.problemPainPoints as string[]) || [];
@@ -2580,9 +2580,15 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
               <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Ícone (emoji)" value={t.icon} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], icon: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
               <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={t.description} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], description: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
               <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Benefício" rows={2} value={t.benefit} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], benefit: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto do Botão Vídeo (ex: Ver vídeo em ação)" value={t.videoButtonText || ""} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], videoButtonText: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link do Vídeo (YouTube ou URL)" value={t.videoUrl || ""} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], videoUrl: e.target.value }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+              <label className="flex items-center gap-2 text-xs">
+                <input type="checkbox" checked={t.hasVideo} onChange={(e) => { const nt = [...technologies]; nt[i] = { ...nt[i], hasVideo: e.target.checked }; onChange({ ...content, technologies: nt }); }} onClick={(e) => e.stopPropagation()} />
+                Mostrar botão de vídeo
+              </label>
             </div>
           ))}
-          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: [...technologies, { name: "", subtitle: "", icon: "", description: "", benefit: "", hasVideo: false }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Tecnologia</button>
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: [...technologies, { name: "", subtitle: "", icon: "", description: "", benefit: "", hasVideo: false, videoButtonText: "", videoUrl: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Tecnologia</button>
         </div>
       )}
 
