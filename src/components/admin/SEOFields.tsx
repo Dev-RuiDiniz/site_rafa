@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FiSearch, FiGlobe, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
+import { upload } from "@vercel/blob/client";
+import Image from "next/image";
 
 interface SEOFieldsProps {
   metaTitle: string;
@@ -23,6 +26,39 @@ export default function SEOFields({
   onChange,
 }: SEOFieldsProps) {
   const [activeTab, setActiveTab] = useState<"fields" | "preview">("fields");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadOgImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setProgress(0);
+    
+    try {
+      const timestamp = Date.now();
+      const ext = file.name.split(".").pop();
+      const filename = `og-images/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+      const blob = await upload(filename, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload/client",
+        onUploadProgress: (progressEvent) => {
+          setProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+        },
+      });
+
+      onChange("ogImage", blob.url);
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Erro ao fazer upload. Tente novamente.");
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
 
   // SEO Score calculation
   const calculateSEOScore = () => {
@@ -213,28 +249,56 @@ export default function SEOFields({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Imagem de Compartilhamento (OG Image)
               </label>
-              <input
-                type="text"
-                value={ogImage}
-                onChange={(e) => onChange("ogImage", e.target.value)}
-                placeholder="URL da imagem para redes sociais"
-                className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all text-sm"
-              />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mb-2 text-xs text-gray-500">
                 Tamanho recomendado: 1200x630 pixels.
               </p>
-              {ogImage && (
-                <div className="mt-2 relative w-full max-w-xs aspect-[1200/630] bg-gray-100 dark:bg-zinc-700 rounded overflow-hidden">
-                  <img
-                    src={ogImage}
-                    alt="OG Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/placeholder.png";
-                    }}
-                  />
-                </div>
-              )}
+              <div className="relative">
+                {ogImage ? (
+                  <div className="relative w-full max-w-md aspect-[1200/630] border border-gray-200 dark:border-zinc-700 group rounded overflow-hidden">
+                    <Image 
+                      src={ogImage} 
+                      alt="OG Preview" 
+                      fill 
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onChange("ogImage", "")}
+                      className="absolute top-2 right-2 p-1.5 bg-black/80 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded"
+                    >
+                      <HiOutlineX className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full max-w-md aspect-[1200/630] border-2 border-dashed border-gray-300 dark:border-zinc-700 hover:border-black dark:hover:border-white flex flex-col items-center justify-center gap-2 transition-colors rounded"
+                  >
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="animate-spin h-6 w-6 border-2 border-black dark:border-white border-t-transparent rounded-full" />
+                        {progress > 0 && <span className="text-sm text-gray-500">{progress}%</span>}
+                      </div>
+                    ) : (
+                      <>
+                        <HiOutlinePhotograph className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Clique para enviar imagem</span>
+                        <span className="text-xs text-gray-400">1200x630 pixels</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadOgImage}
+                  className="hidden"
+                />
+              </div>
             </div>
 
             {/* Issues & Suggestions */}
