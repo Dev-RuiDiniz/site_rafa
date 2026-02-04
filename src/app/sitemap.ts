@@ -1,11 +1,19 @@
 import { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://www.shrhair.com.br";
+  // Detectar domínio atual
+  const headersList = await headers();
+  const host = headersList.get("host") || "www.shrhair.com.br";
+  const isMaletti = host.includes("maletti");
+  
+  const baseUrl = isMaletti 
+    ? "https://www.maletti.com.br" 
+    : "https://www.shrhair.com.br";
 
-  // Páginas estáticas
-  const staticPages: MetadataRoute.Sitemap = [
+  // Páginas estáticas SHR
+  const shrStaticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -74,6 +82,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Páginas estáticas Maletti
+  const malettiStaticPages: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/produtos`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/contato`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+  ];
+
+  const staticPages = isMaletti ? malettiStaticPages : shrStaticPages;
+
   // Produtos dinâmicos
   let productPages: MetadataRoute.Sitemap = [];
   try {
@@ -125,5 +157,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Erro ao buscar marcas para sitemap:", e);
   }
 
-  return [...staticPages, ...productPages, ...blogPages, ...brandPages];
+  // Landing Pages dinâmicas
+  let landingPages: MetadataRoute.Sitemap = [];
+  try {
+    const pages = await prisma.page.findMany({
+      where: { 
+        published: true,
+        slug: { not: "home" }
+      },
+      select: { slug: true, updatedAt: true },
+    });
+    landingPages = pages.map((page) => ({
+      url: `${baseUrl}/${page.slug}`,
+      lastModified: page.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+  } catch (e) {
+    console.error("Erro ao buscar páginas para sitemap:", e);
+  }
+
+  return [...staticPages, ...productPages, ...blogPages, ...brandPages, ...landingPages];
 }
