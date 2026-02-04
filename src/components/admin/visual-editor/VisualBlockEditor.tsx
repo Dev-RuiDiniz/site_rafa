@@ -2319,6 +2319,7 @@ function LPSalaoContentEditor({ content, onChange }: { content: Record<string, u
           <InputField label="Título Destaque" value={(content.heroHighlight as string) || ""} onChange={(v) => onChange({ ...content, heroHighlight: v })} placeholder="Design Italiano e Tecnologia de Wellness." />
           <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
           <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} placeholder="Conhecer a Coleção Maletti" />
+          <InputField label="Link do Botão" value={(content.heroButtonLink as string) || ""} onChange={(v) => onChange({ ...content, heroButtonLink: v })} placeholder="/catalogo" />
         </div>
       )}
 
@@ -2439,6 +2440,8 @@ function LPSalaoContentEditor({ content, onChange }: { content: Record<string, u
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
           <InputField label="Nota" value={(content.ctaNote as string) || ""} onChange={(v) => onChange({ ...content, ctaNote: v })} />
           <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} />
+          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
+          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
         </div>
       )}
     </div>
@@ -2519,7 +2522,8 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
           <InputField label="Título Destaque" value={(content.heroHighlight as string) || ""} onChange={(v) => onChange({ ...content, heroHighlight: v })} placeholder="A revolução no tratamento capilar..." />
           <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
           <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} placeholder="Explorar a Coleção Completa" />
-          <InputField label="URL do Vídeo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} placeholder="/Video Home.mp4" />
+          <InputField label="Link do Botão" value={(content.heroButtonLink as string) || ""} onChange={(v) => onChange({ ...content, heroButtonLink: v })} placeholder="/catalogo" />
+          <VideoUploader label="Vídeo de Fundo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} />
           <InputField label="Overlay %" value={String((content.heroOverlay as number) || 60)} onChange={(v) => onChange({ ...content, heroOverlay: Number(v) })} type="number" />
         </div>
       )}
@@ -2616,6 +2620,7 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
           <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
           <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
+          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
         </div>
       )}
     </div>
@@ -2696,7 +2701,8 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
           <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} />
           <TextareaField label="Sub-Descrição" value={(content.heroSubDescription as string) || ""} onChange={(v) => onChange({ ...content, heroSubDescription: v })} rows={2} />
           <InputField label="Texto do Botão" value={(content.heroButtonText as string) || ""} onChange={(v) => onChange({ ...content, heroButtonText: v })} />
-          <InputField label="URL do Vídeo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} />
+          <InputField label="Link do Botão" value={(content.heroButtonLink as string) || ""} onChange={(v) => onChange({ ...content, heroButtonLink: v })} placeholder="/catalogo" />
+          <VideoUploader label="Vídeo de Fundo" value={(content.heroVideo as string) || ""} onChange={(v) => onChange({ ...content, heroVideo: v })} />
           <InputField label="Overlay %" value={String((content.heroOverlay as number) || 50)} onChange={(v) => onChange({ ...content, heroOverlay: Number(v) })} type="number" />
         </div>
       )}
@@ -2790,6 +2796,7 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
           <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
           <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
+          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
         </div>
       )}
     </div>
