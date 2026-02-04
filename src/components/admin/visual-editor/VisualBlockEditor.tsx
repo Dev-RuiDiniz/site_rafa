@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { HiOutlineUpload, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
+import { HiOutlineUpload, HiOutlinePlus, HiOutlineTrash, HiOutlineX, HiOutlineVideoCamera } from "react-icons/hi";
+import { upload } from "@vercel/blob/client";
 
 interface VisualBlockEditorProps {
   type: string;
@@ -180,43 +181,62 @@ function ImageUploader({ value, onChange, label = "Imagem" }: {
   label?: string;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    setProgress(0);
 
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        onChange(data.url);
-      }
+      const timestamp = Date.now();
+      const ext = file.name.split(".").pop();
+      const filename = `blocks/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+      const blob = await upload(filename, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload/client",
+        onUploadProgress: (progressEvent) => {
+          setProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+        },
+      });
+
+      onChange(blob.url);
     } catch (error) {
       console.error("Upload error:", error);
+      alert("Erro ao fazer upload. Tente novamente.");
     } finally {
       setUploading(false);
+      setProgress(0);
     }
   };
 
   return (
-    <div>
+    <div onClick={(e) => e.stopPropagation()}>
       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
         {label}
       </label>
       <div className="flex items-center gap-2">
         {value && (
-          <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex-shrink-0">
-            <Image src={value} alt="Preview" fill className="object-cover" />
+          <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex-shrink-0 group">
+            <Image src={value} alt="Preview" fill className="object-cover" unoptimized />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onChange(""); }}
+              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+            >
+              <HiOutlineX className="w-5 h-5 text-white" />
+            </button>
           </div>
         )}
         <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 text-sm">
           <HiOutlineUpload className="w-4 h-4" />
-          <span>{uploading ? "Enviando..." : "Upload"}</span>
+          <span>{uploading ? `${progress}%` : value ? "Trocar" : "Upload"}</span>
           <input
+            ref={inputRef}
             type="file"
             accept="image/*"
             onChange={handleUpload}
@@ -225,6 +245,97 @@ function ImageUploader({ value, onChange, label = "Imagem" }: {
           />
         </label>
       </div>
+    </div>
+  );
+}
+
+function VideoUploader({ value, onChange, label = "Vídeo" }: {
+  value: string;
+  onChange: (url: string) => void;
+  label?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setProgress(0);
+
+    try {
+      const timestamp = Date.now();
+      const ext = file.name.split(".").pop();
+      const filename = `videos/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+      const blob = await upload(filename, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload/client",
+        onUploadProgress: (progressEvent) => {
+          setProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+        },
+      });
+
+      onChange(blob.url);
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Erro ao fazer upload. Tente novamente.");
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        {label}
+      </label>
+      {value ? (
+        <div className="relative rounded-lg overflow-hidden bg-black">
+          <video src={value} className="w-full h-32 object-cover" muted />
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
+              className="px-3 py-1.5 bg-white/90 rounded text-xs font-medium hover:bg-white"
+            >
+              {uploading ? `${progress}%` : "Trocar"}
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onChange(""); }}
+              className="p-1.5 bg-red-500 rounded text-white hover:bg-red-600"
+            >
+              <HiOutlineX className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-gray-400">
+          {uploading ? (
+            <>
+              <div className="animate-spin h-6 w-6 border-2 border-black dark:border-white border-t-transparent rounded-full" />
+              <span className="text-sm text-gray-500">{progress}%</span>
+            </>
+          ) : (
+            <>
+              <HiOutlineVideoCamera className="w-8 h-8 text-gray-400" />
+              <span className="text-sm text-gray-500">Clique para enviar vídeo</span>
+            </>
+          )}
+        </label>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="video/*"
+        onChange={handleUpload}
+        className="hidden"
+        disabled={uploading}
+      />
     </div>
   );
 }
@@ -1915,8 +2026,9 @@ function MalettiHeroEditor({ content, onChange }: { content: Record<string, unkn
       <InputField label="Título Principal" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} placeholder="Transforme Espaços." />
       <InputField label="Título Destaque" value={(content.titleHighlight as string) || ""} onChange={(v) => onChange({ ...content, titleHighlight: v })} placeholder="Eleve Experiências." />
       <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
-      <InputField label="URL do Vídeo" value={(content.videoUrl as string) || ""} onChange={(v) => onChange({ ...content, videoUrl: v })} placeholder="/Video Home.mp4" />
+      <VideoUploader label="Vídeo de Fundo" value={(content.videoUrl as string) || ""} onChange={(v) => onChange({ ...content, videoUrl: v })} />
       <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
+      <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} placeholder="/catalogo" />
     </div>
   );
 }
@@ -1932,7 +2044,7 @@ function MalettiEssenciaEditor({ content, onChange }: { content: Record<string, 
       <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Nossa História" />
       <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} />
       <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={4} />
-      <InputField label="Imagem Showroom" value={(content.showroomImage as string) || ""} onChange={(v) => onChange({ ...content, showroomImage: v })} placeholder="/images/site/Shirobody_showroom.jpg" />
+      <ImageUploader label="Imagem Showroom" value={(content.showroomImage as string) || ""} onChange={(v) => onChange({ ...content, showroomImage: v })} />
       <label className="block text-xs font-medium text-gray-600">Estatísticas</label>
       {stats.map((stat, i) => (
         <div key={i} className="flex gap-2">
@@ -1964,13 +2076,16 @@ function MalettiBrasilEditor({ content, onChange }: { content: Record<string, un
       <InputField label="Link Secundário" value={(content.secondaryLink as string) || ""} onChange={(v) => onChange({ ...content, secondaryLink: v })} />
       <label className="block text-xs font-medium text-gray-600">Imagens do Carousel</label>
       {images.map((img, i) => (
-        <div key={i} className="p-2 border rounded space-y-1">
-          <div className="flex justify-between"><span className="text-xs">Imagem {i+1}</span><button onClick={(e) => { e.stopPropagation(); removeImage(i); }} className="text-red-500 text-xs">Remover</button></div>
-          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="/images/site/..." value={img.src} onChange={(e) => updateImage(i, "src", e.target.value)} onClick={(e) => e.stopPropagation()} />
-          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Alt text" value={img.alt} onChange={(e) => updateImage(i, "alt", e.target.value)} onClick={(e) => e.stopPropagation()} />
+        <div key={i} className="p-2 border rounded space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-medium">Imagem {i+1}</span>
+            <button onClick={(e) => { e.stopPropagation(); removeImage(i); }} className="text-red-500 text-xs hover:underline">Remover</button>
+          </div>
+          <ImageUploader label="" value={img.src} onChange={(url) => updateImage(i, "src", url)} />
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Alt text (descrição)" value={img.alt} onChange={(e) => updateImage(i, "alt", e.target.value)} onClick={(e) => e.stopPropagation()} />
         </div>
       ))}
-      <button onClick={(e) => { e.stopPropagation(); addImage(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Imagem</button>
+      <button onClick={(e) => { e.stopPropagation(); addImage(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:border-gray-400">+ Adicionar Imagem</button>
     </div>
   );
 }
@@ -1982,6 +2097,11 @@ function MalettiHeadSpaEditor({ content, onChange }: { content: Record<string, u
   const updateBenefit = (i: number, field: string, value: string) => {
     const newBenefits = [...benefits]; newBenefits[i] = { ...newBenefits[i], [field]: value }; onChange({ ...content, benefits: newBenefits });
   };
+  const updateImage = (i: number, url: string) => {
+    const newImages = [...images]; newImages[i] = url; onChange({ ...content, images: newImages });
+  };
+  const addImage = () => onChange({ ...content, images: [...images, ""] });
+  const removeImage = (i: number) => onChange({ ...content, images: images.filter((_, idx) => idx !== i) });
   return (
     <div className="space-y-4">
       <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Tendência Mundial" />
@@ -1989,8 +2109,16 @@ function MalettiHeadSpaEditor({ content, onChange }: { content: Record<string, u
       <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
       <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
       <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} />
-      <label className="block text-xs font-medium text-gray-600">Imagens (6 URLs, uma por linha)</label>
-      <textarea className="w-full px-3 py-2 text-sm border rounded" rows={6} value={images.join("\n")} onChange={(e) => onChange({ ...content, images: e.target.value.split("\n").filter(Boolean) })} onClick={(e) => e.stopPropagation()} />
+      <label className="block text-xs font-medium text-gray-600">Imagens da Galeria</label>
+      <div className="grid grid-cols-2 gap-2">
+        {images.map((img, i) => (
+          <div key={i} className="relative">
+            <ImageUploader label={`Imagem ${i+1}`} value={img} onChange={(url) => updateImage(i, url)} />
+            <button onClick={(e) => { e.stopPropagation(); removeImage(i); }} className="absolute top-0 right-0 p-1 text-red-500 text-xs">✕</button>
+          </div>
+        ))}
+      </div>
+      <button onClick={(e) => { e.stopPropagation(); addImage(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:border-gray-400">+ Adicionar Imagem</button>
       <label className="block text-xs font-medium text-gray-600">Benefícios</label>
       {benefits.map((b, i) => (
         <div key={i} className="p-2 border rounded space-y-1">
@@ -2015,18 +2143,21 @@ function MalettiDesignEditor({ content, onChange }: { content: Record<string, un
       <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Excelência em Mobiliário" />
       <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} />
       <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
-      <InputField label="Imagem do Vídeo" value={(content.videoThumbnail as string) || ""} onChange={(v) => onChange({ ...content, videoThumbnail: v })} placeholder="/images/site/DK3E3179-MOD.jpg" />
+      <ImageUploader label="Thumbnail do Vídeo" value={(content.videoThumbnail as string) || ""} onChange={(v) => onChange({ ...content, videoThumbnail: v })} />
       <InputField label="URL do Vídeo YouTube" value={(content.videoUrl as string) || ""} onChange={(v) => onChange({ ...content, videoUrl: v })} placeholder="https://youtube.com/..." />
       <label className="block text-xs font-medium text-gray-600">Produtos</label>
       {products.map((p, i) => (
-        <div key={i} className="p-2 border rounded space-y-1">
-          <div className="flex justify-between"><span className="text-xs">Produto {i+1}</span><button onClick={(e) => { e.stopPropagation(); removeProduct(i); }} className="text-red-500 text-xs">Remover</button></div>
-          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={p.name} onChange={(e) => updateProduct(i, "name", e.target.value)} onClick={(e) => e.stopPropagation()} />
-          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="/images/site/..." value={p.image} onChange={(e) => updateProduct(i, "image", e.target.value)} onClick={(e) => e.stopPropagation()} />
+        <div key={i} className="p-2 border rounded space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-medium">Produto {i+1}</span>
+            <button onClick={(e) => { e.stopPropagation(); removeProduct(i); }} className="text-red-500 text-xs hover:underline">Remover</button>
+          </div>
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome do produto" value={p.name} onChange={(e) => updateProduct(i, "name", e.target.value)} onClick={(e) => e.stopPropagation()} />
+          <ImageUploader label="" value={p.image} onChange={(url) => updateProduct(i, "image", url)} />
           <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" value={p.description} onChange={(e) => updateProduct(i, "description", e.target.value)} onClick={(e) => e.stopPropagation()} />
         </div>
       ))}
-      <button onClick={(e) => { e.stopPropagation(); addProduct(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
+      <button onClick={(e) => { e.stopPropagation(); addProduct(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:border-gray-400">+ Adicionar Produto</button>
     </div>
   );
 }
@@ -2038,7 +2169,7 @@ function MalettiCatalogoEditor({ content, onChange }: { content: Record<string, 
       <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Material Exclusivo" />
       <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} />
       <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
-      <InputField label="Imagem do Catálogo" value={(content.catalogImage as string) || ""} onChange={(v) => onChange({ ...content, catalogImage: v })} placeholder="/images/site/PLANIMETRIA..." />
+      <ImageUploader label="Imagem do Catálogo" value={(content.catalogImage as string) || ""} onChange={(v) => onChange({ ...content, catalogImage: v })} />
       <InputField label="Título do Formulário" value={(content.formTitle as string) || ""} onChange={(v) => onChange({ ...content, formTitle: v })} placeholder="Solicite seu Catálogo" />
       <InputField label="Descrição do Formulário" value={(content.formDescription as string) || ""} onChange={(v) => onChange({ ...content, formDescription: v })} />
       <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
