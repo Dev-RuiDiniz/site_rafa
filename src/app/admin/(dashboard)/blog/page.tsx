@@ -1,12 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
 import { Modal, ConfirmModal } from "@/components/admin/Modal";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import SEOFields from "@/components/admin/SEOFields";
 import SEOIndicator from "@/components/admin/SEOIndicator";
+
+const RichTextEditor = dynamic(() => import("@/components/admin/RichTextEditor"), { 
+  ssr: false,
+  loading: () => <div className="h-[300px] border border-gray-200 dark:border-zinc-700 rounded-lg flex items-center justify-center text-gray-400">Carregando editor...</div>
+});
 
 interface Post {
   id: string;
@@ -173,7 +179,11 @@ export default function BlogPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Conteúdo</label>
-            <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={10} className="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white outline-none resize-none font-mono text-sm" />
+            <RichTextEditor 
+              value={formData.content} 
+              onChange={(value) => setFormData({ ...formData, content: value })} 
+              placeholder="Escreva o conteúdo do post aqui..."
+            />
           </div>
           <ImageUpload label="Imagem de Capa" value={formData.image} onChange={(url) => setFormData({ ...formData, image: url })} folder="blog" />
           <SEOFields
