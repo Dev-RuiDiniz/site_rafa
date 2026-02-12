@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { SearchButton } from "./SearchModal";
 
-const navLinks = [
+const defaultNavLinks = [
   { href: "/", label: "Home" },
   { href: "/produtos", label: "Produtos" },
   { href: "/marcas", label: "Nossas Marcas" },
@@ -24,14 +24,51 @@ const navLinks = [
   { href: "/contato", label: "Contato" },
 ];
 
+const defaultCtaButtons = [
+  { label: "Solicitar Catálogo", href: "/contato?assunto=catalogo", variant: "outline" as const },
+  { label: "Falar com Consultor", href: "https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor.", variant: "solid" as const },
+];
+
+interface HeaderConfigData {
+  logoUrl?: string;
+  logoWhiteUrl?: string;
+  subtitle?: string;
+  subtitleLine2?: string;
+  navLinks?: Array<{ label: string; href: string }>;
+  ctaButtons?: Array<{ label: string; href: string; variant: "outline" | "solid" }>;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactCity?: string;
+}
+
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [config, setConfig] = useState<HeaderConfigData | null>(null);
   const pathname = usePathname();
   
   // Na home, header começa transparente. Em outras páginas, começa com fundo
   const isHome = pathname === "/";
   const showDarkElements = isScrolled || !isHome;
+
+  const navLinks = config?.navLinks || defaultNavLinks;
+  const ctaButtons = config?.ctaButtons || defaultCtaButtons;
+  const subtitle = config?.subtitle || "Distribuidor Exclusivo";
+  const subtitleLine2 = config?.subtitleLine2 || "Maletti e Nilo";
+  const logoUrl = config?.logoUrl || "/logoshr-dark.png";
+  const logoWhiteUrl = config?.logoWhiteUrl || "/logoshr-white.png";
+  const contactEmail = config?.contactEmail || "marketing@shrhair.com.br";
+  const contactPhone = config?.contactPhone || "(11) 98198-2279";
+  const contactCity = config?.contactCity || "São Paulo, SP";
+
+  useEffect(() => {
+    fetch("/api/layout?type=header&variant=shr")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.config?.content) setConfig(data.config.content);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +97,7 @@ export function Header() {
             <motion.div whileHover={{ scale: 1.02 }} className="relative h-16 w-[180px]">
               {/* Logo White - quando header transparente */}
               <Image
-                src="/logoshr-white.png"
+                src={logoWhiteUrl}
                 alt="SHR - Distribuidor Exclusivo Maletti"
                 fill
                 className={`object-contain object-left transition-opacity duration-300 ${showDarkElements ? "opacity-0" : "opacity-100"}`}
@@ -68,7 +105,7 @@ export function Header() {
               />
               {/* Logo Dark - quando header com fundo */}
               <Image
-                src="/logoshr-dark.png"
+                src={logoUrl}
                 alt="SHR - Distribuidor Exclusivo Maletti"
                 fill
                 className={`object-contain object-left transition-opacity duration-300 ${showDarkElements ? "opacity-100" : "opacity-0"}`}
@@ -76,8 +113,8 @@ export function Header() {
               />
             </motion.div>
             <div className={`hidden sm:block text-[10px] leading-tight uppercase tracking-wider transition-colors duration-300 ${showDarkElements ? "text-gray-500" : "text-white/70"}`}>
-              <span className="block">Distribuidor Exclusivo</span>
-              <span className="block font-medium">Maletti e Nilo</span>
+              <span className="block">{subtitle}</span>
+              <span className="block font-medium">{subtitleLine2}</span>
             </div>
           </Link>
 
@@ -88,16 +125,30 @@ export function Header() {
 
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-4">
-              <Button
-                variant="outline"
-                className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "border-black text-black hover:bg-black hover:text-white" : "border-white/80 text-white bg-transparent hover:bg-white hover:text-black"}`}
-                asChild
-              >
-                <Link href="/contato?assunto=catalogo">Solicitar Catálogo</Link>
-              </Button>
-              <Button className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black hover:bg-gray-100"}`} asChild>
-                <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor." target="_blank" rel="noopener noreferrer">Falar com Consultor</a>
-              </Button>
+              {ctaButtons.map((btn, i) => (
+                btn.variant === "outline" ? (
+                  <Button
+                    key={i}
+                    variant="outline"
+                    className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "border-black text-black hover:bg-black hover:text-white" : "border-white/80 text-white bg-transparent hover:bg-white hover:text-black"}`}
+                    asChild
+                  >
+                    {btn.href.startsWith("http") ? (
+                      <a href={btn.href} target="_blank" rel="noopener noreferrer">{btn.label}</a>
+                    ) : (
+                      <Link href={btn.href}>{btn.label}</Link>
+                    )}
+                  </Button>
+                ) : (
+                  <Button key={i} className={`font-medium tracking-wide transition-all duration-300 ${showDarkElements ? "bg-black text-white hover:bg-gray-800" : "bg-white text-black hover:bg-gray-100"}`} asChild>
+                    {btn.href.startsWith("http") ? (
+                      <a href={btn.href} target="_blank" rel="noopener noreferrer">{btn.label}</a>
+                    ) : (
+                      <Link href={btn.href}>{btn.label}</Link>
+                    )}
+                  </Button>
+                )
+              ))}
             </div>
 
             {/* Hamburger Menu - Always visible */}
@@ -138,22 +189,36 @@ export function Header() {
                   {/* Contact Info */}
                   <div className="mt-auto pb-12">
                     <div className="mb-8 space-y-3 text-white/60 text-sm">
-                      <p>marketing@shrhair.com.br</p>
-                      <p>(11) 98198-2279</p>
-                      <p>São Paulo, SP</p>
+                      <p>{contactEmail}</p>
+                      <p>{contactPhone}</p>
+                      <p>{contactCity}</p>
                     </div>
                     
                     <div className="flex flex-col gap-3">
-                      <Button
-                        variant="outline"
-                        className="w-full border-white text-white bg-transparent hover:bg-white hover:text-black"
-                        asChild
-                      >
-                        <Link href="/contato?assunto=catalogo">Solicitar Catálogo</Link>
-                      </Button>
-                      <Button className="w-full bg-white text-black hover:bg-gray-100" asChild>
-                        <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor." target="_blank" rel="noopener noreferrer">Falar com Consultor</a>
-                      </Button>
+                      {ctaButtons.map((btn, i) => (
+                        btn.variant === "outline" ? (
+                          <Button
+                            key={i}
+                            variant="outline"
+                            className="w-full border-white text-white bg-transparent hover:bg-white hover:text-black"
+                            asChild
+                          >
+                            {btn.href.startsWith("http") ? (
+                              <a href={btn.href} target="_blank" rel="noopener noreferrer">{btn.label}</a>
+                            ) : (
+                              <Link href={btn.href}>{btn.label}</Link>
+                            )}
+                          </Button>
+                        ) : (
+                          <Button key={i} className="w-full bg-white text-black hover:bg-gray-100" asChild>
+                            {btn.href.startsWith("http") ? (
+                              <a href={btn.href} target="_blank" rel="noopener noreferrer">{btn.label}</a>
+                            ) : (
+                              <Link href={btn.href}>{btn.label}</Link>
+                            )}
+                          </Button>
+                        )
+                      ))}
                     </div>
                   </div>
                 </div>
