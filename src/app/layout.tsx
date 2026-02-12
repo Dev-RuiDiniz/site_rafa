@@ -3,6 +3,7 @@ import { Poppins, Playfair_Display } from "next/font/google";
 import { TrackingScripts, TrackingNoscript } from "@/components/TrackingScripts";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
 import { DynamicScripts } from "@/components/DynamicScripts";
+import { buildMetadata } from "@/lib/seo";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -21,30 +22,9 @@ const playfair = Playfair_Display({
   preload: true,
 });
 
-export const metadata: Metadata = {
-  title: "SHR | Distribuidor Exclusivo Maletti no Brasil",
-  description:
-    "Somos o único distribuidor exclusivo da Maletti no Brasil. Conheça nossa linha completa de lavatórios, cadeiras e mobiliário para salões de beleza e spas.",
-  keywords: [
-    "Maletti",
-    "SHR",
-    "lavatórios",
-    "salão de beleza",
-    "mobiliário",
-    "Heaven",
-    "Shirobody",
-    "Total Body",
-    "Spa Garçon",
-    "Vapomist",
-  ],
-  openGraph: {
-    title: "SHR | Distribuidor Exclusivo Maletti no Brasil",
-    description:
-      "Somos o único distribuidor exclusivo da Maletti no Brasil. Conheça nossa linha completa de lavatórios e mobiliário premium.",
-    type: "website",
-    locale: "pt_BR",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("shr");
+}
 
 export default function RootLayout({
   children,

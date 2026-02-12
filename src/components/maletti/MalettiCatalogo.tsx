@@ -62,7 +62,6 @@ export function MalettiCatalogo({ content = {} }: MalettiCatalogoProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               <div className="absolute bottom-6 left-6 text-white">
-                <HiOutlineDocumentDownload className="w-10 h-10 mb-2" />
                 <p className="text-sm">Catálogo Digital Completo</p>
               </div>
             </div>

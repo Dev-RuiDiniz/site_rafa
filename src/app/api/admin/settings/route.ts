@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
           facebook: data.facebook,
           linkedin: data.linkedin,
           youtube: data.youtube,
-        },
+          seoConfig: data.seoConfig || undefined,
+        } as Record<string, unknown>,
       });
     } else {
       settings = await prisma.siteSettings.create({
@@ -57,7 +58,8 @@ export async function POST(request: NextRequest) {
           facebook: data.facebook,
           linkedin: data.linkedin,
           youtube: data.youtube,
-        },
+          seoConfig: data.seoConfig || undefined,
+        } as Record<string, unknown>,
       });
     }
 

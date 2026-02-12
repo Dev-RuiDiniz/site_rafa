@@ -1942,6 +1942,7 @@ function AboutHeroEditor({ content, onChange }: { content: Record<string, unknow
       <InputField label="Link Principal" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} />
       <InputField label="Texto Botão Secundário" value={(content.secondaryButtonText as string) || ""} onChange={(v) => onChange({ ...content, secondaryButtonText: v })} />
       <InputField label="Link Secundário" value={(content.secondaryLink as string) || ""} onChange={(v) => onChange({ ...content, secondaryLink: v })} />
+      <ImageUploader label="Imagem Hero" value={(content.image as string) || ""} onChange={(v) => onChange({ ...content, image: v })} />
       <InputField label="Stat 1 Valor" value={(content.stat1Value as string) || ""} onChange={(v) => onChange({ ...content, stat1Value: v })} placeholder="10+" />
       <InputField label="Stat 1 Label" value={(content.stat1Label as string) || ""} onChange={(v) => onChange({ ...content, stat1Label: v })} placeholder="Anos de mercado" />
       <InputField label="Stat 2 Valor" value={(content.stat2Value as string) || ""} onChange={(v) => onChange({ ...content, stat2Value: v })} placeholder="500+" />
@@ -1993,6 +1994,7 @@ function AboutValuesEditor({ content, onChange }: { content: Record<string, unkn
             </div>
             <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg" placeholder="Título" value={val.title} onChange={(e) => updateValue(i, "title", e.target.value)} onClick={(e) => e.stopPropagation()} />
             <textarea className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg" placeholder="Descrição" rows={2} value={val.description} onChange={(e) => updateValue(i, "description", e.target.value)} onClick={(e) => e.stopPropagation()} />
+            <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg" placeholder="Ícone (emoji, ex: ✨ 💡 ❤️ 🤝)" value={(val as Record<string, string>).icon || ""} onChange={(e) => updateValue(i, "icon", e.target.value)} onClick={(e) => e.stopPropagation()} />
           </div>
         ))}
         <button onClick={(e) => { e.stopPropagation(); addValue(); }} className="w-full py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-gray-400">+ Adicionar Valor</button>
@@ -2011,6 +2013,7 @@ function AboutPartnershipEditor({ content, onChange }: { content: Record<string,
       <TextareaField label="Descrição 2" value={(content.description2 as string) || ""} onChange={(v) => onChange({ ...content, description2: v })} rows={3} />
       <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
       <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} />
+      <ImageUploader label="Imagem da Parceria" value={(content.image as string) || ""} onChange={(v) => onChange({ ...content, image: v })} />
       <InputField label="Badge Anos" value={(content.yearsBadge as string) || ""} onChange={(v) => onChange({ ...content, yearsBadge: v })} placeholder="55+" />
       <InputField label="Badge Anos Label" value={(content.yearsBadgeLabel as string) || ""} onChange={(v) => onChange({ ...content, yearsBadgeLabel: v })} placeholder="Anos de história" />
     </div>
@@ -2144,11 +2147,11 @@ function MalettiHeadSpaEditor({ content, onChange }: { content: Record<string, u
 
 // Maletti Design Editor
 function MalettiDesignEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
-  const products = (content.products as Array<{ name: string; image: string; description: string }>) || [];
+  const products = (content.products as Array<{ name: string; image: string; description: string; slug?: string }>) || [];
   const updateProduct = (i: number, field: string, value: string) => {
     const newProducts = [...products]; newProducts[i] = { ...newProducts[i], [field]: value }; onChange({ ...content, products: newProducts });
   };
-  const addProduct = () => onChange({ ...content, products: [...products, { name: "", image: "", description: "" }] });
+  const addProduct = () => onChange({ ...content, products: [...products, { name: "", image: "", description: "", slug: "" }] });
   const removeProduct = (i: number) => onChange({ ...content, products: products.filter((_, idx) => idx !== i) });
   return (
     <div className="space-y-4">
@@ -2167,6 +2170,7 @@ function MalettiDesignEditor({ content, onChange }: { content: Record<string, un
           <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome do produto" value={p.name} onChange={(e) => updateProduct(i, "name", e.target.value)} onClick={(e) => e.stopPropagation()} />
           <ImageUploader label="" value={p.image} onChange={(url) => updateProduct(i, "image", url)} />
           <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" value={p.description} onChange={(e) => updateProduct(i, "description", e.target.value)} onClick={(e) => e.stopPropagation()} />
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug (para link 'Saiba mais')" value={p.slug || ""} onChange={(e) => updateProduct(i, "slug", e.target.value)} onClick={(e) => e.stopPropagation()} />
         </div>
       ))}
       <button onClick={(e) => { e.stopPropagation(); addProduct(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:border-gray-400">+ Adicionar Produto</button>
@@ -2452,8 +2456,23 @@ function LPSalaoContentEditor({ content, onChange }: { content: Record<string, u
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
           <InputField label="Nota" value={(content.ctaNote as string) || ""} onChange={(v) => onChange({ ...content, ctaNote: v })} />
           <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} />
-          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
-          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
+          <h4 className="font-medium text-sm mt-3">Botões</h4>
+          {((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []).map((btn, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Botão {i + 1}</span>
+                <button onClick={(e) => { e.stopPropagation(); const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button>
+              </div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                <option value="primary">Primário (preto)</option>
+                <option value="outline">Outline (borda)</option>
+                <option value="secondary">Secundário (cinza)</option>
+              </select>
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []), { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
         </div>
       )}
     </div>
@@ -2564,6 +2583,9 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
       {activeSection === "products" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Produtos</h4>
+          <InputField label="Badge" value={(content.productsBadge as string) || ""} onChange={(v) => onChange({ ...content, productsBadge: v })} placeholder="Equipamentos Premium" />
+          <InputField label="Título" value={(content.productsTitle as string) || ""} onChange={(v) => onChange({ ...content, productsTitle: v })} placeholder="Estações de Excelência" />
+          <TextareaField label="Descrição" value={(content.productsDescription as string) || ""} onChange={(v) => onChange({ ...content, productsDescription: v })} rows={2} />
           {products.map((p, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Produto {i + 1}: {p.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, products: products.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2584,6 +2606,8 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
       {activeSection === "tech" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Tecnologias</h4>
+          <InputField label="Badge" value={(content.techBadge as string) || ""} onChange={(v) => onChange({ ...content, techBadge: v })} placeholder="A Ciência por Trás do Ritual" />
+          <InputField label="Título" value={(content.techTitle as string) || ""} onChange={(v) => onChange({ ...content, techTitle: v })} placeholder="Potencialize seus resultados..." />
           {technologies.map((t, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Tech {i + 1}: {t.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, technologies: technologies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2607,6 +2631,12 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
       {activeSection === "ritual" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Passos do Ritual</h4>
+          <InputField label="Badge" value={(content.ritualBadge as string) || ""} onChange={(v) => onChange({ ...content, ritualBadge: v })} placeholder="O Ritual Passo a Passo" />
+          <InputField label="Título" value={(content.ritualTitle as string) || ""} onChange={(v) => onChange({ ...content, ritualTitle: v })} placeholder="Do Diagnóstico ao Relaxamento Absoluto" />
+          <TextareaField label="Descrição" value={(content.ritualDescription as string) || ""} onChange={(v) => onChange({ ...content, ritualDescription: v })} rows={2} />
+          <InputField label="Nota (após passos)" value={(content.ritualNote as string) || ""} onChange={(v) => onChange({ ...content, ritualNote: v })} placeholder="Este é o padrão que define..." />
+          <InputField label="Texto Botão Vídeo" value={(content.ritualVideoText as string) || ""} onChange={(v) => onChange({ ...content, ritualVideoText: v })} placeholder="Assistir ao Ritual Completo" />
+          <InputField label="URL do Vídeo" value={(content.ritualVideoUrl as string) || ""} onChange={(v) => onChange({ ...content, ritualVideoUrl: v })} placeholder="https://www.youtube.com/embed/..." />
           {ritualSteps.map((r, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Passo {r.step}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ritualSteps: ritualSteps.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2621,6 +2651,9 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
       {activeSection === "gallery" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Galeria</h4>
+          <InputField label="Título" value={(content.galleryTitle as string) || ""} onChange={(v) => onChange({ ...content, galleryTitle: v })} placeholder="Design que transforma ambientes" />
+          <InputField label="Descrição" value={(content.galleryDescription as string) || ""} onChange={(v) => onChange({ ...content, galleryDescription: v })} placeholder="Leve a elegância atemporal..." />
+          <InputField label="Texto Badge (Exclusividade)" value={(content.galleryBadgeText as string) || ""} onChange={(v) => onChange({ ...content, galleryBadgeText: v })} placeholder="Exclusividade no Brasil: Distribuição oficial..." />
           {galleryImages.map((g, i) => (
             <div key={i} className="p-2 border rounded bg-gray-50 space-y-2">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Imagem {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, galleryImages: galleryImages.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2637,8 +2670,20 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
           <h4 className="font-medium text-sm">CTA Final</h4>
           <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
-          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
-          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
+          <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} placeholder="O que você gostaria de fazer agora?" />
+          <h4 className="font-medium text-sm mt-3">Botões</h4>
+          {((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []).map((btn, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Botão {i + 1}</span><button onClick={(e) => { e.stopPropagation(); const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                <option value="primary">Primário (preto)</option>
+                <option value="outline">Outline (borda)</option>
+              </select>
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []), { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
         </div>
       )}
     </div>
@@ -2695,8 +2740,10 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
 
   const sections = [
     { id: "hero", label: "Hero" },
+    { id: "concept", label: "Conceito" },
     { id: "infra", label: "Infraestrutura" },
     { id: "tech", label: "Tecnologias" },
+    { id: "cabin", label: "Spa Cabin" },
     { id: "business", label: "Negócio" },
     { id: "rituals", label: "Rituais" },
     { id: "showcase", label: "Showcase" },
@@ -2725,9 +2772,22 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
         </div>
       )}
 
+      {activeSection === "concept" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Seção Conceito</h4>
+          <InputField label="Badge" value={(content.conceptBadge as string) || ""} onChange={(v) => onChange({ ...content, conceptBadge: v })} placeholder="O Conceito" />
+          <InputField label="Título" value={(content.conceptTitle as string) || ""} onChange={(v) => onChange({ ...content, conceptTitle: v })} placeholder="Explore o potencial da sua infraestrutura." />
+          <TextareaField label="Descrição" value={(content.conceptDescription as string) || ""} onChange={(v) => onChange({ ...content, conceptDescription: v })} rows={3} />
+          <TextareaField label="Destaque (box)" value={(content.conceptHighlight as string) || ""} onChange={(v) => onChange({ ...content, conceptHighlight: v })} rows={4} />
+        </div>
+      )}
+
       {activeSection === "infra" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Produtos de Infraestrutura</h4>
+          <InputField label="Badge" value={(content.infraBadge as string) || ""} onChange={(v) => onChange({ ...content, infraBadge: v })} placeholder="A Infraestrutura" />
+          <InputField label="Título" value={(content.infraTitle as string) || ""} onChange={(v) => onChange({ ...content, infraTitle: v })} placeholder="Design de Assinatura..." />
+          <TextareaField label="Descrição" value={(content.infraDescription as string) || ""} onChange={(v) => onChange({ ...content, infraDescription: v })} rows={2} />
           {infrastructureProducts.map((p, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Produto {i + 1}: {p.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, infrastructureProducts: infrastructureProducts.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2746,6 +2806,9 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
       {activeSection === "tech" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Tecnologias Sensoriais</h4>
+          <InputField label="Badge" value={(content.techBadge as string) || ""} onChange={(v) => onChange({ ...content, techBadge: v })} placeholder="Tecnologia Sensorial" />
+          <InputField label="Título" value={(content.techTitle as string) || ""} onChange={(v) => onChange({ ...content, techTitle: v })} placeholder="A tecnologia deve ser invisível." />
+          <TextareaField label="Descrição" value={(content.techDescription as string) || ""} onChange={(v) => onChange({ ...content, techDescription: v })} rows={2} />
           {sensorTechnologies.map((t, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Tech {i + 1}: {t.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, sensorTechnologies: sensorTechnologies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2762,9 +2825,22 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
         </div>
       )}
 
+      {activeSection === "cabin" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Spa Cabin</h4>
+          <InputField label="Badge" value={(content.cabinBadge as string) || ""} onChange={(v) => onChange({ ...content, cabinBadge: v })} placeholder="Spa Cabin" />
+          <InputField label="Título" value={(content.cabinTitle as string) || ""} onChange={(v) => onChange({ ...content, cabinTitle: v })} placeholder="Monte uma Spa Cabin Completa" />
+          <TextareaField label="Descrição" value={(content.cabinDescription as string) || ""} onChange={(v) => onChange({ ...content, cabinDescription: v })} rows={2} />
+          <InputField label="URL Vídeo (YouTube)" value={(content.cabinVideoUrl as string) || ""} onChange={(v) => onChange({ ...content, cabinVideoUrl: v })} placeholder="https://www.youtube.com/embed/..." />
+        </div>
+      )}
+
       {activeSection === "business" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Benefícios para o Negócio</h4>
+          <InputField label="Badge" value={(content.businessBadge as string) || ""} onChange={(v) => onChange({ ...content, businessBadge: v })} placeholder="Inteligência de Negócio" />
+          <InputField label="Título" value={(content.businessTitle as string) || ""} onChange={(v) => onChange({ ...content, businessTitle: v })} placeholder="Valorização do Ativo" />
+          <TextareaField label="Descrição" value={(content.businessDescription as string) || ""} onChange={(v) => onChange({ ...content, businessDescription: v })} rows={2} />
           {businessBenefits.map((b, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Benefício {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, businessBenefits: businessBenefits.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2779,6 +2855,9 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
       {activeSection === "rituals" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Rituais</h4>
+          <InputField label="Badge" value={(content.ritualsBadge as string) || ""} onChange={(v) => onChange({ ...content, ritualsBadge: v })} placeholder="Menu de Experiências" />
+          <InputField label="Título" value={(content.ritualsTitle as string) || ""} onChange={(v) => onChange({ ...content, ritualsTitle: v })} placeholder="Rituais para o Viajante Global" />
+          <TextareaField label="Descrição" value={(content.ritualsDescription as string) || ""} onChange={(v) => onChange({ ...content, ritualsDescription: v })} rows={2} />
           {rituals.map((r, i) => (
             <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Ritual {i + 1}: {r.name}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, rituals: rituals.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2796,6 +2875,9 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
       {activeSection === "showcase" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Showcase de Hotéis</h4>
+          <InputField label="Badge" value={(content.socialBadge as string) || ""} onChange={(v) => onChange({ ...content, socialBadge: v })} placeholder="Prova Social" />
+          <InputField label="Título" value={(content.socialTitle as string) || ""} onChange={(v) => onChange({ ...content, socialTitle: v })} placeholder="A Escolha dos Melhores Hotéis..." />
+          <TextareaField label="Descrição" value={(content.socialDescription as string) || ""} onChange={(v) => onChange({ ...content, socialDescription: v })} rows={2} />
           {hotelShowcase.map((h, i) => (
             <div key={i} className="p-2 border rounded bg-gray-50 space-y-2">
               <div className="flex justify-between items-center"><span className="text-xs font-medium">Hotel {i + 1}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, hotelShowcase: hotelShowcase.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
@@ -2811,10 +2893,11 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
       {activeSection === "cta" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">CTA Final</h4>
+          <InputField label="Badge" value={(content.ctaBadge as string) || ""} onChange={(v) => onChange({ ...content, ctaBadge: v })} placeholder="Convite ao Projeto" />
           <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
-          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} />
-          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
+          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} placeholder="Falar com um Consultor" />
+          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="https://wa.me/..." />
         </div>
       )}
     </div>

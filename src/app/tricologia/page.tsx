@@ -32,6 +32,7 @@ interface PageData {
   heroHighlight?: string;
   heroDescription?: string;
   heroButtonText?: string;
+  heroButtonLink?: string;
   heroVideo?: string;
   heroOverlay?: number;
   problemTitle?: string;
@@ -40,13 +41,29 @@ interface PageData {
   solutionTitle?: string;
   solutionDescription?: string;
   solutionFeatures?: typeof defaultSolutionFeatures;
+  productsBadge?: string;
+  productsTitle?: string;
+  productsDescription?: string;
   products?: typeof defaultProducts;
+  techBadge?: string;
+  techTitle?: string;
   technologies?: typeof defaultTechnologies;
+  ritualBadge?: string;
+  ritualTitle?: string;
+  ritualDescription?: string;
+  ritualNote?: string;
+  ritualVideoText?: string;
+  ritualVideoUrl?: string;
   ritualSteps?: typeof defaultRitualSteps;
+  galleryTitle?: string;
+  galleryDescription?: string;
+  galleryBadgeText?: string;
   galleryImages?: typeof defaultGalleryImages;
   ctaTitle?: string;
   ctaDescription?: string;
+  ctaSubtitle?: string;
   ctaButtonText?: string;
+  ctaButtons?: { text: string; link: string; style: string }[];
 }
 
 // Products data
@@ -432,14 +449,13 @@ export default function TricologiaPage() {
             className="text-center mb-16"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              Equipamentos Premium
+              {pageData.productsBadge || "Equipamentos Premium"}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6">
-              Estações de Excelência
+              {pageData.productsTitle || "Estações de Excelência"}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-              Projetadas por designers renomados como Giovannoni e Alberto Apostoli, as estações Maletti
-              carregam o selo "Made in Italy" e mais de 85 anos de excelência.
+              {pageData.productsDescription || 'Projetadas por designers renomados como Giovannoni e Alberto Apostoli, as estações Maletti carregam o selo "Made in Italy" e mais de 85 anos de excelência.'}
             </p>
           </motion.div>
 
@@ -542,10 +558,10 @@ export default function TricologiaPage() {
             className="text-center mb-16"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-400 mb-4 block">
-              A Ciência por Trás do Ritual
+              {pageData.techBadge || "A Ciência por Trás do Ritual"}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold mb-6">
-              Potencialize seus resultados com Tecnologias Exclusivas
+              {pageData.techTitle || "Potencialize seus resultados com Tecnologias Exclusivas"}
             </h2>
           </motion.div>
 
@@ -593,13 +609,13 @@ export default function TricologiaPage() {
             className="text-center mb-16"
           >
             <span className="text-sm uppercase tracking-[0.2em] text-gray-500 mb-4 block">
-              O Ritual Passo a Passo
+              {pageData.ritualBadge || "O Ritual Passo a Passo"}
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6">
-              Do Diagnóstico ao Relaxamento Absoluto
+              {pageData.ritualTitle || "Do Diagnóstico ao Relaxamento Absoluto"}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-              Veja como os produtos Maletti se integram para criar um protocolo perfeito:
+              {pageData.ritualDescription || "Veja como os produtos Maletti se integram para criar um protocolo perfeito:"}
             </p>
           </motion.div>
 
@@ -632,15 +648,15 @@ export default function TricologiaPage() {
             className="text-center"
           >
             <p className="text-lg text-gray-600 mb-6">
-              Este é o padrão que define as clínicas de referência mundial.
+              {pageData.ritualNote || "Este é o padrão que define as clínicas de referência mundial."}
             </p>
             <Button
               size="lg"
               className="bg-black text-white hover:bg-gray-800 group"
-              onClick={() => openYoutubeVideo("https://www.youtube.com/embed/OJi4gck03uQ")}
+              onClick={() => openYoutubeVideo(pageData.ritualVideoUrl || "https://www.youtube.com/embed/OJi4gck03uQ")}
             >
               <HiPlay className="mr-2 w-5 h-5" />
-              Assistir ao Ritual Completo
+              {pageData.ritualVideoText || "Assistir ao Ritual Completo"}
             </Button>
           </motion.div>
         </div>
@@ -656,10 +672,10 @@ export default function TricologiaPage() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl md:text-5xl font-serif font-semibold mb-6">
-              Design que transforma ambientes
+              {pageData.galleryTitle || "Design que transforma ambientes"}
             </h2>
             <p className="text-gray-400 text-lg">
-              Leve a elegância atemporal da Itália para o seu espaço.
+              {pageData.galleryDescription || "Leve a elegância atemporal da Itália para o seu espaço."}
             </p>
           </motion.div>
 
@@ -721,7 +737,7 @@ export default function TricologiaPage() {
             <div className="inline-flex items-center gap-3 bg-white/10 px-6 py-3">
               <HiOutlineSparkles className="w-5 h-5 text-white" />
               <span className="text-white">
-                <strong>Exclusividade no Brasil:</strong> Distribuição oficial e suporte técnico pela SHR HAIR.
+                {pageData.galleryBadgeText || <><strong>Exclusividade no Brasil:</strong> Distribuição oficial e suporte técnico pela SHR HAIR.</>}
               </span>
             </div>
           </motion.div>
@@ -733,41 +749,38 @@ export default function TricologiaPage() {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-serif font-semibold text-black mb-6">
-              Sua clínica está pronta para o próximo nível?
+              {pageData.ctaTitle || "Sua clínica está pronta para o próximo nível?"}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-10">
-              A tecnologia Maletti precisa ser vista e sentida para ser compreendida. Convidamos você a
-              conhecer os detalhes técnicos que farão a diferença no seu protocolo.
+              {pageData.ctaDescription || "A tecnologia Maletti precisa ser vista e sentida para ser compreendida. Convidamos você a conhecer os detalhes técnicos que farão a diferença no seu protocolo."}
             </p>
 
-            <p className="text-gray-500 mb-8">O que você gostaria de fazer agora?</p>
+            <p className="text-gray-500 mb-8">{pageData.ctaSubtitle || "O que você gostaria de fazer agora?"}</p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                size="lg"
-                className="bg-black text-white hover:bg-gray-800 group px-8"
-                asChild
-              >
-                <Link href="/produtos">
-                  Saber Mais Sobre os Produtos
-                  <HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-black text-black hover:bg-black hover:text-white group px-8"
-                asChild
-              >
-                <a
-                  href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor técnico sobre os equipamentos Maletti para tricologia."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaWhatsapp className="mr-2 w-5 h-5" />
-                  Falar com Consultor Técnico
-                </a>
-              </Button>
+              {(pageData.ctaButtons && (pageData.ctaButtons as Array<{text:string;link:string;style:string}>).length > 0) ? (
+                (pageData.ctaButtons as Array<{text:string;link:string;style:string}>).map((btn, i) => {
+                  const isExternal = btn.link?.startsWith("http");
+                  return isExternal ? (
+                    <Button key={i} size="lg" variant={btn.style === "outline" ? "outline" : "default"} className={btn.style === "outline" ? "border-black text-black hover:bg-black hover:text-white group px-8" : "bg-black text-white hover:bg-gray-800 group px-8"} asChild>
+                      <a href={btn.link} target="_blank" rel="noopener noreferrer">{btn.text}</a>
+                    </Button>
+                  ) : (
+                    <Button key={i} size="lg" variant={btn.style === "outline" ? "outline" : "default"} className={btn.style === "outline" ? "border-black text-black hover:bg-black hover:text-white group px-8" : "bg-black text-white hover:bg-gray-800 group px-8"} asChild>
+                      <Link href={btn.link || "/produtos"}>{btn.text}<HiArrowRight className="ml-2 w-4 h-4" /></Link>
+                    </Button>
+                  );
+                })
+              ) : (
+                <>
+                  <Button size="lg" className="bg-black text-white hover:bg-gray-800 group px-8" asChild>
+                    <Link href="/produtos">Saber Mais Sobre os Produtos<HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+                  </Button>
+                  <Button size="lg" variant="outline" className="border-black text-black hover:bg-black hover:text-white group px-8" asChild>
+                    <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor técnico sobre os equipamentos Maletti para tricologia." target="_blank" rel="noopener noreferrer"><FaWhatsapp className="mr-2 w-5 h-5" />Falar com Consultor Técnico</a>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -4,24 +4,34 @@ import { useEffect, useState } from "react";
 
 type FaviconType = "shr" | "maletti";
 
-export function DynamicFavicon({ forceFavicon }: { forceFavicon?: FaviconType }) {
-  const [favicon, setFavicon] = useState<FaviconType>("shr");
+interface DynamicFaviconProps {
+  forceFavicon?: FaviconType;
+  faviconUrl?: string;
+}
+
+export function DynamicFavicon({ forceFavicon, faviconUrl }: DynamicFaviconProps) {
+  const [faviconPath, setFaviconPath] = useState<string>(
+    faviconUrl || (forceFavicon === "maletti" ? "/malleti-fav.png" : "/shr-favicon.png")
+  );
 
   useEffect(() => {
+    if (faviconUrl) {
+      setFaviconPath(faviconUrl);
+      return;
+    }
+
     if (forceFavicon) {
-      setFavicon(forceFavicon);
+      setFaviconPath(forceFavicon === "maletti" ? "/malleti-fav.png" : "/shr-favicon.png");
       return;
     }
 
     const hostname = window.location.hostname;
     if (hostname.includes("maletti.com.br")) {
-      setFavicon("maletti");
+      setFaviconPath("/malleti-fav.png");
     } else {
-      setFavicon("shr");
+      setFaviconPath("/shr-favicon.png");
     }
-  }, [forceFavicon]);
-
-  const faviconPath = favicon === "maletti" ? "/malleti-fav.png" : "/shr-favicon.png";
+  }, [forceFavicon, faviconUrl]);
 
   return (
     <>

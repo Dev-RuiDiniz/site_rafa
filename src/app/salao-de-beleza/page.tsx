@@ -680,46 +680,41 @@ export default function SalaoDeBelezaPage() {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-6">
-              Sua tabela de preços reflete a qualidade do seu negócio?
+              {pageData.ctaTitle || "Sua tabela de preços reflete a qualidade do seu negócio?"}
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-6">
-              Pare de deixar dinheiro na mesa. Atraia o público que valoriza a excelência e transforme 
-              seu salão em uma referência de alto padrão.
+              {pageData.ctaDescription || "Pare de deixar dinheiro na mesa. Atraia o público que valoriza a excelência e transforme seu salão em uma referência de alto padrão."}
             </p>
             <p className="text-gray-500 mb-10">
-              A tecnologia Maletti precisa ser vista para ser compreendida.
+              {pageData.ctaNote || "A tecnologia Maletti precisa ser vista para ser compreendida."}
             </p>
 
             <p className="text-sm uppercase tracking-wider text-gray-400 mb-8">
-              Qual o próximo passo para o crescimento do seu faturamento?
+              {pageData.ctaSubtitle || "Qual o próximo passo para o crescimento do seu faturamento?"}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="https://wa.me/5511981982279?text=Olá! Gostaria de agendar uma visita ao showroom para conhecer os equipamentos Maletti."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-4 bg-black text-white hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center"
-              >
-                <HiOutlineCalendar className="w-5 h-5" />
-                Agendar Visita ao Showroom
-              </a>
-              <a
-                href="https://wa.me/5511981982279?text=Olá! Gostaria de uma consultoria sobre os equipamentos Maletti para meu salão."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-4 border border-black text-black hover:bg-black hover:text-white transition-colors w-full sm:w-auto justify-center"
-              >
-                <HiOutlineChat className="w-5 h-5" />
-                Consultoria com Especialista
-              </a>
-              <Link
-                href="/contato"
-                className="flex items-center gap-2 px-6 py-4 border border-gray-300 text-gray-600 hover:border-black hover:text-black transition-colors w-full sm:w-auto justify-center"
-              >
-                <HiOutlineDownload className="w-5 h-5" />
-                Baixar Catálogo
-              </Link>
+              {(pageData.ctaButtons && pageData.ctaButtons.length > 0) ? (
+                pageData.ctaButtons.map((btn, i) => {
+                  const isExternal = btn.link?.startsWith("http") || btn.link?.startsWith("https");
+                  const styles = btn.style === "primary"
+                    ? "flex items-center gap-2 px-6 py-4 bg-black text-white hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center"
+                    : btn.style === "outline"
+                    ? "flex items-center gap-2 px-6 py-4 border border-black text-black hover:bg-black hover:text-white transition-colors w-full sm:w-auto justify-center"
+                    : "flex items-center gap-2 px-6 py-4 border border-gray-300 text-gray-600 hover:border-black hover:text-black transition-colors w-full sm:w-auto justify-center";
+                  const icons = [<HiOutlineCalendar key="cal" className="w-5 h-5" />, <HiOutlineChat key="chat" className="w-5 h-5" />, <HiOutlineDownload key="dl" className="w-5 h-5" />];
+                  if (isExternal) {
+                    return <a key={i} href={btn.link} target="_blank" rel="noopener noreferrer" className={styles}>{icons[i] || null}{btn.text}</a>;
+                  }
+                  return <Link key={i} href={btn.link || "/contato"} className={styles}>{icons[i] || null}{btn.text}</Link>;
+                })
+              ) : (
+                <>
+                  <a href="https://wa.me/5511981982279?text=Olá! Gostaria de agendar uma visita ao showroom para conhecer os equipamentos Maletti." target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-4 bg-black text-white hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center"><HiOutlineCalendar className="w-5 h-5" />Agendar Visita ao Showroom</a>
+                  <a href="https://wa.me/5511981982279?text=Olá! Gostaria de uma consultoria sobre os equipamentos Maletti para meu salão." target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-4 border border-black text-black hover:bg-black hover:text-white transition-colors w-full sm:w-auto justify-center"><HiOutlineChat className="w-5 h-5" />Consultoria com Especialista</a>
+                  <Link href="/contato" className="flex items-center gap-2 px-6 py-4 border border-gray-300 text-gray-600 hover:border-black hover:text-black transition-colors w-full sm:w-auto justify-center"><HiOutlineDownload className="w-5 h-5" />Baixar Catálogo</Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -1,29 +1,20 @@
 import type { Metadata } from "next";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { buildMetadata, getFaviconUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Salão de Beleza Premium | Equipamentos Maletti para Head SPA",
-  description: "O Padrão Ouro do Head SPA: Design Italiano e Tecnologia de Wellness. Crie rituais sensoriais únicos que encantam seus clientes e justificam seu alto valor.",
-  keywords: [
-    "salão de beleza",
-    "head spa",
-    "Maletti",
-    "Heaven",
-    "Shirobody",
-    "Total Body",
-    "equipamentos salão",
-    "mobiliário salão de luxo",
-  ],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("salao");
+}
 
-export default function SalaoDeBelezaLayout({
+export default async function SalaoDeBelezaLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const faviconUrl = await getFaviconUrl("salao");
   return (
     <>
-      <DynamicFavicon forceFavicon="maletti" />
+      <DynamicFavicon forceFavicon="maletti" faviconUrl={faviconUrl} />
       {children}
     </>
   );

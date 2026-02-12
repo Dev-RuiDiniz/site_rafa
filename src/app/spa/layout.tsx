@@ -1,30 +1,20 @@
 import type { Metadata } from "next";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { buildMetadata, getFaviconUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "SPA Profissional | Equipamentos Maletti para Wellness",
-  description: "Transforme seu espaço em um SPA de alto padrão com equipamentos Maletti. Design italiano, tecnologia de ponta e experiências sensoriais únicas para seus clientes.",
-  keywords: [
-    "spa profissional",
-    "head spa",
-    "Maletti",
-    "Heaven",
-    "Shirobody",
-    "Total Body",
-    "Spa Garçon",
-    "wellness",
-    "spa cabin",
-  ],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("spa");
+}
 
-export default function SpaLayout({
+export default async function SpaLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const faviconUrl = await getFaviconUrl("spa");
   return (
     <>
-      <DynamicFavicon forceFavicon="maletti" />
+      <DynamicFavicon forceFavicon="maletti" faviconUrl={faviconUrl} />
       {children}
     </>
   );

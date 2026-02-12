@@ -2,14 +2,15 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { HiPlay, HiX } from "react-icons/hi";
+import { HiPlay, HiX, HiArrowRight } from "react-icons/hi";
 
 const defaultProducts = [
-  { name: "Shirobody", image: "/images/site/Shirobody_showroom.jpg", description: "Lavatório com tecnologia shiatsu integrada" },
-  { name: "Heaven", image: "/images/site/heaven2.jpg", description: "Design e conforto para lavagem de cabelos" },
-  { name: "Total Body", image: "/images/site/Total-Body-356.jpg", description: "Maca de luxo para tratamentos corporais" },
-  { name: "SPA Garçon", image: "/images/site/SPA_GARCON_nuovo_03.png", description: "Tratamento capilar com tecnologia de vapor" }
+  { name: "Shirobody", image: "/images/site/Shirobody_showroom.jpg", description: "Lavatório com tecnologia shiatsu integrada", slug: "shirobody" },
+  { name: "Heaven", image: "/images/site/heaven2.jpg", description: "Design e conforto para lavagem de cabelos", slug: "heaven" },
+  { name: "Total Body", image: "/images/site/Total-Body-356.jpg", description: "Maca de luxo para tratamentos corporais", slug: "total-body" },
+  { name: "SPA Garçon", image: "/images/site/SPA_GARCON_nuovo_03.png", description: "Tratamento capilar com tecnologia de vapor", slug: "spa-garcon" }
 ];
 
 interface MalettiDesignProps {
@@ -22,7 +23,7 @@ export function MalettiDesign({ content = {} }: MalettiDesignProps) {
   const description = (content.description as string) || "A excelência em móveis para salão de beleza de luxo: Veja o autêntico design italiano em sua máxima performance. Assista e sinta por que o mobiliário de alto padrão Maletti é a escolha perfeita para transformar seu espaço.";
   const videoThumbnail = (content.videoThumbnail as string) || "/images/site/DK3E3179-MOD.jpg";
   const videoUrl = (content.videoUrl as string) || "https://www.youtube.com/embed/dQw4w9WgXcQ";
-  const products = (content.products as Array<{ name: string; image: string; description: string }>) || defaultProducts;
+  const products = (content.products as Array<{ name: string; image: string; description: string; slug?: string }>) || defaultProducts;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [showVideo, setShowVideo] = useState(false);
@@ -94,9 +95,18 @@ export function MalettiDesign({ content = {} }: MalettiDesignProps) {
                 <h3 className="text-xl font-serif font-semibold text-black mb-1">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm mb-2">
                   {product.description}
                 </p>
+                {product.slug && (
+                  <Link
+                    href={`/produtos/${product.slug}`}
+                    className="inline-flex items-center text-sm font-medium text-black hover:text-gray-600 transition-colors group/link"
+                  >
+                    Saiba mais
+                    <HiArrowRight className="ml-1 w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+                )}
               </motion.div>
             ))}
           </div>

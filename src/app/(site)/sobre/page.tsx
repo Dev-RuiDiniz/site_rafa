@@ -94,7 +94,7 @@ export default function SobrePage() {
               <div className="aspect-[4/5] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                 {/* Showroom image */}
                 <Image
-                  src="/images/site/Shirobody_showroom.jpg"
+                  src={(heroBlock.image as string) || "/images/site/Shirobody_showroom.jpg"}
                   alt="Showroom SHR"
                   fill
                   className="object-cover"
@@ -190,7 +190,11 @@ export default function SobrePage() {
                 className="text-center group"
               >
                 <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-gray-100 group-hover:bg-black group-hover:text-white transition-all duration-300">
-                  <HiOutlineSparkles className="w-7 h-7" />
+                  {(value as Record<string, unknown>).icon ? (
+                    <span className="text-2xl">{(value as Record<string, unknown>).icon as string}</span>
+                  ) : (
+                    <HiOutlineSparkles className="w-7 h-7" />
+                  )}
                 </div>
                 <h3 className="text-xl font-semibold text-black mb-3">
                   {value.title}
@@ -249,7 +253,7 @@ export default function SobrePage() {
               <div className="aspect-square bg-black relative overflow-hidden">
                 {/* Product image */}
                 <Image
-                  src="/images/site/heaven2.jpg"
+                  src={(partnershipBlock.image as string) || "/images/site/heaven2.jpg"}
                   alt="Maletti Heaven"
                   fill
                   className="object-cover opacity-60"

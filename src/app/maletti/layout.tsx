@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { buildMetadata, getFaviconUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Maletti | Design Italiano de Luxo para Salões",
-  description: "Transforme espaços, eleve experiências. As estações Maletti Head SPA unem o design italiano a tecnologia inovadora para redefinir o luxo em seu salão.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("maletti");
+}
 
-export default function MalettiLayout({
+export default async function MalettiLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const faviconUrl = await getFaviconUrl("maletti");
   return (
     <>
-      <DynamicFavicon forceFavicon="maletti" />
+      <DynamicFavicon forceFavicon="maletti" faviconUrl={faviconUrl} />
       {children}
     </>
   );

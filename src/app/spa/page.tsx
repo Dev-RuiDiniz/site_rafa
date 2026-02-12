@@ -42,16 +42,40 @@ interface PageData {
   heroButtonLink?: string;
   heroVideo?: string;
   heroOverlay?: number;
+  conceptBadge?: string;
   conceptTitle?: string;
   conceptDescription?: string;
+  conceptHighlight?: string;
+  infraBadge?: string;
+  infraTitle?: string;
+  infraDescription?: string;
   infrastructureProducts?: typeof defaultInfrastructureProducts;
+  techBadge?: string;
+  techTitle?: string;
+  techDescription?: string;
   sensorTechnologies?: typeof defaultSensorTechnologies;
+  cabinBadge?: string;
+  cabinTitle?: string;
+  cabinDescription?: string;
+  cabinVideoUrl?: string;
+  businessBadge?: string;
+  businessTitle?: string;
+  businessDescription?: string;
   businessBenefits?: Array<{ title: string; description: string }>;
+  ritualsBadge?: string;
+  ritualsTitle?: string;
+  ritualsDescription?: string;
   rituals?: typeof defaultRituals;
+  socialBadge?: string;
+  socialTitle?: string;
+  socialDescription?: string;
   hotelShowcase?: typeof defaultHotelShowcase;
+  ctaBadge?: string;
   ctaTitle?: string;
   ctaDescription?: string;
   ctaButtonText?: string;
+  ctaButtonLink?: string;
+  ctaButtons?: { text: string; link: string; style: string }[];
 }
 
 // ============================================
@@ -544,24 +568,19 @@ export default function SpaPage() {
             transition={{ duration: 0.8 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <SectionBadge>O Conceito</SectionBadge>
+            <SectionBadge>{pageData.conceptBadge || "O Conceito"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-8">
-              Explore o potencial da sua infraestrutura.
+              {pageData.conceptTitle || "Explore o potencial da sua infraestrutura."}
             </h2>
 
             <p className="text-xl text-gray-600 leading-relaxed mb-8">
-              O conceito de design multifuncional da Maletti e Nilo transforma uma cabine convencional 
-              em uma <strong className="text-black">suíte completa de serviços de alto padrão</strong>.
+              {pageData.conceptDescription || <>O conceito de design multifuncional da Maletti e Nilo transforma uma cabine convencional em uma <strong className="text-black">suíte completa de serviços de alto padrão</strong>.</>}
             </p>
 
             <div className="bg-stone-50 p-8 md:p-12 rounded-sm border-l-4 border-stone-400">
               <p className="text-lg text-gray-700 leading-relaxed">
-                Em um cenário onde <strong className="text-black">78% dos clientes premium</strong> buscam saúde mental 
-                integrada à beleza, nossas estações permitem realizar terapias corporais, faciais e rituais 
-                de Head Spa no mesmo equipamento. Isso amplia seu menu de experiências e a 
-                <strong className="text-black"> rentabilidade por metro quadrado</strong>, oferecendo um atendimento 
-                fluido em um único ambiente exclusivo.
+                {pageData.conceptHighlight || <>Em um cenário onde <strong className="text-black">78% dos clientes premium</strong> buscam saúde mental integrada à beleza, nossas estações permitem realizar terapias corporais, faciais e rituais de Head Spa no mesmo equipamento. Isso amplia seu menu de experiências e a <strong className="text-black"> rentabilidade por metro quadrado</strong>, oferecendo um atendimento fluido em um único ambiente exclusivo.</>}
               </p>
             </div>
           </motion.div>
@@ -577,16 +596,14 @@ export default function SpaPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-20"
           >
-            <SectionBadge>A Infraestrutura</SectionBadge>
+            <SectionBadge>{pageData.infraBadge || "A Infraestrutura"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-6">
-              Design de Assinatura e Performance Clínica.
+              {pageData.infraTitle || "Design de Assinatura e Performance Clínica."}
             </h2>
             
             <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">
-              Selecione a estação ideal para criar rituais completos. Unimos a estética premiada de designers 
-              renomados a equipamentos projetados para suportar protocolos complexos e longos, garantindo que 
-              cada atendimento seja uma experiência de luxo funcional e sem improvisos.
+              {pageData.infraDescription || "Selecione a estação ideal para criar rituais completos. Unimos a estética premiada de designers renomados a equipamentos projetados para suportar protocolos complexos e longos, garantindo que cada atendimento seja uma experiência de luxo funcional e sem improvisos."}
             </p>
           </motion.div>
 
@@ -602,15 +619,14 @@ export default function SpaPage() {
       <section ref={techRef} className="py-28 lg:py-36 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
-            <SectionBadge>Tecnologia Sensorial</SectionBadge>
+            <SectionBadge>{pageData.techBadge || "Tecnologia Sensorial"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-6">
-              A tecnologia deve ser invisível.
+              {pageData.techTitle || "A tecnologia deve ser invisível."}
             </h2>
             
             <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">
-              No mercado de hospitalidade de luxo, a tecnologia serve apenas para potencializar 
-              o relaxamento absoluto do hóspede.
+              {pageData.techDescription || "No mercado de hospitalidade de luxo, a tecnologia serve apenas para potencializar o relaxamento absoluto do hóspede."}
             </p>
           </div>
 
@@ -631,14 +647,14 @@ export default function SpaPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <SectionBadge light>Spa Cabin</SectionBadge>
+            <SectionBadge light>{pageData.cabinBadge || "Spa Cabin"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
-              Monte uma Spa Cabin Completa
+              {pageData.cabinTitle || "Monte uma Spa Cabin Completa"}
             </h2>
             
             <p className="text-stone-600 max-w-2xl mx-auto">
-              Combine os equipamentos para criar a experiência perfeita para seus hóspedes.
+              {pageData.cabinDescription || "Combine os equipamentos para criar a experiência perfeita para seus hóspedes."}
             </p>
           </motion.div>
 
@@ -711,15 +727,14 @@ export default function SpaPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-20"
           >
-            <SectionBadge light>Inteligência de Negócio</SectionBadge>
+            <SectionBadge light>{pageData.businessBadge || "Inteligência de Negócio"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
-              Valorização do Ativo
+              {pageData.businessTitle || "Valorização do Ativo"}
             </h2>
             
             <p className="text-stone-600 max-w-3xl mx-auto text-lg">
-              Incorporar a Nilo Spa Design não é apenas uma compra de mobiliário, 
-              é um <strong className="text-stone-800">investimento na valorização da sua marca</strong> e na retenção do hóspede.
+              {pageData.businessDescription || <>Incorporar a Nilo Spa Design não é apenas uma compra de mobiliário, é um <strong className="text-stone-800">investimento na valorização da sua marca</strong> e na retenção do hóspede.</>}
             </p>
           </motion.div>
 
@@ -747,14 +762,14 @@ export default function SpaPage() {
       <section ref={ritualsRef} className="py-28 lg:py-36 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
-            <SectionBadge light>Menu de Experiências</SectionBadge>
+            <SectionBadge light>{pageData.ritualsBadge || "Menu de Experiências"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-stone-800 mb-6">
-              Rituais para o Viajante Global
+              {pageData.ritualsTitle || "Rituais para o Viajante Global"}
             </h2>
             
             <p className="text-stone-600 max-w-3xl mx-auto text-lg">
-              Desenhe protocolos exclusivos que atendam às necessidades físicas e emocionais do seu perfil de hóspede.
+              {pageData.ritualsDescription || "Desenhe protocolos exclusivos que atendam às necessidades físicas e emocionais do seu perfil de hóspede."}
             </p>
           </div>
 
@@ -775,16 +790,14 @@ export default function SpaPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <SectionBadge>Prova Social</SectionBadge>
+            <SectionBadge>{pageData.socialBadge || "Prova Social"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-6">
-              A Escolha dos Melhores Hotéis do Mundo.
+              {pageData.socialTitle || "A Escolha dos Melhores Hotéis do Mundo."}
             </h2>
             
             <p className="text-gray-600 max-w-3xl mx-auto text-lg">
-              Junte-se a uma rede global de hospitalidade de luxo que escolheu a Nilo Spa Design 
-              para definir o padrão de excelência em bem-estar. De resorts nas Maldivas a hotéis 
-              boutique em Paris, nossa assinatura é sinônimo de experiência inesquecível.
+              {pageData.socialDescription || "Junte-se a uma rede global de hospitalidade de luxo que escolheu a Nilo Spa Design para definir o padrão de excelência em bem-estar. De resorts nas Maldivas a hotéis boutique em Paris, nossa assinatura é sinônimo de experiência inesquecível."}
             </p>
           </motion.div>
 
@@ -854,25 +867,24 @@ export default function SpaPage() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <SectionBadge>Convite ao Projeto</SectionBadge>
+            <SectionBadge>{pageData.ctaBadge || "Convite ao Projeto"}</SectionBadge>
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-black mb-6">
-              Redefina a Experiência do seu Hóspede.
+              {pageData.ctaTitle || "Redefina a Experiência do seu Hóspede."}
             </h2>
             
             <p className="text-gray-600 text-lg leading-relaxed mb-12">
-              Ofereça o extraordinário. Nossa equipe de consultores e arquitetos 
-              está pronta para auxiliar no seu projeto.
+              {pageData.ctaDescription || "Ofereça o extraordinário. Nossa equipe de consultores e arquitetos está pronta para auxiliar no seu projeto."}
             </p>
 
             <a
-              href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre equipamentos para o spa do meu hotel."
+              href={pageData.ctaButtonLink || "https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre equipamentos para o spa do meu hotel."}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-10 py-5 bg-stone-800 text-white text-lg font-medium hover:bg-stone-700 transition-all rounded-sm group"
             >
               <FaWhatsapp className="w-6 h-6" />
-              Falar com um Consultor
+              {pageData.ctaButtonText || "Falar com um Consultor"}
               <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </motion.div>

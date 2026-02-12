@@ -341,6 +341,7 @@ model SiteSettings {
   metaKeywords    String?
   googleAnalytics String?
   facebookPixel   String?
+  seoConfig       Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

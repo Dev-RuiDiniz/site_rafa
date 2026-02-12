@@ -1,31 +1,20 @@
 import type { Metadata } from "next";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { buildMetadata, getFaviconUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Tricologia | Tecnologia Maletti para Clínicas Premium",
-  description: "A união do Design Italiano com a Tecnologia Coreana: A revolução no tratamento capilar chegou à sua clínica. Conheça o ecossistema de equipamentos Maletti.",
-  keywords: [
-    "tricologia",
-    "tratamento capilar",
-    "Maletti",
-    "Heaven",
-    "Shirobody",
-    "Total Body",
-    "Spa Garçon",
-    "Vapomist",
-    "wellness",
-    "clínica de estética",
-  ],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("tricologia");
+}
 
-export default function TricologiaLayout({
+export default async function TricologiaLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const faviconUrl = await getFaviconUrl("tricologia");
   return (
     <>
-      <DynamicFavicon forceFavicon="maletti" />
+      <DynamicFavicon forceFavicon="maletti" faviconUrl={faviconUrl} />
       {children}
     </>
   );
