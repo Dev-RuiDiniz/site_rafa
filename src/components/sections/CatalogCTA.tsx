@@ -37,6 +37,8 @@ export function CatalogCTA() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [email, setEmail] = useState("");
   const [data, setData] = useState<SectionData>(defaultData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
     fetch("/api/home-sections?sectionId=catalog-cta")
@@ -54,10 +56,30 @@ export function CatalogCTA() {
       .catch(() => {});
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implementar envio do formulário
-    console.log("Email:", email);
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/kommo/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: email.split("@")[0],
+          email,
+          phone: "",
+          message: "Solicitou o catálogo digital pela Home.",
+          source: "Catálogo Home",
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao enviar");
+      setSubmitSuccess(true);
+      setEmail("");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erro ao enviar. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,80 +103,110 @@ export function CatalogCTA() {
             </p>
           </motion.div>
 
-          {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto mb-12"
-          >
-            <Input
-              type="email"
-              placeholder="Seu melhor e-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 h-14 px-6 border-gray-200 focus:border-black focus:ring-black"
-              required
-            />
-            <Button
-              type="submit"
-              size="lg"
-              className="h-14 px-8 bg-black text-white hover:bg-gray-800 transition-all duration-300 group"
+          {submitSuccess ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gray-50 p-12 text-center max-w-xl mx-auto mb-12"
             >
-              <HiOutlineDownload className="mr-2 w-5 h-5" />
-              {data.content.buttonText}
-            </Button>
-          </motion.form>
-
-          {/* Divider */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center gap-4 max-w-xl mx-auto mb-12"
-          >
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-gray-400 text-sm">ou</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </motion.div>
-
-          {/* Alternative CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6"
-          >
-            <a
-              href={`tel:${data.content.phoneRaw}`}
-              className="flex items-center gap-3 text-gray-600 hover:text-black transition-colors group"
-            >
-              <span className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-black group-hover:bg-black group-hover:text-white transition-all duration-300">
-                <HiOutlinePhone className="w-5 h-5" />
-              </span>
-              <div className="text-left">
-                <span className="text-xs text-gray-400 block">Ligue para nós</span>
-                <span className="font-medium">{data.content.phone}</span>
+              <div className="w-16 h-16 mx-auto mb-6 bg-black text-white rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-            </a>
-
-            <div className="hidden sm:block w-px h-12 bg-gray-200" />
-
-            <Button
-              variant="outline"
-              className="border-black text-black hover:bg-black hover:text-white transition-all duration-300"
-              asChild
-            >
-              <a
-                href={`https://wa.me/${data.content.phoneRaw.replace(/\D/g, '')}?text=${encodeURIComponent(data.content.whatsappMessage)}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <h3 className="text-2xl font-serif font-semibold text-black mb-3">
+                Catálogo Enviado!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Você receberá o catálogo digital em seu e-mail em breve.
+              </p>
+              <Button
+                onClick={() => setSubmitSuccess(false)}
+                variant="outline"
+                className="border-black text-black hover:bg-black hover:text-white"
               >
-                {data.content.consultorButtonText}
-              </a>
-            </Button>
-          </motion.div>
+                Voltar
+              </Button>
+            </motion.div>
+          ) : (
+            <>
+              {/* Form */}
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                onSubmit={handleSubmit}
+                className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto mb-12"
+              >
+                <Input
+                  type="email"
+                  placeholder="Seu melhor e-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 h-14 px-6 border-gray-200 focus:border-black focus:ring-black"
+                  required
+                />
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="h-14 px-8 bg-black text-white hover:bg-gray-800 transition-all duration-300 group"
+                  disabled={isSubmitting}
+                >
+                  <HiOutlineDownload className="mr-2 w-5 h-5" />
+                  {isSubmitting ? "Enviando..." : data.content.buttonText}
+                </Button>
+              </motion.form>
+
+              {/* Divider */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : {}}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex items-center gap-4 max-w-xl mx-auto mb-12"
+              >
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-gray-400 text-sm">ou</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </motion.div>
+
+              {/* Alternative CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex flex-col sm:flex-row items-center justify-center gap-6"
+              >
+                <a
+                  href={`tel:${data.content.phoneRaw}`}
+                  className="flex items-center gap-3 text-gray-600 hover:text-black transition-colors group"
+                >
+                  <span className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-black group-hover:bg-black group-hover:text-white transition-all duration-300">
+                    <HiOutlinePhone className="w-5 h-5" />
+                  </span>
+                  <div className="text-left">
+                    <span className="text-xs text-gray-400 block">Ligue para nós</span>
+                    <span className="font-medium">{data.content.phone}</span>
+                  </div>
+                </a>
+
+                <div className="hidden sm:block w-px h-12 bg-gray-200" />
+
+                <Button
+                  variant="outline"
+                  className="border-black text-black hover:bg-black hover:text-white transition-all duration-300"
+                  asChild
+                >
+                  <a
+                    href={`https://wa.me/${data.content.phoneRaw.replace(/\D/g, '')}?text=${encodeURIComponent(data.content.whatsappMessage)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {data.content.consultorButtonText}
+                  </a>
+                </Button>
+              </motion.div>
+            </>
+          )}
         </div>
       </div>
     </section>

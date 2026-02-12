@@ -67,8 +67,8 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-72 bg-black text-white hidden lg:block">
-      <div className="flex h-full flex-col">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-72 bg-black text-white hidden lg:block border-none outline-none">
+      <div className="flex h-full flex-col border-none outline-none">
         {/* Logo */}
         <div className="flex h-20 items-center px-8 border-b border-white/10">
           <Link href="/admin" className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export function AdminSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-6 px-4">
+        <nav className="flex-1 overflow-y-auto py-6 px-4 border-0 outline-none [&::-webkit-scrollbar]:w-0 [scrollbar-width:none]">
           {menuItems.map((section) => (
             <div key={section.section} className="mb-6">
               <h3 className="px-4 text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mb-3">
