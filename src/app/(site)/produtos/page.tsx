@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
@@ -59,17 +59,32 @@ function ProductsContent() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
-  // Usar buscaParam diretamente para a API (evita problemas de timing)
-  const searchTerm = buscaParam || searchQuery;
+  // Debounced search para evitar fetches a cada tecla
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
   // Buscar blocos da página
   const heroBlock = blocks.find(b => b.type === "products-hero")?.content || {};
   const gridBlock = blocks.find(b => b.type === "products-grid")?.content || {};
   const ctaBlock = blocks.find(b => b.type === "products-cta")?.content || {};
 
+  // Sync busca do URL
   useEffect(() => {
     setSearchQuery(buscaParam);
+    setDebouncedSearch(buscaParam);
   }, [buscaParam]);
+
+  // Debounce: atrasa a busca 400ms após parar de digitar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset página ao mudar categoria ou busca
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, debouncedSearch]);
 
   // Carregar categorias e blocos uma vez
   useEffect(() => {
@@ -84,30 +99,34 @@ function ProductsContent() {
       .catch(console.error);
   }, []);
 
-  // Carregar produtos com paginação
+  // Carregar produtos com paginação (usa AbortController para evitar race conditions)
   useEffect(() => {
+    const abortController = new AbortController();
     setLoading(true);
     const params = new URLSearchParams();
     params.set("page", currentPage.toString());
     params.set("limit", "9");
     if (selectedCategory) params.set("category", selectedCategory);
-    if (searchTerm.trim()) params.set("search", searchTerm.trim());
+    if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
     
-    fetch(`/api/products?${params.toString()}`)
+    fetch(`/api/products?${params.toString()}`, { signal: abortController.signal })
       .then((r) => r.json())
       .then((data) => {
-        setProducts(data.products || []);
-        setTotalPages(data.pagination?.totalPages || 1);
-        setTotalProducts(data.pagination?.total || 0);
+        if (!abortController.signal.aborted) {
+          setProducts(data.products || []);
+          setTotalPages(data.pagination?.totalPages || 1);
+          setTotalProducts(data.pagination?.total || 0);
+        }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [currentPage, selectedCategory, searchTerm]);
+      .catch((err) => {
+        if (err.name !== "AbortError") console.error(err);
+      })
+      .finally(() => {
+        if (!abortController.signal.aborted) setLoading(false);
+      });
 
-  // Reset página ao mudar categoria ou busca
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchTerm]);
+    return () => abortController.abort();
+  }, [currentPage, selectedCategory, debouncedSearch]);
 
   // Produtos já filtrados pela API
   const filteredProducts = products;

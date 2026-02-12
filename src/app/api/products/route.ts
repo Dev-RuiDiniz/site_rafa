@@ -22,7 +22,11 @@ export async function GET(request: NextRequest) {
       andConditions.push({
         OR: [
           { name: { contains: search, mode: "insensitive" } },
+          { slug: { contains: search, mode: "insensitive" } },
           { shortDescription: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+          { category: { name: { contains: search, mode: "insensitive" } } },
+          { categories: { some: { category: { name: { contains: search, mode: "insensitive" } } } } },
         ]
       });
     }
