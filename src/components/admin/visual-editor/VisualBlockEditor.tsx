@@ -97,6 +97,18 @@ export function VisualBlockEditor({ type, content, onChange }: VisualBlockEditor
       return <LPTricologiaContentEditor content={content} onChange={onChange} />;
     case "lp-spa-content":
       return <LPSpaContentEditor content={content} onChange={onChange} />;
+    case "faq-hero":
+      return <FAQHeroEditor content={content} onChange={onChange} />;
+    case "faq-items":
+      return <FAQItemsEditor content={content} onChange={onChange} />;
+    case "faq-cta":
+      return <FAQCTAEditor content={content} onChange={onChange} />;
+    case "garantia-hero":
+      return <GarantiaHeroEditor content={content} onChange={onChange} />;
+    case "garantia-info":
+      return <GarantiaInfoEditor content={content} onChange={onChange} />;
+    case "garantia-cta":
+      return <GarantiaCTAEditor content={content} onChange={onChange} />;
     default:
       return <div className="text-gray-500 text-sm">Editor não disponível</div>;
   }
@@ -2805,6 +2817,200 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
           <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="/contato" />
         </div>
       )}
+    </div>
+  );
+}
+
+// ==================== FAQ EDITORS ====================
+
+function FAQHeroEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  return (
+    <div className="space-y-3">
+      <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Central de Ajuda" />
+      <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} placeholder="Perguntas Frequentes" />
+      <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
+    </div>
+  );
+}
+
+function FAQItemsEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const categories = (content.categories as Array<{ name: string; items: Array<{ question: string; answer: string }> }>) || [];
+
+  const addCategory = () => {
+    onChange({ ...content, categories: [...categories, { name: "Nova Categoria", items: [] }] });
+  };
+
+  const removeCategory = (ci: number) => {
+    onChange({ ...content, categories: categories.filter((_, i) => i !== ci) });
+  };
+
+  const updateCategoryName = (ci: number, name: string) => {
+    const nc = [...categories];
+    nc[ci] = { ...nc[ci], name };
+    onChange({ ...content, categories: nc });
+  };
+
+  const addItem = (ci: number) => {
+    const nc = [...categories];
+    nc[ci] = { ...nc[ci], items: [...nc[ci].items, { question: "", answer: "" }] };
+    onChange({ ...content, categories: nc });
+  };
+
+  const removeItem = (ci: number, ii: number) => {
+    const nc = [...categories];
+    nc[ci] = { ...nc[ci], items: nc[ci].items.filter((_, i) => i !== ii) };
+    onChange({ ...content, categories: nc });
+  };
+
+  const updateItem = (ci: number, ii: number, field: string, value: string) => {
+    const nc = [...categories];
+    nc[ci] = { ...nc[ci], items: nc[ci].items.map((item, i) => i === ii ? { ...item, [field]: value } : item) };
+    onChange({ ...content, categories: nc });
+  };
+
+  return (
+    <div className="space-y-4">
+      {categories.map((cat, ci) => (
+        <div key={ci} className="p-3 border rounded bg-gray-50 space-y-2">
+          <div className="flex justify-between items-center">
+            <input
+              className="text-sm font-medium bg-transparent border-none p-0 focus:outline-none focus:ring-0 flex-1"
+              value={cat.name}
+              onChange={(e) => updateCategoryName(ci, e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              placeholder="Nome da categoria"
+            />
+            <button onClick={(e) => { e.stopPropagation(); removeCategory(ci); }} className="text-red-500 text-xs ml-2">Remover</button>
+          </div>
+
+          {cat.items.map((item, ii) => (
+            <div key={ii} className="p-2 border rounded bg-white space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">Pergunta {ii + 1}</span>
+                <button onClick={(e) => { e.stopPropagation(); removeItem(ci, ii); }} className="text-red-500 text-xs">×</button>
+              </div>
+              <input
+                className="w-full px-2 py-1 text-sm border rounded"
+                placeholder="Pergunta"
+                value={item.question}
+                onChange={(e) => updateItem(ci, ii, "question", e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <textarea
+                className="w-full px-2 py-1 text-sm border rounded"
+                placeholder="Resposta"
+                rows={2}
+                value={item.answer}
+                onChange={(e) => updateItem(ci, ii, "answer", e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          ))}
+
+          <button
+            onClick={(e) => { e.stopPropagation(); addItem(ci); }}
+            className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500 hover:text-gray-700"
+          >
+            + Adicionar Pergunta
+          </button>
+        </div>
+      ))}
+
+      <button
+        onClick={(e) => { e.stopPropagation(); addCategory(); }}
+        className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:text-gray-700"
+      >
+        + Adicionar Categoria
+      </button>
+    </div>
+  );
+}
+
+function FAQCTAEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  return (
+    <div className="space-y-3">
+      <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} />
+      <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={2} />
+      <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
+      <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} placeholder="/contato" />
+      <InputField label="Texto WhatsApp" value={(content.whatsappText as string) || ""} onChange={(v) => onChange({ ...content, whatsappText: v })} />
+      <InputField label="Link WhatsApp" value={(content.whatsappLink as string) || ""} onChange={(v) => onChange({ ...content, whatsappLink: v })} placeholder="https://wa.me/..." />
+    </div>
+  );
+}
+
+// ==================== GARANTIA EDITORS ====================
+
+function GarantiaHeroEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  return (
+    <div className="space-y-3">
+      <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Sua Segurança" />
+      <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} placeholder="Garantia de Qualidade" />
+      <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={3} />
+    </div>
+  );
+}
+
+function GarantiaInfoEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const highlights = (content.highlights as Array<{ icon: string; title: string; description: string }>) || [];
+  const policies = (content.policies as Array<{ title: string; content: string }>) || [];
+
+  return (
+    <div className="space-y-4">
+      <h4 className="font-medium text-sm">Destaques</h4>
+      {highlights.map((h, i) => (
+        <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-medium">Destaque {i + 1}</span>
+            <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, highlights: highlights.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+          </div>
+          <SelectField
+            label="Ícone"
+            value={h.icon}
+            onChange={(v) => { const nh = [...highlights]; nh[i] = { ...nh[i], icon: v }; onChange({ ...content, highlights: nh }); }}
+            options={[
+              { value: "shield", label: "Escudo" },
+              { value: "clock", label: "Relógio" },
+              { value: "document", label: "Documento" },
+              { value: "phone", label: "Telefone" },
+            ]}
+          />
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={h.title} onChange={(e) => { const nh = [...highlights]; nh[i] = { ...nh[i], title: e.target.value }; onChange({ ...content, highlights: nh }); }} onClick={(e) => e.stopPropagation()} />
+          <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" rows={2} value={h.description} onChange={(e) => { const nh = [...highlights]; nh[i] = { ...nh[i], description: e.target.value }; onChange({ ...content, highlights: nh }); }} onClick={(e) => e.stopPropagation()} />
+        </div>
+      ))}
+      <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, highlights: [...highlights, { icon: "shield", title: "", description: "" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Destaque</button>
+
+      <hr className="my-3" />
+
+      <InputField label="Badge Políticas" value={(content.policiesBadge as string) || ""} onChange={(v) => onChange({ ...content, policiesBadge: v })} />
+      <InputField label="Título Políticas" value={(content.policiesTitle as string) || ""} onChange={(v) => onChange({ ...content, policiesTitle: v })} />
+
+      <h4 className="font-medium text-sm mt-3">Políticas</h4>
+      {policies.map((p, i) => (
+        <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-medium">Política {i + 1}</span>
+            <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, policies: policies.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button>
+          </div>
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Título" value={p.title} onChange={(e) => { const np = [...policies]; np[i] = { ...np[i], title: e.target.value }; onChange({ ...content, policies: np }); }} onClick={(e) => e.stopPropagation()} />
+          <textarea className="w-full px-2 py-1 text-sm border rounded" placeholder="Conteúdo" rows={3} value={p.content} onChange={(e) => { const np = [...policies]; np[i] = { ...np[i], content: e.target.value }; onChange({ ...content, policies: np }); }} onClick={(e) => e.stopPropagation()} />
+        </div>
+      ))}
+      <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, policies: [...policies, { title: "", content: "" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Política</button>
+    </div>
+  );
+}
+
+function GarantiaCTAEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  return (
+    <div className="space-y-3">
+      <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} />
+      <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={2} />
+      <InputField label="Texto do Botão" value={(content.buttonText as string) || ""} onChange={(v) => onChange({ ...content, buttonText: v })} />
+      <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} placeholder="/contato" />
+      <InputField label="Texto Secundário" value={(content.secondaryText as string) || ""} onChange={(v) => onChange({ ...content, secondaryText: v })} />
+      <InputField label="Link Secundário" value={(content.secondaryLink as string) || ""} onChange={(v) => onChange({ ...content, secondaryLink: v })} placeholder="/manutencao" />
     </div>
   );
 }

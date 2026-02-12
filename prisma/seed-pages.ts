@@ -63,6 +63,22 @@ async function main() {
       isSystem: true,
       published: true,
     },
+    {
+      name: "FAQ",
+      slug: "faq",
+      title: "Perguntas Frequentes",
+      description: "Perguntas frequentes sobre nossos produtos e serviços",
+      isSystem: true,
+      published: true,
+    },
+    {
+      name: "Garantia",
+      slug: "garantia",
+      title: "Garantia",
+      description: "Informações sobre garantia dos produtos",
+      isSystem: true,
+      published: true,
+    },
   ];
 
   // Páginas Maletti (LPs)

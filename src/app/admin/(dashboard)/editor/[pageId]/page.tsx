@@ -90,6 +90,12 @@ const BLOCK_TYPES = [
   { type: "maletti-headspa", name: "Head SPA", icon: HiOutlineSparkles, description: "Seção Head SPA", category: "maletti" },
   { type: "maletti-design", name: "Design", icon: HiOutlinePhotograph, description: "Produtos e vídeo", category: "maletti" },
   { type: "maletti-catalogo", name: "Catálogo", icon: HiOutlineMenuAlt2, description: "Formulário catálogo", category: "maletti" },
+  { type: "faq-hero", name: "Hero FAQ", icon: HiOutlinePhotograph, description: "Título e busca do FAQ", category: "faq" },
+  { type: "faq-items", name: "Itens FAQ", icon: HiOutlineCollection, description: "Perguntas e respostas por categoria", category: "faq" },
+  { type: "faq-cta", name: "CTA FAQ", icon: HiOutlineSpeakerphone, description: "Chamada para ação", category: "faq" },
+  { type: "garantia-hero", name: "Hero Garantia", icon: HiOutlinePhotograph, description: "Título e descrição", category: "garantia" },
+  { type: "garantia-info", name: "Info Garantia", icon: HiOutlineCollection, description: "Destaques e políticas", category: "garantia" },
+  { type: "garantia-cta", name: "CTA Garantia", icon: HiOutlineSpeakerphone, description: "Chamada para ação", category: "garantia" },
 ];
 
 const BLOCK_CATEGORIES = [
@@ -104,6 +110,8 @@ const BLOCK_CATEGORIES = [
   { id: "brands", name: "Marcas" },
   { id: "about", name: "Sobre" },
   { id: "maletti", name: "Maletti" },
+  { id: "faq", name: "FAQ" },
+  { id: "garantia", name: "Garantia" },
 ];
 
 export default function VisualEditorPage({ params }: { params: Promise<{ pageId: string }> }) {
@@ -348,6 +356,70 @@ export default function VisualEditorPage({ params }: { params: Promise<{ pageId:
             { image: "", title: "Card 1", description: "Descrição", link: "" },
           ],
           columns: 3,
+        };
+      case "faq-hero":
+        return {
+          badge: "Central de Ajuda",
+          title: "Perguntas Frequentes",
+          description: "Encontre respostas para as dúvidas mais comuns sobre nossos produtos, serviços e políticas.",
+        };
+      case "faq-items":
+        return {
+          categories: [
+            {
+              name: "Produtos",
+              items: [
+                { question: "Quais marcas vocês representam?", answer: "Somos distribuidores exclusivos da Maletti no Brasil." },
+                { question: "Os produtos possuem garantia?", answer: "Sim, todos os produtos possuem garantia de fábrica." },
+              ],
+            },
+            {
+              name: "Entregas",
+              items: [
+                { question: "Vocês entregam para todo o Brasil?", answer: "Sim, realizamos entregas em todo o território nacional." },
+              ],
+            },
+          ],
+        };
+      case "faq-cta":
+        return {
+          title: "Não encontrou sua resposta?",
+          description: "Entre em contato conosco e nossa equipe terá prazer em ajudá-lo.",
+          buttonText: "Falar Conosco",
+          buttonLink: "/contato",
+          whatsappText: "WhatsApp",
+          whatsappLink: "https://wa.me/5511981982279",
+        };
+      case "garantia-hero":
+        return {
+          badge: "Sua Segurança",
+          title: "Garantia de Qualidade",
+          description: "Nosso compromisso é com a sua satisfação. Todos os produtos comercializados pela SHR possuem garantia e suporte técnico especializado.",
+        };
+      case "garantia-info":
+        return {
+          highlights: [
+            { icon: "shield", title: "Garantia Original", description: "Todos os produtos possuem garantia de fábrica contra defeitos." },
+            { icon: "clock", title: "Prazo de Garantia", description: "12 meses a partir da data de compra." },
+            { icon: "document", title: "Documentação", description: "Mantenha a nota fiscal para acionar o serviço." },
+            { icon: "phone", title: "Suporte Técnico", description: "Equipe disponível durante todo o período de garantia." },
+          ],
+          policiesBadge: "Políticas",
+          policiesTitle: "Termos de Garantia",
+          policies: [
+            { title: "O que a garantia cobre?", content: "Defeitos de fabricação em materiais, mecanismos, soldas e acabamentos." },
+            { title: "O que a garantia NÃO cobre?", content: "Danos por mau uso, acidentes, modificações não autorizadas e desgaste natural." },
+            { title: "Como acionar a garantia?", content: "Entre em contato com nosso suporte informando a nota fiscal e o problema." },
+          ],
+        };
+      case "garantia-cta":
+        return {
+          title: "Precisa acionar a garantia?",
+          description: "Entre em contato com nosso suporte técnico.",
+          buttonText: "Solicitar Suporte",
+          buttonLink: "/contato",
+          secondaryText: "Manutenção",
+          secondaryLink: "/manutencao",
         };
       default:
         return {};

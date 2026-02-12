@@ -549,11 +549,11 @@ export default function RodapePage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-hidden">
             {config.linkGroups.map((group, gi) => (
               <div
                 key={gi}
-                className="p-4 border border-gray-100 dark:border-gray-600 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-700"
+                className="p-4 border border-gray-100 dark:border-gray-600 rounded-lg space-y-3 bg-gray-50 dark:bg-gray-700 min-w-0 overflow-hidden"
               >
                 <div className="flex items-center justify-between">
                   <input
@@ -561,7 +561,7 @@ export default function RodapePage() {
                     value={group.title}
                     onChange={(e) => updateLinkGroup(gi, "title", e.target.value)}
                     placeholder="Título do grupo"
-                    className="text-sm font-medium bg-transparent border-none p-0 text-gray-900 dark:text-white focus:outline-none focus:ring-0 flex-1"
+                    className="text-sm font-medium bg-transparent border-none p-0 text-gray-900 dark:text-white focus:outline-none focus:ring-0 flex-1 min-w-0"
                   />
                   <button
                     onClick={() => removeLinkGroup(gi)}
@@ -573,24 +573,26 @@ export default function RodapePage() {
 
                 <div className="space-y-2">
                   {group.links.map((link, li) => (
-                    <div key={li} className="flex items-center gap-1">
-                      <input
-                        type="text"
-                        value={link.label}
-                        onChange={(e) => updateLink(gi, li, "label", e.target.value)}
-                        placeholder="Label"
-                        className="flex-1 px-2 py-1.5 border border-gray-200 dark:border-gray-500 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs"
-                      />
-                      <input
-                        type="text"
-                        value={link.href}
-                        onChange={(e) => updateLink(gi, li, "href", e.target.value)}
-                        placeholder="/caminho"
-                        className="flex-1 px-2 py-1.5 border border-gray-200 dark:border-gray-500 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs"
-                      />
+                    <div key={li} className="flex items-start gap-1">
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <input
+                          type="text"
+                          value={link.label}
+                          onChange={(e) => updateLink(gi, li, "label", e.target.value)}
+                          placeholder="Label"
+                          className="w-full px-2 py-1.5 border border-gray-200 dark:border-gray-500 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs"
+                        />
+                        <input
+                          type="text"
+                          value={link.href}
+                          onChange={(e) => updateLink(gi, li, "href", e.target.value)}
+                          placeholder="/caminho"
+                          className="w-full px-2 py-1.5 border border-gray-200 dark:border-gray-500 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs"
+                        />
+                      </div>
                       <button
                         onClick={() => removeLink(gi, li)}
-                        className="p-1 text-red-500 hover:text-red-700"
+                        className="p-1 text-red-500 hover:text-red-700 mt-1 flex-shrink-0"
                       >
                         <HiOutlineTrash className="w-3 h-3" />
                       </button>
