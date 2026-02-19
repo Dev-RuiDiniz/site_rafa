@@ -76,6 +76,7 @@ interface PageData {
   ctaButtonText?: string;
   ctaButtonLink?: string;
   ctaButtons?: { text: string; link: string; style: string }[];
+  relatedProducts?: typeof defaultRelatedProducts;
 }
 
 // ============================================
@@ -417,7 +418,7 @@ export default function SpaPage() {
   const sensorTechnologies = pageData.sensorTechnologies || defaultSensorTechnologies;
   const rituals = pageData.rituals || defaultRituals;
   const hotelShowcase = pageData.hotelShowcase || defaultHotelShowcase;
-  const relatedProducts = defaultRelatedProducts;
+  const relatedProducts = (pageData.relatedProducts as typeof defaultRelatedProducts) || defaultRelatedProducts;
   
   // businessBenefits precisa manter os ícones React, então merge com defaults
   const benefitIcons = [TbBuildingSkyscraper, TbTrendingUp, TbShieldCheck];
@@ -877,16 +878,39 @@ export default function SpaPage() {
               {pageData.ctaDescription || "Ofereça o extraordinário. Nossa equipe de consultores e arquitetos está pronta para auxiliar no seu projeto."}
             </p>
 
-            <a
-              href={pageData.ctaButtonLink || "https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre equipamentos para o spa do meu hotel."}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-stone-800 text-white text-lg font-medium hover:bg-stone-700 transition-all rounded-sm group"
-            >
-              <FaWhatsapp className="w-6 h-6" />
-              {pageData.ctaButtonText || "Falar com um Consultor"}
-              <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            {(pageData.ctaButtons && pageData.ctaButtons.length > 0) ? (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {pageData.ctaButtons.map((btn, i) => {
+                  const isExternal = btn.link?.startsWith("http");
+                  const primaryCls = "inline-flex items-center gap-3 px-10 py-5 bg-stone-800 text-white text-lg font-medium hover:bg-stone-700 transition-all rounded-sm group";
+                  const outlineCls = "inline-flex items-center gap-3 px-10 py-5 border border-stone-800 text-stone-800 text-lg font-medium hover:bg-stone-800 hover:text-white transition-all rounded-sm group";
+                  const cls = btn.style === "outline" ? outlineCls : primaryCls;
+                  return isExternal ? (
+                    <a key={i} href={btn.link} target="_blank" rel="noopener noreferrer" className={cls}>
+                      {i === 0 && <FaWhatsapp className="w-6 h-6" />}
+                      {btn.text}
+                      <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  ) : (
+                    <Link key={i} href={btn.link || "/contato"} className={cls}>
+                      {btn.text}
+                      <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <a
+                href={pageData.ctaButtonLink || "https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor sobre equipamentos para o spa do meu hotel."}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-10 py-5 bg-stone-800 text-white text-lg font-medium hover:bg-stone-700 transition-all rounded-sm group"
+              >
+                <FaWhatsapp className="w-6 h-6" />
+                {pageData.ctaButtonText || "Falar com um Consultor"}
+                <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
+            )}
           </motion.div>
         </div>
       </section>

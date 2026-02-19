@@ -115,7 +115,7 @@ export function CatalogCTA() {
                 </svg>
               </div>
               <h3 className="text-2xl font-serif font-semibold text-black mb-3">
-                Catálogo Enviado!
+               Solicitação Enviada. 
               </h3>
               <p className="text-gray-600 mb-6">
                 Você receberá o catálogo digital em seu e-mail em breve.

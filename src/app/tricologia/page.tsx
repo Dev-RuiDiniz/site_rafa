@@ -761,23 +761,30 @@ export default function TricologiaPage() {
               {(pageData.ctaButtons && (pageData.ctaButtons as Array<{text:string;link:string;style:string}>).length > 0) ? (
                 (pageData.ctaButtons as Array<{text:string;link:string;style:string}>).map((btn, i) => {
                   const isExternal = btn.link?.startsWith("http");
+                  const sendKommoLead = () => {
+                    fetch("/api/kommo/leads", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ name: "Lead Tricologia", email: "", phone: "", message: `Clicou em "${btn.text}" na página de Tricologia.`, source: "CTA Tricologia" }),
+                    }).catch(() => {});
+                  };
                   return isExternal ? (
                     <Button key={i} size="lg" variant={btn.style === "outline" ? "outline" : "default"} className={btn.style === "outline" ? "border-black text-black hover:bg-black hover:text-white group px-8" : "bg-black text-white hover:bg-gray-800 group px-8"} asChild>
-                      <a href={btn.link} target="_blank" rel="noopener noreferrer">{btn.text}</a>
+                      <a href={btn.link} target="_blank" rel="noopener noreferrer" onClick={sendKommoLead}>{btn.text}</a>
                     </Button>
                   ) : (
                     <Button key={i} size="lg" variant={btn.style === "outline" ? "outline" : "default"} className={btn.style === "outline" ? "border-black text-black hover:bg-black hover:text-white group px-8" : "bg-black text-white hover:bg-gray-800 group px-8"} asChild>
-                      <Link href={btn.link || "/produtos"}>{btn.text}<HiArrowRight className="ml-2 w-4 h-4" /></Link>
+                      <Link href={btn.link || "/produtos"} onClick={sendKommoLead}>{btn.text}<HiArrowRight className="ml-2 w-4 h-4" /></Link>
                     </Button>
                   );
                 })
               ) : (
                 <>
                   <Button size="lg" className="bg-black text-white hover:bg-gray-800 group px-8" asChild>
-                    <Link href="/produtos">Saber Mais Sobre os Produtos<HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+                    <Link href="/produtos" onClick={() => { fetch("/api/kommo/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Lead Tricologia", email: "", phone: "", message: 'Clicou em "Saber Mais Sobre os Produtos" na página de Tricologia.', source: "CTA Tricologia" }) }).catch(() => {}); }}>Saber Mais Sobre os Produtos<HiArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
                   </Button>
                   <Button size="lg" variant="outline" className="border-black text-black hover:bg-black hover:text-white group px-8" asChild>
-                    <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor técnico sobre os equipamentos Maletti para tricologia." target="_blank" rel="noopener noreferrer"><FaWhatsapp className="mr-2 w-5 h-5" />Falar com Consultor Técnico</a>
+                    <a href="https://wa.me/5511981982279?text=Olá! Gostaria de falar com um consultor técnico sobre os equipamentos Maletti para tricologia." target="_blank" rel="noopener noreferrer" onClick={() => { fetch("/api/kommo/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Lead Tricologia", email: "", phone: "", message: 'Clicou em "Falar com Consultor Técnico" na página de Tricologia.', source: "CTA Tricologia" }) }).catch(() => {}); }}><FaWhatsapp className="mr-2 w-5 h-5" />Falar com Consultor Técnico</a>
                   </Button>
                 </>
               )}

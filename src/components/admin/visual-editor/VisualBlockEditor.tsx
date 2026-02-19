@@ -109,6 +109,8 @@ export function VisualBlockEditor({ type, content, onChange }: VisualBlockEditor
       return <GarantiaInfoEditor content={content} onChange={onChange} />;
     case "garantia-cta":
       return <GarantiaCTAEditor content={content} onChange={onChange} />;
+    case "blog-settings":
+      return <BlogSettingsEditor content={content} onChange={onChange} />;
     default:
       return <div className="text-gray-500 text-sm">Editor não disponível</div>;
   }
@@ -2170,7 +2172,8 @@ function MalettiDesignEditor({ content, onChange }: { content: Record<string, un
           <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome do produto" value={p.name} onChange={(e) => updateProduct(i, "name", e.target.value)} onClick={(e) => e.stopPropagation()} />
           <ImageUploader label="" value={p.image} onChange={(url) => updateProduct(i, "image", url)} />
           <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Descrição" value={p.description} onChange={(e) => updateProduct(i, "description", e.target.value)} onClick={(e) => e.stopPropagation()} />
-          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug (para link 'Saiba mais')" value={p.slug || ""} onChange={(e) => updateProduct(i, "slug", e.target.value)} onClick={(e) => e.stopPropagation()} />
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug (ex: heaven)" value={p.slug || ""} onChange={(e) => updateProduct(i, "slug", e.target.value)} onClick={(e) => e.stopPropagation()} />
+          <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link direto (ex: /produtos/heaven) — prioridade sobre slug" value={(p as Record<string, string>).link || ""} onChange={(e) => updateProduct(i, "link", e.target.value)} onClick={(e) => e.stopPropagation()} />
         </div>
       ))}
       <button onClick={(e) => { e.stopPropagation(); addProduct(); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500 hover:border-gray-400">+ Adicionar Produto</button>
@@ -2457,22 +2460,34 @@ function LPSalaoContentEditor({ content, onChange }: { content: Record<string, u
           <InputField label="Nota" value={(content.ctaNote as string) || ""} onChange={(v) => onChange({ ...content, ctaNote: v })} />
           <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} />
           <h4 className="font-medium text-sm mt-3">Botões</h4>
-          {((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []).map((btn, i) => (
-            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-medium">Botão {i + 1}</span>
-                <button onClick={(e) => { e.stopPropagation(); const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button>
-              </div>
-              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
-              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
-              <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
-                <option value="primary">Primário (preto)</option>
-                <option value="outline">Outline (borda)</option>
-                <option value="secondary">Secundário (cinza)</option>
-              </select>
-            </div>
-          ))}
-          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []), { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+          {(() => {
+            const defaultCtaButtons = [
+              { text: "Agendar Visita ao Showroom", link: "https://wa.me/5511981982279?text=Olá! Gostaria de agendar uma visita ao showroom para conhecer os equipamentos Maletti.", style: "primary" },
+              { text: "Consultoria com Especialista", link: "https://wa.me/5511981982279?text=Olá! Gostaria de uma consultoria sobre os equipamentos Maletti para meu salão.", style: "outline" },
+              { text: "Baixar Catálogo", link: "/contato", style: "secondary" },
+            ];
+            const ctaButtons = (content.ctaButtons as Array<{ text: string; link: string; style: string }>) || defaultCtaButtons;
+            return (
+              <>
+                {ctaButtons.map((btn, i) => (
+                  <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-medium">Botão {i + 1}</span>
+                      <button onClick={(e) => { e.stopPropagation(); const nb = [...ctaButtons]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button>
+                    </div>
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                      <option value="primary">Primário (preto)</option>
+                      <option value="outline">Outline (borda)</option>
+                      <option value="secondary">Secundário (cinza)</option>
+                    </select>
+                  </div>
+                ))}
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...ctaButtons, { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -2672,18 +2687,30 @@ function LPTricologiaContentEditor({ content, onChange }: { content: Record<stri
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
           <InputField label="Subtítulo" value={(content.ctaSubtitle as string) || ""} onChange={(v) => onChange({ ...content, ctaSubtitle: v })} placeholder="O que você gostaria de fazer agora?" />
           <h4 className="font-medium text-sm mt-3">Botões</h4>
-          {((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []).map((btn, i) => (
-            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
-              <div className="flex justify-between items-center"><span className="text-xs font-medium">Botão {i + 1}</span><button onClick={(e) => { e.stopPropagation(); const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button></div>
-              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
-              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
-              <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || [])]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
-                <option value="primary">Primário (preto)</option>
-                <option value="outline">Outline (borda)</option>
-              </select>
-            </div>
-          ))}
-          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...((content.ctaButtons as Array<{ text: string; link: string; style: string }>) || []), { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+          {(() => {
+            const defaultCtaButtons = [
+              { text: "Agendar Visita ao Showroom", link: "https://wa.me/5511981982279?text=Olá! Gostaria de agendar uma visita ao showroom para conhecer os equipamentos Maletti.", style: "primary" },
+              { text: "Consultoria com Especialista", link: "https://wa.me/5511981982279?text=Olá! Gostaria de uma consultoria sobre os equipamentos Maletti para meu salão de tricologia.", style: "outline" },
+            ];
+            const ctaButtons = (content.ctaButtons as Array<{ text: string; link: string; style: string }>) || defaultCtaButtons;
+            return (
+              <>
+                {ctaButtons.map((btn, i) => (
+                  <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+                    <div className="flex justify-between items-center"><span className="text-xs font-medium">Botão {i + 1}</span><button onClick={(e) => { e.stopPropagation(); const nb = [...ctaButtons]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button></div>
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                      <option value="primary">Primário (preto)</option>
+                      <option value="outline">Outline (borda)</option>
+                      <option value="secondary">Secundário (cinza)</option>
+                    </select>
+                  </div>
+                ))}
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...ctaButtons, { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -2738,6 +2765,8 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
     </div>
   );
 
+  const relatedProducts = (content.relatedProducts as Array<{ name: string; image: string; slug: string; category: string }>) || [];
+
   const sections = [
     { id: "hero", label: "Hero" },
     { id: "concept", label: "Conceito" },
@@ -2747,6 +2776,7 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
     { id: "business", label: "Negócio" },
     { id: "rituals", label: "Rituais" },
     { id: "showcase", label: "Showcase" },
+    { id: "related", label: "Produtos" },
     { id: "cta", label: "CTA" },
   ];
 
@@ -2890,14 +2920,54 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
         </div>
       )}
 
+      {activeSection === "related" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Produtos Relacionados</h4>
+          <p className="text-xs text-gray-500">Edite os produtos que aparecem na seção de produtos relacionados do SPA.</p>
+          {relatedProducts.map((p, i) => (
+            <div key={i} className="p-2 border rounded space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center"><span className="text-xs font-medium">Produto {i + 1}: {p.name || "Novo"}</span><button onClick={(e) => { e.stopPropagation(); onChange({ ...content, relatedProducts: relatedProducts.filter((_, idx) => idx !== i) }); }} className="text-red-500 text-xs">Remover</button></div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Nome" value={p.name} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], name: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <ImageUploadField label="Imagem" value={p.image} fieldKey={`related-${i}`} arrayField="relatedProducts" arrayIndex={i} arrayImageKey="image" />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug (ex: heaven)" value={p.slug} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], slug: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Categoria (ex: Macas)" value={p.category} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], category: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, relatedProducts: [...relatedProducts, { name: "", image: "", slug: "", category: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
+        </div>
+      )}
+
       {activeSection === "cta" && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm">CTA Final</h4>
           <InputField label="Badge" value={(content.ctaBadge as string) || ""} onChange={(v) => onChange({ ...content, ctaBadge: v })} placeholder="Convite ao Projeto" />
           <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} />
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} />
-          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} placeholder="Falar com um Consultor" />
-          <InputField label="Link do Botão" value={(content.ctaButtonLink as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonLink: v })} placeholder="https://wa.me/..." />
+          <h4 className="font-medium text-sm mt-3">Botões</h4>
+          {(() => {
+            const defaultCtaButtons = [
+              { text: "Falar com um Consultor", link: "https://wa.me/5511981982279?text=Olá! Gostaria de uma consultoria sobre os equipamentos Maletti para meu spa.", style: "primary" },
+              { text: "Baixar Catálogo", link: "/contato?assunto=catalogo", style: "outline" },
+            ];
+            const ctaButtons = (content.ctaButtons as Array<{ text: string; link: string; style: string }>) || defaultCtaButtons;
+            return (
+              <>
+                {ctaButtons.map((btn, i) => (
+                  <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+                    <div className="flex justify-between items-center"><span className="text-xs font-medium">Botão {i + 1}</span><button onClick={(e) => { e.stopPropagation(); const nb = [...ctaButtons]; nb.splice(i, 1); onChange({ ...content, ctaButtons: nb }); }} className="text-red-500 text-xs">Remover</button></div>
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link" value={btn.link} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()} />
+                    <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...ctaButtons]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, ctaButtons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                      <option value="primary">Primário (preto)</option>
+                      <option value="outline">Outline (borda)</option>
+                      <option value="secondary">Secundário (cinza)</option>
+                    </select>
+                  </div>
+                ))}
+                <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, ctaButtons: [...ctaButtons, { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -3094,6 +3164,128 @@ function GarantiaCTAEditor({ content, onChange }: { content: Record<string, unkn
       <InputField label="Link do Botão" value={(content.buttonLink as string) || ""} onChange={(v) => onChange({ ...content, buttonLink: v })} placeholder="/contato" />
       <InputField label="Texto Secundário" value={(content.secondaryText as string) || ""} onChange={(v) => onChange({ ...content, secondaryText: v })} />
       <InputField label="Link Secundário" value={(content.secondaryLink as string) || ""} onChange={(v) => onChange({ ...content, secondaryLink: v })} placeholder="/manutencao" />
+    </div>
+  );
+}
+
+// ==================== BLOG SETTINGS EDITOR ====================
+
+function BlogSettingsEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; slug: string; color: string | null }>>([]);
+  const [loadingCats, setLoadingCats] = useState(false);
+
+  useEffect(() => {
+    setLoadingCats(true);
+    fetch("/api/admin/blog/categories")
+      .then((r) => r.json())
+      .then((d) => setCategories(d.categories || []))
+      .catch(() => {})
+      .finally(() => setLoadingCats(false));
+  }, []);
+
+  const sections = [
+    { id: "hero", label: "Hero" },
+    { id: "categories", label: "Categorias" },
+    { id: "posts", label: "Posts" },
+    { id: "cta", label: "CTA Newsletter" },
+  ];
+
+  const hiddenCategories = (content.hiddenCategories as string[]) || [];
+  const toggleCategory = (catId: string) => {
+    const updated = hiddenCategories.includes(catId) ? hiddenCategories.filter((id) => id !== catId) : [...hiddenCategories, catId];
+    onChange({ ...content, hiddenCategories: updated });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-1.5">
+        {sections.map((s) => (
+          <button key={s.id} onClick={(e) => { e.stopPropagation(); setActiveSection(s.id); }}
+            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${activeSection === s.id ? "bg-black text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {activeSection === "hero" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Hero do Blog</h4>
+          <InputField label="Badge" value={(content.heroBadge as string) || ""} onChange={(v) => onChange({ ...content, heroBadge: v })} placeholder="Blog" />
+          <InputField label="Título" value={(content.heroTitle as string) || ""} onChange={(v) => onChange({ ...content, heroTitle: v })} placeholder="Insights & Tendências" />
+          <TextareaField label="Descrição" value={(content.heroDescription as string) || ""} onChange={(v) => onChange({ ...content, heroDescription: v })} rows={2} placeholder="Descubra as últimas novidades..." />
+        </div>
+      )}
+
+      {activeSection === "categories" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Categorias Visíveis</h4>
+          <p className="text-xs text-gray-500">Desmarque as categorias que não deseja exibir no filtro do blog.</p>
+          {loadingCats ? (
+            <p className="text-xs text-gray-400">Carregando categorias...</p>
+          ) : categories.length === 0 ? (
+            <p className="text-xs text-gray-400">Nenhuma categoria cadastrada. Crie categorias no gerenciador do Blog.</p>
+          ) : (
+            <div className="space-y-2">
+              {categories.map((cat) => {
+                const visible = !hiddenCategories.includes(cat.id);
+                return (
+                  <label key={cat.id} className="flex items-center gap-3 p-2 border rounded bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors" onClick={(e) => e.stopPropagation()}>
+                    <input type="checkbox" checked={visible} onChange={() => toggleCategory(cat.id)} className="accent-black" />
+                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color || "#000" }} />
+                    <span className="text-sm font-medium text-gray-800">{cat.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeSection === "posts" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Configurações de Posts</h4>
+          <div onClick={(e) => e.stopPropagation()}>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Ordenar por</label>
+            <select value={(content.postOrder as string) || "newest"} onChange={(e) => onChange({ ...content, postOrder: e.target.value })}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded bg-white outline-none">
+              <option value="newest">Mais recentes primeiro</option>
+              <option value="oldest">Mais antigos primeiro</option>
+              <option value="views">Mais visualizados</option>
+              <option value="title">Ordem alfabética</option>
+            </select>
+          </div>
+          <div onClick={(e) => e.stopPropagation()}>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Posts por página</label>
+            <select value={String((content.postsPerPage as number) || 10)} onChange={(e) => onChange({ ...content, postsPerPage: parseInt(e.target.value) })}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded bg-white outline-none">
+              <option value="6">6</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+            <input type="checkbox" checked={(content.showFeatured as boolean) !== false} onChange={(e) => onChange({ ...content, showFeatured: e.target.checked })} className="accent-black" />
+            <span className="text-sm text-gray-700">Exibir post em destaque (primeiro post maior)</span>
+          </label>
+        </div>
+      )}
+
+      {activeSection === "cta" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">CTA Newsletter</h4>
+          <label className="flex items-center gap-2 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+            <input type="checkbox" checked={(content.showCta as boolean) !== false} onChange={(e) => onChange({ ...content, showCta: e.target.checked })} className="accent-black" />
+            <span className="text-sm text-gray-700">Exibir seção de newsletter</span>
+          </label>
+          <InputField label="Título" value={(content.ctaTitle as string) || ""} onChange={(v) => onChange({ ...content, ctaTitle: v })} placeholder="Fique por dentro das novidades" />
+          <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} placeholder="Receba insights exclusivos..." />
+          <InputField label="Placeholder do Email" value={(content.ctaEmailPlaceholder as string) || ""} onChange={(v) => onChange({ ...content, ctaEmailPlaceholder: v })} placeholder="Seu melhor e-mail" />
+          <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} placeholder="Inscrever" />
+        </div>
+      )}
     </div>
   );
 }

@@ -34,23 +34,60 @@ interface Post {
   createdAt: string;
 }
 
+interface BlogSettings {
+  heroBadge?: string;
+  heroTitle?: string;
+  heroDescription?: string;
+  hiddenCategories?: string[];
+  postOrder?: string;
+  postsPerPage?: number;
+  showFeatured?: boolean;
+  showCta?: boolean;
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaEmailPlaceholder?: string;
+  ctaButtonText?: string;
+}
+
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [settings, setSettings] = useState<BlogSettings>({});
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
 
   const heroRef = useRef(null);
   const heroInView = useInView(heroRef, { once: true });
 
   useEffect(() => {
-    fetchPosts();
+    fetchData();
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/blog");
-      const data = await res.json();
+      // Fetch page settings first, then posts with order param
+      let blogSettings: BlogSettings = {};
+      try {
+        const pageRes = await fetch("/api/pages/blog");
+        if (pageRes.ok) {
+          const pageData = await pageRes.json();
+          const blogBlock = pageData.page?.blocks?.find((b: { type: string }) => b.type === "blog-settings");
+          if (blogBlock?.content) {
+            blogSettings = blogBlock.content as BlogSettings;
+            setSettings(blogSettings);
+          }
+        }
+      } catch { /* ignore */ }
+
+      const params = new URLSearchParams();
+      if (blogSettings.postOrder) params.set("order", blogSettings.postOrder);
+      if (blogSettings.postsPerPage) params.set("limit", String(blogSettings.postsPerPage));
+
+      const postsRes = await fetch(`/api/blog?${params.toString()}`);
+      const data = await postsRes.json();
       setPosts(data.posts || []);
       setCategories(data.categories || []);
     } catch (error) {
@@ -60,14 +97,18 @@ export default function BlogPage() {
     }
   };
 
+  const hiddenCategories = settings.hiddenCategories || [];
+  const visibleCategories = categories.filter((c) => !hiddenCategories.includes(c.id));
+
   const filteredPosts = selectedCategory
     ? posts.filter((post) =>
         post.categories.some((c) => c.category.id === selectedCategory)
       )
     : posts;
 
-  const featuredPost = filteredPosts[0];
-  const otherPosts = filteredPosts.slice(1);
+  const showFeatured = settings.showFeatured !== false;
+  const featuredPost = showFeatured ? filteredPosts[0] : null;
+  const otherPosts = showFeatured ? filteredPosts.slice(1) : filteredPosts;
 
   return (
     <>
@@ -84,21 +125,20 @@ export default function BlogPage() {
             className="max-w-3xl"
           >
             <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500 mb-4 block">
-              Blog
+              {settings.heroBadge || "Blog"}
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-black mb-6">
-              Insights & Tendências
+              {settings.heroTitle || "Insights & Tendências"}
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Descubra as últimas novidades em tecnologia, design e inovação para
-              o mercado de beleza e bem-estar.
+              {settings.heroDescription || "Descubra as últimas novidades em tecnologia, design e inovação para o mercado de beleza e bem-estar."}
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Categories Filter */}
-      {categories.length > 0 && (
+      {visibleCategories.length > 0 && (
         <section className="border-b border-gray-100 sticky top-20 bg-white z-30">
           <div className="container mx-auto px-6">
             <div className="flex items-center gap-2 py-4 overflow-x-auto">
@@ -112,7 +152,7 @@ export default function BlogPage() {
               >
                 Todos
               </button>
-              {categories.map((category) => (
+              {visibleCategories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
@@ -257,32 +297,74 @@ export default function BlogPage() {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="py-20 bg-black text-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">
-              Fique por dentro das novidades
-            </h2>
-            <p className="text-gray-400 mb-8">
-              Receba insights exclusivos sobre tendências e inovações do mercado
-              de beleza diretamente no seu e-mail.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Seu melhor e-mail"
-                className="flex-1 px-5 py-3 bg-white/10 border border-white/20 text-white placeholder:text-gray-500 outline-none focus:border-white/40 transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-8 py-3 bg-white text-black font-medium hover:bg-gray-100 transition-colors"
-              >
-                Inscrever
-              </button>
-            </form>
+      {settings.showCta !== false && (
+        <section className="py-20 bg-black text-white">
+          <div className="container mx-auto px-6">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">
+                {settings.ctaTitle || "Fique por dentro das novidades"}
+              </h2>
+              <p className="text-gray-400 mb-8">
+                {settings.ctaDescription || "Receba insights exclusivos sobre tendências e inovações do mercado de beleza diretamente no seu e-mail."}
+              </p>
+              {subscribed ? (
+                <div className="max-w-md mx-auto text-center">
+                  <div className="w-14 h-14 mx-auto mb-4 bg-white text-black rounded-full flex items-center justify-center">
+                    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <p className="text-white font-medium">Inscrição realizada com sucesso!</p>
+                  <p className="text-gray-400 text-sm mt-1">Você receberá nossas novidades em breve.</p>
+                </div>
+              ) : (
+                <form
+                  className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!email || submitting) return;
+                    setSubmitting(true);
+                    try {
+                      const res = await fetch("/api/kommo/leads", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: email.split("@")[0],
+                          email,
+                          phone: "",
+                          message: "Inscreveu-se na newsletter do Blog.",
+                          source: "Newsletter Blog",
+                        }),
+                      });
+                      if (!res.ok) throw new Error("Erro");
+                      setSubscribed(true);
+                      setEmail("");
+                    } catch {
+                      alert("Erro ao enviar. Tente novamente.");
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  }}
+                >
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={settings.ctaEmailPlaceholder || "Seu melhor e-mail"}
+                    className="flex-1 px-5 py-3 bg-white/10 border border-white/20 text-white placeholder:text-gray-500 outline-none focus:border-white/40 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-8 py-3 bg-white text-black font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  >
+                    {submitting ? "Enviando..." : (settings.ctaButtonText || "Inscrever")}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   );
 }

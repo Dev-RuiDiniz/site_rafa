@@ -61,6 +61,7 @@ function ProductsContent() {
 
   // Debounced search para evitar fetches a cada tecla
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   // Buscar blocos da página
   const heroBlock = blocks.find(b => b.type === "products-hero")?.content || {};
@@ -106,7 +107,8 @@ function ProductsContent() {
     const params = new URLSearchParams();
     params.set("page", currentPage.toString());
     params.set("limit", "9");
-    if (selectedCategory) params.set("category", selectedCategory);
+    // Quando busca está ativa, NÃO filtrar por categoria (busca global)
+    if (selectedCategory && !debouncedSearch.trim()) params.set("category", selectedCategory);
     if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
     
     fetch(`/api/products?${params.toString()}`, { signal: abortController.signal })
@@ -116,6 +118,7 @@ function ProductsContent() {
           setProducts(data.products || []);
           setTotalPages(data.pagination?.totalPages || 1);
           setTotalProducts(data.pagination?.total || 0);
+          setInitialLoad(false);
         }
       })
       .catch((err) => {
@@ -125,7 +128,10 @@ function ProductsContent() {
         if (!abortController.signal.aborted) setLoading(false);
       });
 
-    return () => abortController.abort();
+    return () => {
+      // Não abortar a primeira request (initial load)
+      if (!initialLoad) abortController.abort();
+    };
   }, [currentPage, selectedCategory, debouncedSearch]);
 
   // Produtos já filtrados pela API

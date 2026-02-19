@@ -38,6 +38,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Escreva
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: {

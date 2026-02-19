@@ -37,6 +37,28 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const data = await request.json();
+    const { id, name } = data;
+    if (!id) return NextResponse.json({ error: "ID não fornecido" }, { status: 400 });
+    const slug = name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const tag = await prisma.blogTag.update({
+      where: { id },
+      data: { name, slug },
+    });
+    return NextResponse.json({ success: true, tag });
+  } catch (error) {
+    console.error("Error updating tag:", error);
+    return NextResponse.json({ error: "Erro ao atualizar tag" }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

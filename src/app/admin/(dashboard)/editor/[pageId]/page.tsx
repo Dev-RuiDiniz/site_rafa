@@ -96,6 +96,7 @@ const BLOCK_TYPES = [
   { type: "garantia-hero", name: "Hero Garantia", icon: HiOutlinePhotograph, description: "Título e descrição", category: "garantia" },
   { type: "garantia-info", name: "Info Garantia", icon: HiOutlineCollection, description: "Destaques e políticas", category: "garantia" },
   { type: "garantia-cta", name: "CTA Garantia", icon: HiOutlineSpeakerphone, description: "Chamada para ação", category: "garantia" },
+  { type: "blog-settings", name: "Configurações do Blog", icon: HiOutlineNewspaper, description: "Categorias, ordem e CTA", category: "blog" },
 ];
 
 const BLOCK_CATEGORIES = [
@@ -112,6 +113,7 @@ const BLOCK_CATEGORIES = [
   { id: "maletti", name: "Maletti" },
   { id: "faq", name: "FAQ" },
   { id: "garantia", name: "Garantia" },
+  { id: "blog", name: "Blog" },
 ];
 
 export default function VisualEditorPage({ params }: { params: Promise<{ pageId: string }> }) {
@@ -134,7 +136,22 @@ export default function VisualEditorPage({ params }: { params: Promise<{ pageId:
       const res = await fetch(`/api/admin/pages/${pageId}`);
       if (res.ok) {
         const data = await res.json();
-        setPage(data.page);
+        const pageData = data.page;
+
+        // Auto-populate default blocks for pages that have none
+        if (pageData && (!pageData.blocks || pageData.blocks.length === 0)) {
+          const defaultBlocksMap: Record<string, PageBlock[]> = {
+            blog: [
+              { type: "blog-settings", content: getDefaultContent("blog-settings"), order: 0, active: true },
+            ],
+          };
+          const defaults = defaultBlocksMap[pageData.slug];
+          if (defaults) {
+            pageData.blocks = defaults;
+          }
+        }
+
+        setPage(pageData);
       } else {
         router.push("/admin/paginas");
       }
@@ -420,6 +437,21 @@ export default function VisualEditorPage({ params }: { params: Promise<{ pageId:
           buttonLink: "/contato",
           secondaryText: "Manutenção",
           secondaryLink: "/manutencao",
+        };
+      case "blog-settings":
+        return {
+          heroBadge: "Blog",
+          heroTitle: "Insights & Tendências",
+          heroDescription: "Descubra as últimas novidades em tecnologia, design e inovação para o mercado de beleza e bem-estar.",
+          hiddenCategories: [],
+          postOrder: "newest",
+          postsPerPage: 10,
+          showFeatured: true,
+          showCta: true,
+          ctaTitle: "Fique por dentro das novidades",
+          ctaDescription: "Receba insights exclusivos sobre tendências e inovações do mercado de beleza diretamente no seu e-mail.",
+          ctaEmailPlaceholder: "Seu melhor e-mail",
+          ctaButtonText: "Inscrever",
         };
       default:
         return {};

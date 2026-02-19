@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     const categorySlug = searchParams.get("category");
     const tagSlug = searchParams.get("tag");
     const limit = parseInt(searchParams.get("limit") || "20");
+    const order = searchParams.get("order") || "newest";
 
     const where: Record<string, unknown> = {
       published: true,
@@ -28,10 +29,15 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    const orderBy = order === "oldest" ? { publishedAt: "asc" as const }
+      : order === "views" ? { views: "desc" as const }
+      : order === "title" ? { title: "asc" as const }
+      : { publishedAt: "desc" as const };
+
     const [posts, categories, tags] = await Promise.all([
       prisma.blogPost.findMany({
         where,
-        orderBy: { publishedAt: "desc" },
+        orderBy,
         take: limit,
         include: {
           categories: { include: { category: true } },

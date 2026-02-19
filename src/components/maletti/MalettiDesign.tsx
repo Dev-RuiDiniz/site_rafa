@@ -23,7 +23,7 @@ export function MalettiDesign({ content = {} }: MalettiDesignProps) {
   const description = (content.description as string) || "A excelência em móveis para salão de beleza de luxo: Veja o autêntico design italiano em sua máxima performance. Assista e sinta por que o mobiliário de alto padrão Maletti é a escolha perfeita para transformar seu espaço.";
   const videoThumbnail = (content.videoThumbnail as string) || "/images/site/DK3E3179-MOD.jpg";
   const videoUrl = (content.videoUrl as string) || "https://www.youtube.com/embed/dQw4w9WgXcQ";
-  const products = (content.products as Array<{ name: string; image: string; description: string; slug?: string }>) || defaultProducts;
+  const products = (content.products as Array<{ name: string; image: string; description: string; slug?: string; link?: string }>) || defaultProducts;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [showVideo, setShowVideo] = useState(false);
@@ -98,9 +98,9 @@ export function MalettiDesign({ content = {} }: MalettiDesignProps) {
                 <p className="text-gray-600 text-sm mb-2">
                   {product.description}
                 </p>
-                {product.slug && (
+                {(product.link || product.slug) && (
                   <Link
-                    href={`/produtos/${product.slug}`}
+                    href={product.link || `/produtos/${product.slug}`}
                     className="inline-flex items-center text-sm font-medium text-black hover:text-gray-600 transition-colors group/link"
                   >
                     Saiba mais
