@@ -96,7 +96,13 @@ export function Footer() {
     <footer className="bg-black text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-6 lg:px-12 py-16 lg:py-20">
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${2 + linkGroups.length} gap-12 lg:gap-8`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-8 ${
+          linkGroups.length === 1 ? "lg:grid-cols-3" :
+          linkGroups.length === 2 ? "lg:grid-cols-4" :
+          linkGroups.length === 3 ? "lg:grid-cols-5" :
+          linkGroups.length === 4 ? "lg:grid-cols-6" :
+          "lg:grid-cols-5"
+        }`}>
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <motion.div
