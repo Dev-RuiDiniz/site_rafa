@@ -37,7 +37,7 @@ export default function RootLayout({
         {/* Google Site Verification - Maletti */}
         <meta name="google-site-verification" content="SkrI3t5Q5vQ_OvnnTNksc-gx1nKisw0Gq0oANsuLvM0" />
         {/* Google Site Verification - SHR */}
-        <meta name="google-site-verification" content="112RyTUhJGRP8qhuDD0pqF3oBZZ67udUZofNOu3qQP4" />
+        <meta name="google-site-verification" content="11zRyTUhJGRP8qhuDDOpqF3oBZZ67udUZofNOu3qQP4" />
         {/* Preconnect para recursos externos */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
