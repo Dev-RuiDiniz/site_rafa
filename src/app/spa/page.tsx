@@ -694,7 +694,7 @@ export default function SpaPage() {
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 >
                   <Link
-                    href={`https://shrhair.com.br/produtos/${product.slug}`}
+                    href={(product as Record<string, string>).link || `/produtos/${product.slug}`}
                     className="block group"
                   >
                     <div className="relative aspect-square mb-3 overflow-hidden rounded-sm bg-white shadow-md">
@@ -711,6 +711,9 @@ export default function SpaPage() {
                     <h4 className="text-stone-800 text-sm font-medium group-hover:text-stone-600 transition-colors">
                       {product.name}
                     </h4>
+                    <span className="text-xs text-stone-400 group-hover:text-black transition-colors mt-1 inline-block">
+                      Saiba mais →
+                    </span>
                   </Link>
                 </motion.div>
               ))}

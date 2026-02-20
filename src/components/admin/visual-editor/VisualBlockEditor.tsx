@@ -2767,7 +2767,7 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
     </div>
   );
 
-  const relatedProducts = (content.relatedProducts as Array<{ name: string; image: string; slug: string; category: string }>) || [];
+  const relatedProducts = (content.relatedProducts as Array<{ name: string; image: string; slug: string; category: string; link?: string }>) || [];
 
   const sections = [
     { id: "hero", label: "Hero" },
@@ -2933,9 +2933,10 @@ function LPSpaContentEditor({ content, onChange }: { content: Record<string, unk
               <ImageUploadField label="Imagem" value={p.image} fieldKey={`related-${i}`} arrayField="relatedProducts" arrayIndex={i} arrayImageKey="image" />
               <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Slug (ex: heaven)" value={p.slug} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], slug: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
               <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Categoria (ex: Macas)" value={p.category} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], category: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link direto (ex: /produtos/heaven) — prioridade sobre slug" value={(p as Record<string, string>).link || ""} onChange={(e) => { const np = [...relatedProducts]; np[i] = { ...np[i], link: e.target.value }; onChange({ ...content, relatedProducts: np }); }} onClick={(e) => e.stopPropagation()} />
             </div>
           ))}
-          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, relatedProducts: [...relatedProducts, { name: "", image: "", slug: "", category: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, relatedProducts: [...relatedProducts, { name: "", image: "", slug: "", category: "", link: "" }] }); }} className="w-full py-2 border border-dashed rounded text-sm text-gray-500">+ Adicionar Produto</button>
         </div>
       )}
 
