@@ -418,7 +418,7 @@ export default function SpaPage() {
   const sensorTechnologies = pageData.sensorTechnologies || defaultSensorTechnologies;
   const rituals = pageData.rituals || defaultRituals;
   const hotelShowcase = pageData.hotelShowcase || defaultHotelShowcase;
-  const relatedProducts = (pageData.relatedProducts as typeof defaultRelatedProducts) || defaultRelatedProducts;
+  const editorRelatedProducts = (pageData.relatedProducts as typeof defaultRelatedProducts) || [];
   
   // businessBenefits precisa manter os ícones React, então merge com defaults
   const benefitIcons = [TbBuildingSkyscraper, TbTrendingUp, TbShieldCheck];
@@ -686,7 +686,7 @@ export default function SpaPage() {
               Produtos Relacionados
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {(apiProducts.length > 0 ? apiProducts : relatedProducts).map((product, index) => (
+              {(editorRelatedProducts.length > 0 ? editorRelatedProducts : apiProducts.length > 0 ? apiProducts : defaultRelatedProducts).map((product, index) => (
                 <motion.div
                   key={product.slug || product.name}
                   initial={{ opacity: 0, y: 20 }}
@@ -706,7 +706,7 @@ export default function SpaPage() {
                       />
                     </div>
                     <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
-                      {(product as Product).category?.name || (product as typeof relatedProducts[0]).category || "Produto"}
+                      {(product as Product).category?.name || (product as typeof defaultRelatedProducts[0]).category || "Produto"}
                     </span>
                     <h4 className="text-stone-800 text-sm font-medium group-hover:text-stone-600 transition-colors">
                       {product.name}
