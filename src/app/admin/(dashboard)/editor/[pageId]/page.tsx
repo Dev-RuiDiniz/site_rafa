@@ -144,6 +144,9 @@ export default function VisualEditorPage({ params }: { params: Promise<{ pageId:
             blog: [
               { type: "blog-settings", content: getDefaultContent("blog-settings"), order: 0, active: true },
             ],
+            "404": [
+              { type: "lp-404-content", content: getDefaultContent("lp-404-content"), order: 0, active: true },
+            ],
           };
           const defaults = defaultBlocksMap[pageData.slug];
           if (defaults) {
@@ -452,6 +455,25 @@ export default function VisualEditorPage({ params }: { params: Promise<{ pageId:
           ctaDescription: "Receba insights exclusivos sobre tendências e inovações do mercado de beleza diretamente no seu e-mail.",
           ctaEmailPlaceholder: "Seu melhor e-mail",
           ctaButtonText: "Inscrever",
+        };
+      case "lp-404-content":
+        return {
+          badge: "Página não encontrada",
+          title: "Ops! Esta página não existe.",
+          description: "A página que você está procurando pode ter sido removida, renomeada ou nunca existiu.",
+          buttons: [
+            { text: "Voltar para a Home", link: "/", style: "primary" },
+            { text: "Ver Produtos", link: "/produtos", style: "outline" },
+          ],
+          quickLinksTitle: "Ou acesse diretamente:",
+          quickLinks: [
+            { label: "Produtos", href: "/produtos" },
+            { label: "Marcas", href: "/marcas" },
+            { label: "Sobre", href: "/sobre" },
+            { label: "Blog", href: "/blog" },
+            { label: "Contato", href: "/contato" },
+          ],
+          footerText: "",
         };
       default:
         return {};

@@ -111,6 +111,8 @@ export function VisualBlockEditor({ type, content, onChange }: VisualBlockEditor
       return <GarantiaCTAEditor content={content} onChange={onChange} />;
     case "blog-settings":
       return <BlogSettingsEditor content={content} onChange={onChange} />;
+    case "lp-404-content":
+      return <LP404ContentEditor content={content} onChange={onChange} />;
     default:
       return <div className="text-gray-500 text-sm">Editor não disponível</div>;
   }
@@ -3284,6 +3286,100 @@ function BlogSettingsEditor({ content, onChange }: { content: Record<string, unk
           <TextareaField label="Descrição" value={(content.ctaDescription as string) || ""} onChange={(v) => onChange({ ...content, ctaDescription: v })} rows={2} placeholder="Receba insights exclusivos..." />
           <InputField label="Placeholder do Email" value={(content.ctaEmailPlaceholder as string) || ""} onChange={(v) => onChange({ ...content, ctaEmailPlaceholder: v })} placeholder="Seu melhor e-mail" />
           <InputField label="Texto do Botão" value={(content.ctaButtonText as string) || ""} onChange={(v) => onChange({ ...content, ctaButtonText: v })} placeholder="Inscrever" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== 404 PAGE EDITOR ====================
+
+function LP404ContentEditor({ content, onChange }: { content: Record<string, unknown>; onChange: (c: Record<string, unknown>) => void }) {
+  const [activeSection, setActiveSection] = useState("textos");
+
+  const sections = [
+    { id: "textos", label: "Textos" },
+    { id: "botoes", label: "Botões" },
+    { id: "links", label: "Links Rápidos" },
+    { id: "footer", label: "Footer" },
+  ];
+
+  const buttons = (content.buttons as Array<{ text: string; link: string; style: string }>) || [
+    { text: "Voltar para a Home", link: "/", style: "primary" },
+    { text: "Ver Produtos", link: "/produtos", style: "outline" },
+  ];
+
+  const quickLinks = (content.quickLinks as Array<{ label: string; href: string }>) || [
+    { label: "Produtos", href: "/produtos" },
+    { label: "Marcas", href: "/marcas" },
+    { label: "Sobre", href: "/sobre" },
+    { label: "Blog", href: "/blog" },
+    { label: "Contato", href: "/contato" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-1.5">
+        {sections.map((s) => (
+          <button key={s.id} onClick={(e) => { e.stopPropagation(); setActiveSection(s.id); }}
+            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${activeSection === s.id ? "bg-black text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {activeSection === "textos" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Textos da Página 404</h4>
+          <InputField label="Badge" value={(content.badge as string) || ""} onChange={(v) => onChange({ ...content, badge: v })} placeholder="Página não encontrada" />
+          <InputField label="Título" value={(content.title as string) || ""} onChange={(v) => onChange({ ...content, title: v })} placeholder="Ops! Esta página não existe." />
+          <TextareaField label="Descrição" value={(content.description as string) || ""} onChange={(v) => onChange({ ...content, description: v })} rows={2} placeholder="A página que você está procurando pode ter sido removida..." />
+        </div>
+      )}
+
+      {activeSection === "botoes" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Botões de Ação</h4>
+          {buttons.map((btn, i) => (
+            <div key={i} className="p-2 border rounded bg-gray-50 space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-medium">Botão {i + 1}</span>
+                {buttons.length > 1 && (
+                  <button onClick={(e) => { e.stopPropagation(); const nb = [...buttons]; nb.splice(i, 1); onChange({ ...content, buttons: nb }); }} className="text-red-500 text-xs">Remover</button>
+                )}
+              </div>
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Texto" value={btn.text} onChange={(e) => { const nb = [...buttons]; nb[i] = { ...nb[i], text: e.target.value }; onChange({ ...content, buttons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="w-full px-2 py-1 text-sm border rounded" placeholder="Link (ex: /produtos)" value={btn.link} onChange={(e) => { const nb = [...buttons]; nb[i] = { ...nb[i], link: e.target.value }; onChange({ ...content, buttons: nb }); }} onClick={(e) => e.stopPropagation()} />
+              <select className="w-full px-2 py-1 text-sm border rounded" value={btn.style} onChange={(e) => { const nb = [...buttons]; nb[i] = { ...nb[i], style: e.target.value }; onChange({ ...content, buttons: nb }); }} onClick={(e) => e.stopPropagation()}>
+                <option value="primary">Primário (preto)</option>
+                <option value="outline">Outline (borda)</option>
+              </select>
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, buttons: [...buttons, { text: "", link: "", style: "primary" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Botão</button>
+        </div>
+      )}
+
+      {activeSection === "links" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Links Rápidos</h4>
+          <p className="text-xs text-gray-500">Links exibidos na parte inferior da página 404.</p>
+          <InputField label="Texto acima dos links" value={(content.quickLinksTitle as string) || ""} onChange={(v) => onChange({ ...content, quickLinksTitle: v })} placeholder="Ou acesse diretamente:" />
+          {quickLinks.map((link, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <input className="flex-1 px-2 py-1 text-sm border rounded" placeholder="Label" value={link.label} onChange={(e) => { const nl = [...quickLinks]; nl[i] = { ...nl[i], label: e.target.value }; onChange({ ...content, quickLinks: nl }); }} onClick={(e) => e.stopPropagation()} />
+              <input className="flex-1 px-2 py-1 text-sm border rounded" placeholder="/link" value={link.href} onChange={(e) => { const nl = [...quickLinks]; nl[i] = { ...nl[i], href: e.target.value }; onChange({ ...content, quickLinks: nl }); }} onClick={(e) => e.stopPropagation()} />
+              <button onClick={(e) => { e.stopPropagation(); const nl = [...quickLinks]; nl.splice(i, 1); onChange({ ...content, quickLinks: nl }); }} className="text-red-500 text-xs shrink-0">✕</button>
+            </div>
+          ))}
+          <button onClick={(e) => { e.stopPropagation(); onChange({ ...content, quickLinks: [...quickLinks, { label: "", href: "/" }] }); }} className="w-full py-1.5 border border-dashed rounded text-xs text-gray-500">+ Adicionar Link</button>
+        </div>
+      )}
+
+      {activeSection === "footer" && (
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">Footer</h4>
+          <InputField label="Texto do Footer" value={(content.footerText as string) || ""} onChange={(v) => onChange({ ...content, footerText: v })} placeholder="© 2026 SHR — Distribuidor Exclusivo Maletti no Brasil" />
         </div>
       )}
     </div>
