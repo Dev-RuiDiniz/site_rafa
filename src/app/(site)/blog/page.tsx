@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
@@ -49,11 +50,13 @@ interface BlogSettings {
   ctaButtonText?: string;
 }
 
-export default function BlogPage() {
+function BlogContent() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const categoriaParam = searchParams.get("categoria");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoriaParam);
   const [settings, setSettings] = useState<BlogSettings>({});
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -65,6 +68,11 @@ export default function BlogPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Sync categoria from URL
+  useEffect(() => {
+    setSelectedCategory(categoriaParam);
+  }, [categoriaParam]);
 
   const fetchData = async () => {
     try {
@@ -102,7 +110,7 @@ export default function BlogPage() {
 
   const filteredPosts = selectedCategory
     ? posts.filter((post) =>
-        post.categories.some((c) => c.category.id === selectedCategory)
+        post.categories.some((c) => c.category.slug === selectedCategory)
       )
     : posts;
 
@@ -155,9 +163,9 @@ export default function BlogPage() {
               {visibleCategories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => setSelectedCategory(category.slug)}
                   className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedCategory === category.id
+                    selectedCategory === category.slug
                       ? "bg-black text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
@@ -366,5 +374,23 @@ export default function BlogPage() {
         </section>
       )}
     </>
+  );
+}
+
+export default function BlogPage() {
+  return (
+    <Suspense fallback={
+      <div className="pt-32 pb-16 bg-white min-h-screen">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
+            <div className="h-12 bg-gray-200 rounded w-2/3 mb-6" />
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+          </div>
+        </div>
+      </div>
+    }>
+      <BlogContent />
+    </Suspense>
   );
 }

@@ -6,6 +6,14 @@ export async function GET() {
     const categories = await prisma.category.findMany({
       where: { active: true },
       orderBy: { order: "asc" },
+      include: {
+        _count: { select: { products: true, productCategories: true } },
+        children: {
+          where: { active: true },
+          orderBy: { order: "asc" },
+          select: { id: true, name: true, slug: true, image: true },
+        },
+      },
     });
 
     return NextResponse.json({ categories });
