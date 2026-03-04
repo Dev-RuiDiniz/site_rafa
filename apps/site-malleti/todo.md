@@ -1,0 +1,14 @@
+- aumentar a logo do header
+- retirar o Distribuidor exclusivo do Brasil do banner
+- na seção COLEÇÃO, diminuir a fonte da frase Produtos em Destaque
+- diminuir os quadros dos produtos de todo o site e deixar quadrado.
+- na seção Suporte técnico da home, reirar "Departamento de"
+- na página de Manutenção, troca a foto (enviaremos) ✅ FEITO - manutencao.webp
+- em Manutenção, trocar o telefone para 11 94537-0735
+- Nos produtos, deixar a estrutura de descrições similar ao site da maletti (teremos que colocar textos)
+- trocar as imagens da página nosssas marcas (enviaremos)
+- trocar imagem do banner da página nossas marcas (logo da shr)
+- aumentar o botão do whatsapp do site todo
+- no rodapé, alterar a frase "somos o unico exclusivo distribuidor da maletti" por somos representantes exclusivos
+- na pa´gina sobre nós, colocar o quadrado 10+ e 500+ no outro lado da foto
+- os links do header e do menu não estão funcionando (catálogo e falar com conusltor)
